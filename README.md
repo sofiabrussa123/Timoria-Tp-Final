@@ -1,33 +1,36 @@
-# Timoria
+Nombre del Proyecto: Timōría
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+Integrantes del Grupo:
+Sofía Brussa
+Enzo Stigliano
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+Descripción:
+Timōría es un videojuego de plataformas 2D con fuerte carga narrativa, ambientado en el inframundo griego. Los jugadores encarnan almas en busca de redención, enfrentando desafíos cooperativos y competitivos a través de niveles simbólicos inspirados en emociones humanas. A lo largo del camino, deben resolver acertijos, combatir enemigos mitológicos y recolectar dracmas para progresar en habilidades, narrativa y equipamiento.
 
-## Platforms
+Tecnologías Utilizadas:
+Lenguajes: Java, Groovy
+Motor: LibGDX
+Extensiones: Box2D, Box2DLights, FreeType, VisUI, AI, WebSocket, makeSomeNoise
+Plataformas Objetivo: Escritorio (Windows/Linux/macOS)
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+Requisitos: Tener instalado JDK 8 o superior, tener instalado git, y tener una cuenta de github.
 
-## Gradle
+Cómo Compilar y Ejecutar:
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+1. Descargar Git
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+1. Clonar el repositorio:
+Abrir una consola de comandos (buscar "Símbolo de sistema" en el buscador) y poner:
+git clone https://github.com/tu-usuario/timoria.git
+cd timoria
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+2. Ejecutar:
+Para Linux y macOS poner
+chmod +x gradlew
+./gradlew desktop:run
+
+Para Windows:
+gradlew.bat desktop:run
+
+Estado Actual del Proyecto:
+Configuración inicial y estructura del proyecto.
