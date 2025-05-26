@@ -17,20 +17,33 @@ Requisitos: Tener instalado JDK 8 o superior, tener instalado git, y tener una c
 
 Cómo Compilar y Ejecutar:
 
-1. Descargar Git
+1. Asegurate de tener Eclipse IDE for Java Developers y el plugin Buildship: Gradle Integration instalado.
 
-1. Clonar el repositorio:
-Abrir una consola de comandos (buscar "Símbolo de sistema" en el buscador) y poner:
-git clone https://github.com/tu-usuario/timoria.git
-cd timoria
+2. Abrí Eclipse, luego:
 
-2. Ejecutar:
-Para Linux y macOS poner
-chmod +x gradlew
-./gradlew desktop:run
+  Ir a File > Import...
 
-Para Windows:
-gradlew.bat desktop:run
+  Elegí Gradle > Existing Gradle Project
+
+  Seleccioná la carpeta raíz del juego
+
+  Terminá los pasos que te diga el asistente.
+
+3. Esperá a que Eclipse sincronice el proyecto y descargue las dependencias.
+
+4. En el módulo desktop, buscá la clase: com.timoria.game.desktop.Lwjgl3Launcher
+
+5. Hacé clic derecho sobre Lwjgl3Launcher.java > Run As > Java Application
+
+6. (Opcional) Si el juego no carga correctamente, verificá la siguiente configuración:
+
+  Hacé clic derecho en la clase > Run Configurations...
+
+  En la pestaña Arguments, sección Working Directory, seleccioná:
+
+  Other > Browse Workspace... > Elegí la carpeta assets dentro del módulo core.
+
+
 
 Estado Actual del Proyecto:
 Configuración inicial y estructura del proyecto.
