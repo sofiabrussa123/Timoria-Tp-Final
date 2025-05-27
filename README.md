@@ -1,49 +1,40 @@
-Nombre del Proyecto: Timōría
+# Nombre del Proyecto: Timōría
 
-Integrantes del Grupo:
-Sofía Brussa
-Enzo Stigliano
+## Integrantes del Grupo
+- Sofía Brussa  
+- Enzo Stigliano
 
-Descripción:
-Timōría es un videojuego de plataformas 2D con fuerte carga narrativa, ambientado en el inframundo griego. Los jugadores encarnan almas en busca de redención, enfrentando desafíos cooperativos y competitivos a través de niveles simbólicos inspirados en emociones humanas. A lo largo del camino, deben resolver acertijos, combatir enemigos mitológicos y recolectar dracmas para progresar en habilidades, narrativa y equipamiento.
+## Descripción
+**Timōría** es un videojuego de plataformas 2D con fuerte carga narrativa, ambientado en el inframundo griego.  
+Los jugadores encarnan almas en busca de redención, enfrentando desafíos cooperativos y competitivos a través de niveles simbólicos inspirados en emociones humanas. A lo largo del camino, deben resolver acertijos, combatir enemigos mitológicos y recolectar dracmas para progresar en habilidades, narrativa y equipamiento.
 
-Tecnologías Utilizadas:
-Lenguajes: Java, Groovy
-Motor: LibGDX
-Extensiones: Box2D, Box2DLights, FreeType, VisUI, AI, WebSocket, makeSomeNoise
-Plataformas Objetivo: Escritorio (Windows/Linux/macOS)
+## Tecnologías Utilizadas
+- **Lenguajes**: Java, Groovy  
+- **Motor**: LibGDX  
+- **Extensiones**: Box2D, Box2DLights, FreeType, VisUI, AI, WebSocket, makeSomeNoise  
+- **Plataformas Objetivo**: Escritorio (Windows/Linux/macOS)
 
-Requisitos: Tener instalado JDK 8 o superior, tener instalado git, y tener una cuenta de github.
+## Requisitos
+- Tener instalado **JDK 8 o superior**  
+- Tener instalado **git**  
+- Tener una cuenta de **GitHub**
 
-Cómo Compilar y Ejecutar:
+## Cómo Compilar y Ejecutar
 
-1. Asegurate de tener Eclipse IDE for Java Developers y el plugin Buildship: Gradle Integration instalado.
-
-2. Abrí Eclipse, luego:
-
-  Ir a File > Import...
-
-  Elegí Gradle > Existing Gradle Project
-
-  Seleccioná la carpeta raíz del juego
-
-  Terminá los pasos que te diga el asistente.
-
+1. Asegurate de tener **Eclipse IDE for Java Developers** y el plugin **Buildship: Gradle Integration** instalado.
+2. Abrí Eclipse, luego:  
+   - Ir a `File > Import...`  
+   - Elegí `Gradle > Existing Gradle Project`  
+   - Seleccioná la carpeta raíz del juego  
+   - Terminá los pasos que te diga el asistente.
 3. Esperá a que Eclipse sincronice el proyecto y descargue las dependencias.
+4. En el módulo `desktop`, buscá la clase:  
+   `com.timoria.game.desktop.Lwjgl3Launcher`
+5. Hacé clic derecho sobre `Lwjgl3Launcher.java` > `Run As` > `Java Application`
+6. *(Opcional)* Si el juego no carga correctamente, verificá la siguiente configuración:  
+   - Hacé clic derecho en la clase > `Run Configurations...`  
+   - En la pestaña **Arguments**, sección **Working Directory**, seleccioná:  
+     `Other > Browse Workspace... >` Elegí la carpeta `assets` dentro del módulo `core`.
 
-4. En el módulo desktop, buscá la clase: com.timoria.game.desktop.Lwjgl3Launcher
-
-5. Hacé clic derecho sobre Lwjgl3Launcher.java > Run As > Java Application
-
-6. (Opcional) Si el juego no carga correctamente, verificá la siguiente configuración:
-
-  Hacé clic derecho en la clase > Run Configurations...
-
-  En la pestaña Arguments, sección Working Directory, seleccioná:
-
-  Other > Browse Workspace... > Elegí la carpeta assets dentro del módulo core.
-
-
-
-Estado Actual del Proyecto:
+## Estado Actual del Proyecto
 Configuración inicial y estructura del proyecto.
