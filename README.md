@@ -9,7 +9,7 @@
 Los jugadores encarnan almas en busca de redención, enfrentando desafíos cooperativos y competitivos a través de niveles simbólicos inspirados en emociones humanas. A lo largo del camino, deben resolver acertijos, combatir enemigos mitológicos y recolectar dracmas para progresar en habilidades, narrativa y equipamiento.
 
 ## Tecnologías Utilizadas
-- **Lenguajes**: Java, Groovy  
+- **Lenguajes**: Java
 - **Motor**: LibGDX  
 - **Extensiones**: Box2D, Box2DLights, FreeType, VisUI, AI, WebSocket, makeSomeNoise  
 - **Plataformas Objetivo**: Escritorio (Windows/Linux/macOS)
