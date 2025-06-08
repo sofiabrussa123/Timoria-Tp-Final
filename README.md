@@ -19,19 +19,28 @@ Los jugadores encarnan almas en busca de redención, enfrentando desafíos coope
 - Tener instalado **git**  
 - Tener una cuenta de **GitHub**
 
-## Cómo Compilar y Ejecutar
+## Wiki del proyecto
+https://github.com/sofiabrussa123/Timoria-Tp-Final/wiki
+
+## Cómo Instalar, Compilar, y Ejecutar
 
 1. Asegurate de tener **Eclipse IDE for Java Developers** y el plugin **Buildship: Gradle Integration** instalado.
-2. Abrí Eclipse, luego:  
+
+2. Abra una consola de comandos:
+   - Si está en Windows, busque "cmd"; si está en MacOS o Linux busque "terminal"
+   - Escriba git clone https://github.com/sofiabrussa123/Timoria-Tp-Final
+   - Escriba cd Timoria-Tp-Final
+
+3. Abrí Eclipse, luego:  
    - Ir a `File > Import...`  
    - Elegí `Gradle > Existing Gradle Project`  
    - Seleccioná la carpeta raíz del juego  
    - Terminá los pasos que te diga el asistente.
-3. Esperá a que Eclipse sincronice el proyecto y descargue las dependencias.
-4. En el módulo `desktop`, buscá la clase:  
+4. Esperá a que Eclipse sincronice el proyecto y descargue las dependencias.
+5. En el módulo `desktop`, buscá la clase:  
    `com.timoria.game.desktop.Lwjgl3Launcher`
-5. Hacé clic derecho sobre `Lwjgl3Launcher.java` > `Run As` > `Java Application`
-6. *(Opcional)* Si el juego no carga correctamente, verificá la siguiente configuración:  
+6. Hacé clic derecho sobre `Lwjgl3Launcher.java` > `Run As` > `Java Application`
+7. *(Opcional)* Si el juego no carga correctamente, verificá la siguiente configuración:  
    - Hacé clic derecho en la clase > `Run Configurations...`  
    - En la pestaña **Arguments**, sección **Working Directory**, seleccioná:  
      `Other > Browse Workspace... >` Elegí la carpeta `assets` dentro del módulo `core`.
