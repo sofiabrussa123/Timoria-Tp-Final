@@ -13,7 +13,7 @@ import io.github.timoria.NivelBase;
 import movimientos.MovimientoBase;
 
 public class Personaje extends Actor {
-    
+
     private World mundo;
     private String nombre;
     private Animaciones animaciones = new Animaciones();
@@ -35,7 +35,7 @@ public class Personaje extends Actor {
     public Personaje(World mundo, String nombre, float anchoPantalla) {
         this.mundo = mundo;
         this.nombre = nombre;
-        this.animacionActual = animaciones.getIdleAnimation();
+        this.animacionActual = animaciones.getAnimacionQuieto();
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.DynamicBody;
@@ -44,12 +44,12 @@ public class Personaje extends Actor {
 
         this.cuerpo = mundo.createBody(defCuerpo);
 
-        TextureRegion primerFrame = animaciones.getIdleAnimation().getKeyFrame(0);
+        TextureRegion primerFrame = animaciones.getAnimacionQuieto().getKeyFrame(0);
         float anchoSprite = primerFrame.getRegionWidth();
         float altoSprite = primerFrame.getRegionHeight();
 
-        float anchoHitbox = anchoSprite * NivelBase.PIXELS_TO_METERS;
-        float altoHitbox = altoSprite * NivelBase.PIXELS_TO_METERS;
+        float anchoHitbox = anchoSprite * NivelBase.PIXELES_A_METROS;
+        float altoHitbox = altoSprite * NivelBase.PIXELES_A_METROS;
 
         PolygonShape forma = new PolygonShape();
         forma.setAsBox(anchoHitbox / 2, altoHitbox / 2);
@@ -76,8 +76,8 @@ public class Personaje extends Actor {
         float anchoFrame = frameActual.getRegionWidth();
         float altoFrame = frameActual.getRegionHeight();
 
-        float posXPx = cuerpo.getPosition().x / NivelBase.PIXELS_TO_METERS;
-        float posYPx = cuerpo.getPosition().y / NivelBase.PIXELS_TO_METERS;
+        float posXPx = cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS;
+        float posYPx = cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS;
 
         if (!mirandoDerecha) {
             frameActual.flip(true, false);
@@ -108,21 +108,21 @@ public class Personaje extends Actor {
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
                 velocidadX = -5f;
                 mirandoDerecha = false;
-                animacionActual = animaciones.getRunAnimation();
+                animacionActual = animaciones.getAnimacionCorrer();
             } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
                 velocidadX = 5f;
                 mirandoDerecha = true;
-                animacionActual = animaciones.getRunAnimation();
+                animacionActual = animaciones.getAnimacionCorrer();
             } else {
-                animacionActual = animaciones.getIdleAnimation();
+                animacionActual = animaciones.getAnimacionQuieto();
             }
 
             cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
         }
 
         setPosition(
-            (cuerpo.getPosition().x / NivelBase.PIXELS_TO_METERS) - getWidth() / 2,
-            (cuerpo.getPosition().y / NivelBase.PIXELS_TO_METERS) - getHeight() / 2
+            (cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS) - getWidth() / 2,
+            (cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS) - getHeight() / 2
         );
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.W) && !enElAire) {
