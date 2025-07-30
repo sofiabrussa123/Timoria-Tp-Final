@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class Menu extends EscenaBase {
 
     private Music musica;
+    private boolean musicaActiva = true;
 
     public Menu(Principal juego) {
         super(juego, "Fondo.jpeg");
@@ -37,7 +38,7 @@ public class Menu extends EscenaBase {
         // Crear el cartel "Menu"
         Label titulo = new Label("Timoria", fuenteTextos);
 
-        // Crear el botón "Jugar"
+        // Botón Jugar
         TextButton botonJugar = new TextButton("Jugar", fuenteTextos);
         botonJugar.addListener(new ClickListener() {
             @Override
@@ -48,10 +49,27 @@ public class Menu extends EscenaBase {
             }
         });
 
+        // Botón de Música (activar/desactivar)
+        TextButton botonMusica = new TextButton("Silenciar Música", fuenteTextos);
+        botonMusica.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                musicaActiva = !musicaActiva;
+                if (musicaActiva) {
+                    musica.play();
+                    botonMusica.setText("Silenciar Música");
+                } else {
+                    musica.pause();
+                    botonMusica.setText("Activar Música");
+                }
+            }
+        });
+
         // Agregar elementos a la tabla
         table.add(titulo).padBottom(30);
         table.row();
-        table.add(botonJugar).width(200).height(50);
+        table.add(botonJugar).width(200).height(50).padBottom(15);
+        table.row();
+        table.add(botonMusica).width(200).height(50);
     }
-
 }
