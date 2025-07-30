@@ -131,6 +131,11 @@ public abstract class EscenaBase implements Screen{
     }
 
     @Override
+    public void pause() {
+        // No es necesario implementar
+    }
+
+    @Override
     public void hide() {
         // No es necesario implementar
     }
