@@ -34,6 +34,7 @@ public class NivelBase extends EscenaBase {
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
 
         crearPiso();
+
     }
 
     @Override
