@@ -1,33 +1,49 @@
-# Timoria
+# Nombre del Proyecto: Timōría
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+## Integrantes del Grupo
+- Sofía Brussa  
+- Enzo Stigliano
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+## Descripción
+**Timōría** es un videojuego de plataformas 2D con fuerte carga narrativa, ambientado en el inframundo griego.  
+Los jugadores encarnan almas en busca de redención, enfrentando desafíos cooperativos y competitivos a través de niveles simbólicos inspirados en emociones humanas. A lo largo del camino, deben resolver acertijos, combatir enemigos mitológicos y recolectar dracmas para progresar en habilidades, narrativa y equipamiento.
 
-## Platforms
+## Tecnologías Utilizadas
+- **Lenguajes**: Java
+- **Motor**: LibGDX  
+- **Extensiones**: Box2D, Box2DLights, FreeType, VisUI, AI, WebSocket, makeSomeNoise  
+- **Plataformas Objetivo**: Escritorio (Windows/Linux/macOS)
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+## Requisitos
+- Tener instalado **JDK 8 o superior**  
+- Tener instalado **git**  
+- Tener una cuenta de **GitHub**
 
-## Gradle
+## Wiki del proyecto
+https://github.com/sofiabrussa123/Timoria-Tp-Final/wiki
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+## Cómo Instalar, Compilar, y Ejecutar
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+1. Asegurate de tener **Eclipse IDE for Java Developers** y el plugin **Buildship: Gradle Integration** instalado.
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+2. Abra una consola de comandos:
+   - Si está en Windows, busque "cmd"; si está en MacOS o Linux busque "terminal"
+   - Escriba git clone https://github.com/sofiabrussa123/Timoria-Tp-Final
+   - Escriba cd Timoria-Tp-Final
+
+3. Abrí Eclipse, luego:  
+   - Ir a `File > Import...`  
+   - Elegí `Gradle > Existing Gradle Project`  
+   - Seleccioná la carpeta raíz del juego  
+   - Terminá los pasos que te diga el asistente.
+4. Esperá a que Eclipse sincronice el proyecto y descargue las dependencias.
+5. En el módulo `desktop`, buscá la clase:  
+   `com.timoria.game.desktop.Lwjgl3Launcher`
+6. Hacé clic derecho sobre `Lwjgl3Launcher.java` > `Run As` > `Java Application`
+7. *(Opcional)* Si el juego no carga correctamente, verificá la siguiente configuración:  
+   - Hacé clic derecho en la clase > `Run Configurations...`  
+   - En la pestaña **Arguments**, sección **Working Directory**, seleccioná:  
+     `Other > Browse Workspace... >` Elegí la carpeta `assets` dentro del módulo `core`.
+
+## Estado Actual del Proyecto
+Configuración inicial y estructura del proyecto.
