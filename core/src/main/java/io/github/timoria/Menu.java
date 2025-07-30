@@ -2,6 +2,7 @@ package io.github.timoria;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,12 +16,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class Menu extends EscenaBase {
-    
-    public Menu(Principal juego) {
 
+    private Music musica;
+
+    public Menu(Principal juego) {
         super(juego, "Fondo.jpeg");
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
-        
+
+        // Música de fondo
+        musica = Gdx.audio.newMusic(Gdx.files.internal("musica_fondo.mp3"));
+        musica.setLooping(true);
+        musica.setVolume(0.5f);
+        musica.play();
+
         // Crear una tabla para organizar los elementos
         Table table = new Table();
         table.setFillParent(true);
@@ -34,7 +42,8 @@ public class Menu extends EscenaBase {
         botonJugar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Aquí podrías cambiar de pantalla o iniciar el juego
+                musica.stop();
+                musica.dispose();
                 juego.setScreen(new Nivel1(juego, fuenteTextos));
             }
         });
