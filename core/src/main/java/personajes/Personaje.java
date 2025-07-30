@@ -1,7 +1,5 @@
 package personajes;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -31,6 +29,10 @@ public class Personaje extends Actor {
     private final float gravedad = 800;
     private final float impulsoSalto = 200;
     private final float pisoY = 100;
+    
+    private boolean moverIzquierda = false;
+    private boolean moverDerecha = false;
+    private boolean saltar = false;
 
     public Personaje(World mundo, String nombre, float anchoPantalla) {
         this.mundo = mundo;
@@ -105,11 +107,11 @@ public class Personaje extends Actor {
         if (movimientoActual == null || movimientoActual.estaCompletado()) {
             float velocidadX = 0;
 
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            if (moverIzquierda) {
                 velocidadX = -5f;
                 mirandoDerecha = false;
                 animacionActual = animaciones.getAnimacionCorrer();
-            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            } else if (moverDerecha) {
                 velocidadX = 5f;
                 mirandoDerecha = true;
                 animacionActual = animaciones.getAnimacionCorrer();
@@ -125,9 +127,10 @@ public class Personaje extends Actor {
             (cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS) - getHeight() / 2
         );
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W) && !enElAire) {
-            cuerpo.setLinearVelocity(cuerpo.getLinearVelocity().x, 10f); // salto
+        if (saltar && !enElAire) {
+            cuerpo.setLinearVelocity(cuerpo.getLinearVelocity().x, 10f);
             enElAire = true;
+            saltar = false;
         }
 
         if (enElAire) {
@@ -154,5 +157,17 @@ public class Personaje extends Actor {
 
     public boolean estaMirandoDerecha() {
         return mirandoDerecha;
+    }
+    
+    public void setMoverIzquierda(boolean moverIzquierda) {
+        this.moverIzquierda = moverIzquierda;
+    }
+
+    public void setMoverDerecha(boolean moverDerecha) {
+        this.moverDerecha = moverDerecha;
+    }
+
+    public void setSaltar(boolean saltar) {
+        this.saltar = saltar;
     }
 }
