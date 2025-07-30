@@ -1,0 +1,158 @@
+package personajes;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+
+import io.github.timoria.NivelBase;
+import movimientos.MovimientoBase;
+
+public class Personaje extends Actor {
+    
+    private World mundo;
+    private String nombre;
+    private Animaciones animaciones = new Animaciones();
+    private MovimientoBase movimientoActual;
+
+    private Body cuerpo;
+    private boolean mirandoDerecha = true;
+
+    private Animation<TextureRegion> animacionActual;
+    private float tiempoEstado = 0;
+
+    private float velocidadSaltoY = 0;
+    private boolean enElAire = false;
+
+    private final float gravedad = 800;
+    private final float impulsoSalto = 200;
+    private final float pisoY = 100;
+
+    public Personaje(World mundo, String nombre, float anchoPantalla) {
+        this.mundo = mundo;
+        this.nombre = nombre;
+        this.animacionActual = animaciones.getIdleAnimation();
+
+        BodyDef defCuerpo = new BodyDef();
+        defCuerpo.type = BodyDef.BodyType.DynamicBody;
+        defCuerpo.position.set(anchoPantalla / 2, 5);
+        defCuerpo.fixedRotation = true;
+
+        this.cuerpo = mundo.createBody(defCuerpo);
+
+        TextureRegion primerFrame = animaciones.getIdleAnimation().getKeyFrame(0);
+        float anchoSprite = primerFrame.getRegionWidth();
+        float altoSprite = primerFrame.getRegionHeight();
+
+        float anchoHitbox = anchoSprite * NivelBase.PIXELS_TO_METERS;
+        float altoHitbox = altoSprite * NivelBase.PIXELS_TO_METERS;
+
+        PolygonShape forma = new PolygonShape();
+        forma.setAsBox(anchoHitbox / 2, altoHitbox / 2);
+
+        FixtureDef defFixture = new FixtureDef();
+        defFixture.shape = forma;
+        defFixture.density = 1.0f;
+        defFixture.friction = 0.4f;
+        defFixture.restitution = 0.1f;
+
+        cuerpo.createFixture(defFixture);
+        forma.dispose();
+
+        setSize(anchoSprite, altoSprite);
+        cuerpo.setUserData(this);
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        TextureRegion frameActual = animacionActual.getKeyFrame(tiempoEstado, true);
+        Color color = getColor();
+        batch.setColor(color);
+
+        float anchoFrame = frameActual.getRegionWidth();
+        float altoFrame = frameActual.getRegionHeight();
+
+        float posXPx = cuerpo.getPosition().x / NivelBase.PIXELS_TO_METERS;
+        float posYPx = cuerpo.getPosition().y / NivelBase.PIXELS_TO_METERS;
+
+        if (!mirandoDerecha) {
+            frameActual.flip(true, false);
+        }
+
+        batch.draw(
+            frameActual,
+            posXPx - anchoFrame / 2,
+            posYPx - altoFrame / 2,
+            anchoFrame,
+            altoFrame
+        );
+
+        if (!mirandoDerecha) {
+            frameActual.flip(true, false);
+        }
+
+        batch.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void act(float delta) {
+        tiempoEstado += delta;
+
+        if (movimientoActual == null || movimientoActual.estaCompletado()) {
+            float velocidadX = 0;
+
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                velocidadX = -5f;
+                mirandoDerecha = false;
+                animacionActual = animaciones.getRunAnimation();
+            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                velocidadX = 5f;
+                mirandoDerecha = true;
+                animacionActual = animaciones.getRunAnimation();
+            } else {
+                animacionActual = animaciones.getIdleAnimation();
+            }
+
+            cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
+        }
+
+        setPosition(
+            (cuerpo.getPosition().x / NivelBase.PIXELS_TO_METERS) - getWidth() / 2,
+            (cuerpo.getPosition().y / NivelBase.PIXELS_TO_METERS) - getHeight() / 2
+        );
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W) && !enElAire) {
+            cuerpo.setLinearVelocity(cuerpo.getLinearVelocity().x, 10f); // salto
+            enElAire = true;
+        }
+
+        if (enElAire) {
+            velocidadSaltoY += gravedad * delta;
+            float nuevaY = getY() - velocidadSaltoY * delta;
+
+            if (nuevaY <= pisoY) {
+                nuevaY = pisoY;
+                velocidadSaltoY = 0;
+                enElAire = false;
+            }
+
+            setY(nuevaY);
+        }
+    }
+
+    public Body getCuerpo() {
+        return cuerpo;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public boolean estaMirandoDerecha() {
+        return mirandoDerecha;
+    }
+}
