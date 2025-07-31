@@ -1,10 +1,29 @@
 package io.github.timoria;
 
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import menus.Menu;
+import menus.PantallaGanaste;
+import personajes.Enemigo;
+import personajes.Personaje;
 
 public class NivelBase extends EscenaBase {
 
@@ -20,6 +39,10 @@ public class NivelBase extends EscenaBase {
     protected float anchoViewport;
     protected float altoViewport;
     protected Body cuerpoPiso;
+    protected boolean juegoPausado = false;
+    protected Stage escenaPausa;
+    protected Skin skinPausa;
+
 
     public NivelBase(Principal juego, String fondo) {
         super(juego, fondo);
@@ -32,18 +55,81 @@ public class NivelBase extends EscenaBase {
 
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
+        
+        mundo.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Object a = contact.getFixtureA().getBody().getUserData();
+                Object b = contact.getFixtureB().getBody().getUserData();
 
-        crearPiso();
+                if ((a instanceof personajes.Personaje && b instanceof entorno.PuertaLlegada) ||
+                    (b instanceof personajes.Personaje && a instanceof entorno.PuertaLlegada)) {
+                    juego.setScreen(new PantallaGanaste(juego));
+                }
 
+                if ((a instanceof Personaje && b instanceof Enemigo) || (b instanceof Personaje && a instanceof Enemigo)) {
+                    Personaje jugador = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
+                    Enemigo enemigo = (a instanceof Enemigo) ? (Enemigo) a : (Enemigo) b;
+
+                    enemigo.aplicarDañoJugador(jugador);
+                }
+            }
+
+            @Override public void endContact(Contact contact) {}
+            @Override public void preSolve(Contact contact, Manifold oldManifold) {}
+            @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
+        });
+
+        crearMenuPausa();
     }
+    
+    private void crearMenuPausa() {
+        skinPausa = new Skin(Gdx.files.internal("uiskin.json"));
+        escenaPausa = new Stage(new ScreenViewport());
+
+        TextButton btnSeguir = new TextButton("Seguir", skinPausa);
+        TextButton btnMenu = new TextButton("Menú", skinPausa);
+
+        btnSeguir.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                juegoPausado = false;
+                Gdx.input.setInputProcessor(crearMultiplexer());
+            }
+        });
+
+        btnMenu.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                juego.setScreen(new Menu(juego));
+            }
+        });
+
+        Table tabla = new Table();
+        tabla.setFillParent(true);
+        tabla.center();
+        tabla.add(btnSeguir).pad(10);
+        tabla.row();
+        tabla.add(btnMenu).pad(10);
+
+        escenaPausa.addActor(tabla);
+    }
+
 
     @Override
     public void render(float delta) {
-        super.render(delta);
+    	if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+    	    juegoPausado = !juegoPausado;
+    	    Gdx.input.setInputProcessor(juegoPausado ? escenaPausa : crearMultiplexer());
+    	}
 
-        mundo.step(1 / 60f, 6, 2);
-
-        depuradorBox2D.render(mundo, escena.getCamera().combined.scl(1 / PIXELES_A_METROS));
+    	if (juegoPausado) {
+    	    escenaPausa.act(delta);
+    	    escenaPausa.draw();
+    	} else {
+    	    super.render(delta); // ← solo se actualiza escena si no está pausado
+    	    mundo.step(1 / 60f, 6, 2);
+    	    depuradorBox2D.render(mundo, escena.getCamera().combined.scl(1 / PIXELES_A_METROS));
+    	}
     }
 
     @Override
@@ -57,36 +143,11 @@ public class NivelBase extends EscenaBase {
         );
 
         camaraBox2D.update();
-        crearPiso();
     }
-
-    private void crearPiso() {
-        if (cuerpoPiso != null) {
-            mundo.destroyBody(cuerpoPiso);
-        }
-
-        BodyDef definicionCuerpo = new BodyDef();
-        definicionCuerpo.type = BodyDef.BodyType.StaticBody;
-        definicionCuerpo.position.set(anchoViewport / 2, 0.5f);
-
-        cuerpoPiso = mundo.createBody(definicionCuerpo);
-
-        PolygonShape forma = new PolygonShape();
-        forma.setAsBox(anchoViewport / 2, 0.5f); // Mitad del ancho y alto
-
-        FixtureDef definicionFixture = new FixtureDef();
-        definicionFixture.shape = forma;
-        definicionFixture.density = 1.0f;
-
-        cuerpoPiso.createFixture(definicionFixture);
-        forma.dispose();
-
-        actualizarCamara();
-    }
-
-    private void actualizarCamara() {
-        camaraBox2D.setToOrtho(false, anchoViewport, altoViewport);
-        camaraBox2D.position.set(anchoViewport / 2, altoViewport / 2, 0);
-        camaraBox2D.update();
+    
+    @Override
+    public void dispose() {
+    	escenaPausa.dispose();
+    	skinPausa.dispose();
     }
 }
