@@ -1,4 +1,4 @@
-package io.github.timoria;
+package menus;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
