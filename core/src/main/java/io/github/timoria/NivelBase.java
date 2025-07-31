@@ -24,6 +24,7 @@ import menus.Menu;
 import menus.PantallaGanaste;
 import personajes.Enemigo;
 import personajes.Personaje;
+import entorno.PuertaLlegada
 
 public class NivelBase extends EscenaBase {
 
@@ -62,8 +63,8 @@ public class NivelBase extends EscenaBase {
                 Object a = contact.getFixtureA().getBody().getUserData();
                 Object b = contact.getFixtureB().getBody().getUserData();
 
-                if ((a instanceof personajes.Personaje && b instanceof entorno.PuertaLlegada) ||
-                    (b instanceof personajes.Personaje && a instanceof entorno.PuertaLlegada)) {
+                if ((a instanceof personajes.Personaje && b instanceof PuertaLlegada) ||
+                    (b instanceof personajes.Personaje && a instanceof PuertaLlegada)) {
                     juego.setScreen(new PantallaGanaste(juego));
                 }
 
