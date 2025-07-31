@@ -1,18 +1,24 @@
 package personajes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import io.github.timoria.BarraVida;
 import io.github.timoria.NivelBase;
 import movimientos.MovimientoBase;
 
 public class Personaje extends Actor {
 
-    private World mundo;
     private String nombre;
     private Animaciones animaciones = new Animaciones();
     private MovimientoBase movimientoActual;
@@ -27,21 +33,28 @@ public class Personaje extends Actor {
     private boolean enElAire = false;
 
     private final float gravedad = 800;
-    private final float impulsoSalto = 200;
     private final float pisoY = 100;
     
     private boolean moverIzquierda = false;
     private boolean moverDerecha = false;
     private boolean saltar = false;
+    private int vida = 100;
+    private int vidaMaxima = 100;
+    private BarraVida barraVida;
+    private Texture texturaBarraFondo;
+    private Texture texturaBarraVida;
 
-    public Personaje(World mundo, String nombre, float anchoPantalla) {
-        this.mundo = mundo;
+    public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
         this.nombre = nombre;
         this.animacionActual = animaciones.getAnimacionQuieto();
+        this.barraVida = new BarraVida(this);
+
+        texturaBarraFondo = new Texture(Gdx.files.internal("barra_fondo.png"));
+        texturaBarraVida = new Texture(Gdx.files.internal("barra_vida.png"));
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.DynamicBody;
-        defCuerpo.position.set(anchoPantalla / 2, 5);
+        defCuerpo.position.set(coordenadaXAparicion * NivelBase.PIXELES_A_METROS, coordenadaYAparicion * NivelBase.PIXELES_A_METROS);
         defCuerpo.fixedRotation = true;
 
         this.cuerpo = mundo.createBody(defCuerpo);
@@ -50,8 +63,8 @@ public class Personaje extends Actor {
         float anchoSprite = primerFrame.getRegionWidth();
         float altoSprite = primerFrame.getRegionHeight();
 
-        float anchoHitbox = anchoSprite * NivelBase.PIXELES_A_METROS;
-        float altoHitbox = altoSprite * NivelBase.PIXELES_A_METROS;
+        float anchoHitbox = 50 * NivelBase.PIXELES_A_METROS;
+        float altoHitbox = 100 * NivelBase.PIXELES_A_METROS;
 
         PolygonShape forma = new PolygonShape();
         forma.setAsBox(anchoHitbox / 2, altoHitbox / 2);
@@ -98,6 +111,16 @@ public class Personaje extends Actor {
         }
 
         batch.setColor(Color.WHITE);
+        
+     // Posición de la barra (ejemplo: esquina superior izquierda)
+        float xBarra = getStage().getViewport().getScreenX() + 10;
+        float yBarra = getStage().getViewport().getScreenY() + getStage().getViewport().getScreenHeight() - 30;
+
+        batch.draw(texturaBarraFondo, xBarra, yBarra, 200, 20);
+
+        float porcentaje = (float) vida / vidaMaxima;
+        batch.draw(texturaBarraVida, xBarra, yBarra, 200 * porcentaje, 20);
+
     }
 
     @Override
@@ -145,6 +168,19 @@ public class Personaje extends Actor {
 
             setY(nuevaY);
         }
+    }
+    
+    public void recibirDaño(int cantidad) {
+        vida -= cantidad;
+        if (vida < 0) vida = 0;
+    }
+    
+    public int getVida() {
+        return vida;
+    }
+
+    public int getVidaMaxima() {
+        return vidaMaxima;
     }
 
     public Body getCuerpo() {
