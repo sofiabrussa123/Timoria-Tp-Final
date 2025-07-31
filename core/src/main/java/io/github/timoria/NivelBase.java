@@ -24,7 +24,7 @@ import menus.Menu;
 import menus.PantallaGanaste;
 import personajes.Enemigo;
 import personajes.Personaje;
-import entorno.PuertaLlegada
+import entorno.PuertaLlegada;
 
 public class NivelBase extends EscenaBase {
 
