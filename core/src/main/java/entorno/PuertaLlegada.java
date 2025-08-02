@@ -35,6 +35,17 @@ public class PuertaLlegada extends Actor {
         cuerpo.setUserData(this);
     }
 
+    private boolean estaBloqueada = true;
+
+    public boolean sePuedeCruzar() {
+        return !estaBloqueada;
+    }
+
+    public void desbloquear() {
+        estaBloqueada = false;
+    }
+
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(textura, getX(), getY(), getWidth(), getHeight());
