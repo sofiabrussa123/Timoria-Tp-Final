@@ -43,22 +43,22 @@ public class Menu extends EscenaBase {
             public void clicked(InputEvent event, float x, float y) {
                 musica.stop();
                 musica.dispose();
-                juego.setScreen(new Nivel1(juego, fuenteTextos));
+                juego.setScreen(new Nivel1(juego));
             }
         });
 
         // Botón de Música (activar/desactivar)
-        TextButton botonMusica = new TextButton("Silenciar Música", fuenteTextos);
-        botonMusica.addListener(new ClickListener() {
+        TextButton botonMusicaMenu = new TextButton("Silenciar Música", fuenteTextos);
+        botonMusicaMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 musicaActiva = !musicaActiva;
                 if (musicaActiva) {
                     musica.play();
-                    botonMusica.setText("Silenciar Música");
+                    botonMusicaMenu.setText("Silenciar Música");
                 } else {
                     musica.pause();
-                    botonMusica.setText("Activar Música");
+                    botonMusicaMenu.setText("Activar Música");
                 }
             }
         });
@@ -68,6 +68,6 @@ public class Menu extends EscenaBase {
         table.row();
         table.add(botonJugar).width(200).height(50).padBottom(15);
         table.row();
-        table.add(botonMusica).width(200).height(50);
+        table.add(botonMusicaMenu).width(200).height(50);
     }
 }
