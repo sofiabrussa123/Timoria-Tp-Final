@@ -1,6 +1,7 @@
 package personajes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -12,6 +13,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import io.github.timoria.Principal;
+import menus.PantallaDeMuerte;
 
 import io.github.timoria.BarraVida;
 import io.github.timoria.NivelBase;
@@ -34,7 +37,9 @@ public class Personaje extends Actor {
 
     private final float gravedad = 800;
     private final float pisoY = 100;
-    
+
+    private static final float desfaseVisual = 30f; // desplazamiento del sprite hacia arriba
+
     private boolean moverIzquierda = false;
     private boolean moverDerecha = false;
     private boolean saltar = false;
@@ -44,13 +49,25 @@ public class Personaje extends Actor {
     private Texture texturaBarraFondo;
     private Texture texturaBarraVida;
 
-    public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
+    private Sound sonidoDaño;
+    private boolean efectosActivos = true;
+    private long tiempoUltimoDaño = 0;
+    private boolean sonidoReproduciéndose = false;
+    private final long DURACION_SONIDO_DAÑO = 1000; // en milisegundos
+
+    private Principal principal;
+
+    public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, Principal principal) {
         this.nombre = nombre;
+        this.principal = principal;
         this.animacionActual = animaciones.getAnimacionQuieto();
         this.barraVida = new BarraVida(this);
 
+
         texturaBarraFondo = new Texture(Gdx.files.internal("barra_fondo.png"));
         texturaBarraVida = new Texture(Gdx.files.internal("barra_vida.png"));
+        sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));
+
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.DynamicBody;
@@ -63,8 +80,8 @@ public class Personaje extends Actor {
         float anchoSprite = primerFrame.getRegionWidth();
         float altoSprite = primerFrame.getRegionHeight();
 
-        float anchoHitbox = 50 * NivelBase.PIXELES_A_METROS;
-        float altoHitbox = 100 * NivelBase.PIXELES_A_METROS;
+        float anchoHitbox = 40 * NivelBase.PIXELES_A_METROS;
+        float altoHitbox = 70 * NivelBase.PIXELES_A_METROS;
 
         PolygonShape forma = new PolygonShape();
         forma.setAsBox(anchoHitbox / 2, altoHitbox / 2);
@@ -82,8 +99,10 @@ public class Personaje extends Actor {
         cuerpo.setUserData(this);
     }
 
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
+
         TextureRegion frameActual = animacionActual.getKeyFrame(tiempoEstado, true);
         Color color = getColor();
         batch.setColor(color);
@@ -101,17 +120,18 @@ public class Personaje extends Actor {
         batch.draw(
             frameActual,
             posXPx - anchoFrame / 2,
-            posYPx - altoFrame / 2,
+            posYPx - altoFrame / 2 + desfaseVisual,
             anchoFrame,
             altoFrame
         );
+
 
         if (!mirandoDerecha) {
             frameActual.flip(true, false);
         }
 
         batch.setColor(Color.WHITE);
-        
+
      // Posición de la barra (ejemplo: esquina superior izquierda)
         float xBarra = getStage().getViewport().getScreenX() + 10;
         float yBarra = getStage().getViewport().getScreenY() + getStage().getViewport().getScreenHeight() - 30;
@@ -125,6 +145,7 @@ public class Personaje extends Actor {
 
     @Override
     public void act(float delta) {
+
         tiempoEstado += delta;
 
         if (movimientoActual == null || movimientoActual.estaCompletado()) {
@@ -168,13 +189,53 @@ public class Personaje extends Actor {
 
             setY(nuevaY);
         }
+
+        float umbralMuerteY = -5f;
+
+        if (cuerpo.getPosition().y < umbralMuerteY) {
+            principal.setScreen(new PantallaDeMuerte(principal));
+        }
+
+        if (sonidoReproduciéndose) {
+            long ahora = System.currentTimeMillis();
+            if (ahora - tiempoUltimoDaño >= DURACION_SONIDO_DAÑO) {
+                sonidoDaño.stop();
+                sonidoReproduciéndose = false;
+            }
+        }
+
     }
-    
+
     public void recibirDaño(int cantidad) {
+        if (cantidad <= 0 || vida <= 0) return;
+
+        int vidaAnterior = vida;
         vida -= cantidad;
         if (vida < 0) vida = 0;
+
+        if (
+            vida < vidaAnterior &&
+                vida < vidaMaxima &&
+                vida > 0 &&
+                efectosActivos &&
+                sonidoDaño != null
+        ) {
+            tiempoUltimoDaño = System.currentTimeMillis();
+
+            if (!sonidoReproduciéndose) {
+                sonidoDaño.loop();
+                sonidoReproduciéndose = true;
+            }
+        }
+
+        if (vida == 0) {
+            sonidoDaño.stop(); // asegúrate de cortarlo al morir
+            sonidoReproduciéndose = false;
+            principal.setScreen(new PantallaDeMuerte(principal));
+        }
     }
-    
+
+
     public int getVida() {
         return vida;
     }
@@ -194,7 +255,7 @@ public class Personaje extends Actor {
     public boolean estaMirandoDerecha() {
         return mirandoDerecha;
     }
-    
+
     public void setMoverIzquierda(boolean moverIzquierda) {
         this.moverIzquierda = moverIzquierda;
     }
