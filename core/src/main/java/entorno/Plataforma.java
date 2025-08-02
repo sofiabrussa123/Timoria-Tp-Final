@@ -31,7 +31,13 @@ public class Plataforma extends Actor {
 
         // Definir la forma
         PolygonShape forma = new PolygonShape();
-        forma.setAsBox(ancho / 2 / Principal.PPM, alto / 2 / Principal.PPM);
+        forma.setAsBox(
+            ancho / 2 / Principal.PPM,
+            (alto - 10) / 2 / Principal.PPM,
+            new Vector2(0, 5 / Principal.PPM), // desplaza la hitbox hacia arriba
+            0
+        );
+
 
         // Definir la fixture
         FixtureDef fixtureDef = new FixtureDef();
