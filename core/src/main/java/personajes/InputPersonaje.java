@@ -35,5 +35,4 @@ public class InputPersonaje extends InputAdapter {
         }
         return true;
     }
-}
-
+} 
