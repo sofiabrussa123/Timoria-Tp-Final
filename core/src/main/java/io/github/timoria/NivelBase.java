@@ -26,7 +26,7 @@ import personajes.Enemigo;
 import personajes.Personaje;
 import entorno.PuertaLlegada;
 
-public class NivelBase extends EscenaBase {
+public class NivelBase extends EscenaBase  {
 
     public static final float PIXELES_A_METROS = 1 / 100f;
     private static final float ALTO_VIEWPORT_INICIAL = 15f;
@@ -45,7 +45,7 @@ public class NivelBase extends EscenaBase {
     protected Skin skinPausa;
 
 
-    public NivelBase(Principal juego, String fondo) {
+    public NivelBase (Principal juego, String fondo) {
         super(juego, fondo);
 
         this.mundo = new World(new Vector2(0, -25f), true);
@@ -56,7 +56,7 @@ public class NivelBase extends EscenaBase {
 
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
-        
+
         mundo.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -83,12 +83,13 @@ public class NivelBase extends EscenaBase {
 
         crearMenuPausa();
     }
-    
+
     private void crearMenuPausa() {
         skinPausa = new Skin(Gdx.files.internal("uiskin.json"));
         escenaPausa = new Stage(new ScreenViewport());
 
         TextButton btnSeguir = new TextButton("Seguir", skinPausa);
+
         TextButton btnMenu = new TextButton("Menú", skinPausa);
 
         btnSeguir.addListener(new ClickListener() {
@@ -104,6 +105,8 @@ public class NivelBase extends EscenaBase {
                 juego.setScreen(new Menu(juego));
             }
         });
+
+
 
         Table tabla = new Table();
         tabla.setFillParent(true);
@@ -145,7 +148,7 @@ public class NivelBase extends EscenaBase {
 
         camaraBox2D.update();
     }
-    
+
     @Override
     public void dispose() {
     	escenaPausa.dispose();
