@@ -19,12 +19,12 @@ public class Enemigo extends Actor {
     private Personaje objetivo;
 
     public Enemigo(World mundo, float x, float y, float daño, Personaje jugador) {
-        this.textura = new Texture("enemigo.png"); // asegurate de tener esta imagen
+        this.textura = new Texture("enemigo.png");
         this.objetivo = jugador;
         this.daño = daño;
 
-        this.ancho = 64;
-        this.alto = 64;
+        this.ancho = 48;
+        this.alto = 48;
 
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.DynamicBody;
@@ -48,7 +48,7 @@ public class Enemigo extends Actor {
     }
 
     public void aplicarDañoJugador(Personaje jugador) {
-        jugador.recibirDaño((int) daño); // o una constante como 10
+        jugador.recibirDaño((int) daño);
     }
 
     @Override
