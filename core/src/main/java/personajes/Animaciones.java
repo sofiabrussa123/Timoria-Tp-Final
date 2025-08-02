@@ -46,4 +46,4 @@ public class Animaciones {
     public void setAnimacionQuieto(Animation<TextureRegion> animacionQuieto) {
         this.animacionQuieto = animacionQuieto;
     }
-}
+} 
