@@ -15,7 +15,7 @@ public class PuertaLlegada extends Actor {
     private Body cuerpo;
 
     public PuertaLlegada(World mundo, float x, float y, float ancho, float alto) {
-        textura = new Texture(Gdx.files.internal("puerta.png")); // poné tu textura real
+        textura = new Texture(Gdx.files.internal("puerta.png")); 
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.StaticBody;
@@ -27,7 +27,7 @@ public class PuertaLlegada extends Actor {
 
         FixtureDef defFixture = new FixtureDef();
         defFixture.shape = forma;
-        defFixture.isSensor = true; // importante: sensor para detectar sin colisionar
+        defFixture.isSensor = true; 
         cuerpo.createFixture(defFixture);
         forma.dispose();
 
@@ -43,6 +43,7 @@ public class PuertaLlegada extends Actor {
 
     public void desbloquear() {
         estaBloqueada = false;
+        textura = new Texture(Gdx.files.internal("puertaAbierta.png"));
     }
 
 
