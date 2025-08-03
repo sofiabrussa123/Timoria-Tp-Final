@@ -229,7 +229,7 @@ public class Personaje extends Actor {
         }
 
         if (vida == 0) {
-            sonidoDaño.stop(); // asegúrate de cortarlo al morir
+            sonidoDaño.stop(); 
             sonidoReproduciéndose = false;
             principal.setScreen(new PantallaDeMuerte(principal));
         }
