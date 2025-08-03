@@ -1,6 +1,7 @@
 package io.github.timoria;
 
 import com.badlogic.gdx.InputMultiplexer;
+import entorno.BotonActivador;
 import entorno.Plataforma;
 import entorno.PuertaLlegada;
 import personajes.Enemigo;
@@ -12,8 +13,8 @@ public class Nivel1 extends NivelBase {
     private Personaje jugador;
 
     public Nivel1(Principal juego) {
-        super(juego, "FondoNivel1.jpeg");
-
+        super(juego, "FondoNivel1.jpeg",null);
+        pantallaRetorno = this;
 
         // Crear jugador
         jugador = new Personaje(mundo, "Jugador1", 100, 85, juego);
@@ -21,14 +22,17 @@ public class Nivel1 extends NivelBase {
 
         // Crear plataformas
         Plataforma plataforma1 = new Plataforma(mundo, 200, 130, 150, 20);
-        Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 95, 20);
+        Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20);
         Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20);
-        Plataforma piso = new Plataforma(mundo, 0, 0, 800, 50);
+        Plataforma piso = new Plataforma(mundo, 0, 10, 800, 50);
 
         // Crear puerta bloqueada
-        PuertaLlegada puerta = new PuertaLlegada(mundo, 600, 50, 40, 70);
+        PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, 50, 95);
         escena.addActor(puerta);
 
+        //Crear boton
+        BotonActivador boton = new BotonActivador(mundo, 532, 210, 30, 45, puerta);
+        escena.addActor(boton);
 
         // Crear enemigo
         Enemigo enemigo1 = new Enemigo(mundo, 400, 150, 10, jugador);
