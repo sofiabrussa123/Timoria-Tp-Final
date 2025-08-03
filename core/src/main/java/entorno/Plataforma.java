@@ -64,4 +64,3 @@ public class Plataforma extends Actor {
         textura.dispose();
     }
 }
-
