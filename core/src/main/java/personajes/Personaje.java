@@ -132,7 +132,7 @@ public class Personaje extends Actor {
 
         batch.setColor(Color.WHITE);
 
-     // Posición de la barra (ejemplo: esquina superior izquierda)
+     // Posición de la barra
         float xBarra = getStage().getViewport().getScreenX() + 10;
         float yBarra = getStage().getViewport().getScreenY() + getStage().getViewport().getScreenHeight() - 30;
 
@@ -235,6 +235,9 @@ public class Personaje extends Actor {
         }
     }
 
+    public void setEnElAire(boolean valor) {
+        enElAire = valor;
+    }
 
     public int getVida() {
         return vida;
@@ -267,4 +270,5 @@ public class Personaje extends Actor {
     public void setSaltar(boolean saltar) {
         this.saltar = saltar;
     }
+
 }
