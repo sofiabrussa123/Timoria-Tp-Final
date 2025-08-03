@@ -1,16 +1,11 @@
 package io.github.timoria;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -21,12 +16,13 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import menus.Menu;
+import menus.Instrucciones;
 import menus.PantallaGanaste;
 import personajes.Enemigo;
 import personajes.Personaje;
 import entorno.PuertaLlegada;
 
-public class NivelBase extends EscenaBase  {
+public class NivelBase extends EscenaBase {
 
     public static final float PIXELES_A_METROS = 1 / 100f;
     private static final float ALTO_VIEWPORT_INICIAL = 15f;
@@ -43,16 +39,21 @@ public class NivelBase extends EscenaBase  {
     protected boolean juegoPausado = false;
     protected Stage escenaPausa;
     protected Skin skinPausa;
+    protected Screen pantallaRetorno;
 
+    protected Personaje personaje; // ← personaje seguido por la cámara
+    protected SpriteBatch batch;   // ← batch local para renderizado
 
-    public NivelBase (Principal juego, String fondo) {
+    public NivelBase(Principal juego, String fondo, Screen pantallaRetorno) {
         super(juego, fondo);
 
         this.mundo = new World(new Vector2(0, -25f), true);
         this.depuradorBox2D = new Box2DDebugRenderer();
-
         this.viewport = new ExtendViewport(anchoPantalla, altoPantalla);
+        this.juego = juego;
+        this.pantallaRetorno = pantallaRetorno;
         this.camaraBox2D = new OrthographicCamera();
+        this.batch = new SpriteBatch(); // ← inicializado aquí
 
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
@@ -63,16 +64,39 @@ public class NivelBase extends EscenaBase  {
                 Object a = contact.getFixtureA().getBody().getUserData();
                 Object b = contact.getFixtureB().getBody().getUserData();
 
-                if ((a instanceof personajes.Personaje && b instanceof PuertaLlegada) ||
-                    (b instanceof personajes.Personaje && a instanceof PuertaLlegada)) {
-                    juego.setScreen(new PantallaGanaste(juego));
+                if ((a instanceof Personaje && b instanceof PuertaLlegada) ||
+                    (b instanceof Personaje && a instanceof PuertaLlegada)) {
+
+                    PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
+                    if (puerta.sePuedeCruzar()) {
+                        juego.setScreen(new PantallaGanaste(juego));
+                    }
                 }
 
-                if ((a instanceof Personaje && b instanceof Enemigo) || (b instanceof Personaje && a instanceof Enemigo)) {
+                if ((a instanceof Personaje && b instanceof Enemigo) ||
+                    (b instanceof Personaje && a instanceof Enemigo)) {
+
                     Personaje jugador = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
                     Enemigo enemigo = (a instanceof Enemigo) ? (Enemigo) a : (Enemigo) b;
 
                     enemigo.aplicarDañoJugador(jugador);
+                }
+
+                if ((a instanceof Personaje && b instanceof entorno.BotonActivador) ||
+                    (b instanceof Personaje && a instanceof entorno.BotonActivador)) {
+
+                    entorno.BotonActivador boton = (a instanceof entorno.BotonActivador)
+                        ? (entorno.BotonActivador) a
+                        : (entorno.BotonActivador) b;
+
+                    boton.activar();
+                }
+
+                if ((a instanceof Personaje && b instanceof entorno.Plataforma) ||
+                    (b instanceof Personaje && a instanceof entorno.Plataforma)) {
+
+                    Personaje personaje = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
+                    personaje.setEnElAire(false);
                 }
             }
 
@@ -82,6 +106,7 @@ public class NivelBase extends EscenaBase  {
         });
 
         crearMenuPausa();
+
     }
 
     private void crearMenuPausa() {
@@ -89,9 +114,6 @@ public class NivelBase extends EscenaBase  {
         escenaPausa = new Stage(new ScreenViewport());
 
         TextButton btnSeguir = new TextButton("Seguir", skinPausa);
-
-        TextButton btnMenu = new TextButton("Menú", skinPausa);
-
         btnSeguir.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 juegoPausado = false;
@@ -99,6 +121,7 @@ public class NivelBase extends EscenaBase  {
             }
         });
 
+        TextButton btnMenu = new TextButton("Menú", skinPausa);
         btnMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -106,34 +129,64 @@ public class NivelBase extends EscenaBase  {
             }
         });
 
+        // Boton con instrucciones basicas
+        TextButton btnInstrucciones = new TextButton("Instrucciones", skinPausa);
+        btnInstrucciones.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                juego.setScreen(new menus.Instrucciones(juego, NivelBase.this));
+            }
+        });
 
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center();
+        table.add(btnSeguir).pad(10);
+        table.row();
+        table.add(btnMenu).pad(10);
+        table.row();
+        table.add(btnInstrucciones).pad(10);
 
-        Table tabla = new Table();
-        tabla.setFillParent(true);
-        tabla.center();
-        tabla.add(btnSeguir).pad(10);
-        tabla.row();
-        tabla.add(btnMenu).pad(10);
-
-        escenaPausa.addActor(tabla);
+        escenaPausa.addActor(table);
     }
 
+    public void setPersonaje(Personaje personaje) {
+        this.personaje = personaje;
+    }
+
+    protected void actualizarCamara() {
+        if (personaje == null) return;
+
+        Vector2 objetivo = personaje.getCuerpo().getPosition();
+        camaraBox2D.position.x += (objetivo.x - camaraBox2D.position.x) * 0.1f;
+        camaraBox2D.position.y += (objetivo.y - camaraBox2D.position.y) * 0.1f;
+
+        camaraBox2D.update();
+    }
 
     @Override
     public void render(float delta) {
-    	if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-    	    juegoPausado = !juegoPausado;
-    	    Gdx.input.setInputProcessor(juegoPausado ? escenaPausa : crearMultiplexer());
-    	}
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            juegoPausado = !juegoPausado;
+            Gdx.input.setInputProcessor(juegoPausado ? escenaPausa : crearMultiplexer());
+        }
 
-    	if (juegoPausado) {
-    	    escenaPausa.act(delta);
-    	    escenaPausa.draw();
-    	} else {
-    	    super.render(delta); // ← solo se actualiza escena si no está pausado
-    	    mundo.step(1 / 60f, 6, 2);
-    	    depuradorBox2D.render(mundo, escena.getCamera().combined.scl(1 / PIXELES_A_METROS));
-    	}
+        if (juegoPausado) {
+            if (Gdx.input.getInputProcessor() != escenaPausa) {
+                Gdx.input.setInputProcessor(escenaPausa);
+            }
+
+            escenaPausa.act(delta);
+            escenaPausa.draw();
+        } else {
+            super.render(delta);
+            actualizarCamara();
+            batch.setProjectionMatrix(camaraBox2D.combined); // ← usa el batch propio
+            batch.begin();
+            batch.end();
+            mundo.step(1 / 60f, 6, 2);
+
+        }
     }
 
     @Override
@@ -151,7 +204,8 @@ public class NivelBase extends EscenaBase  {
 
     @Override
     public void dispose() {
-    	escenaPausa.dispose();
-    	skinPausa.dispose();
+        escenaPausa.dispose();
+        skinPausa.dispose();
+        batch.dispose(); // ← importante liberar memoria
     }
 }
