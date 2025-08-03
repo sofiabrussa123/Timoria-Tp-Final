@@ -15,7 +15,6 @@ public class Enemigo extends Actor {
     private float ancho;
     private float alto;
     private float daño;
-
     private Personaje objetivo;
 
     public Enemigo(World mundo, float x, float y, float daño, Personaje jugador) {
