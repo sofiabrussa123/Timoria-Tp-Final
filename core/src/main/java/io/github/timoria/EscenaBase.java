@@ -68,7 +68,7 @@ public abstract class EscenaBase implements Screen {
     public void hide() {
     }
 
-    // 🔧 Este método puede ser sobreescrito en cada nivel
+    // Este método puede ser sobreescrito en cada nivel
     protected InputMultiplexer crearMultiplexer() {
         return new InputMultiplexer(escena);
     }
