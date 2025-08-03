@@ -20,7 +20,10 @@ Los jugadores encarnan almas en busca de redención, enfrentando desafíos coope
 - Tener una cuenta de **GitHub**
 
 ## Wiki del proyecto
-https://github.com/sofiabrussa123/Timoria-Tp-Final/wiki
+[https://github.com/sofiabrussa123/Timoria-Tp-Final/wiki]
+
+## Videos demostracion
+[https://drive.google.com/file/d/16R9_ouLyho7p87HoIhIrVmU-zMNvVgWS/view?usp=sharing]
 
 ## Cómo Instalar, Compilar, y Ejecutar
 
