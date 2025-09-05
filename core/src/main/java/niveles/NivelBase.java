@@ -1,4 +1,4 @@
-package io.github.timoria;
+package niveles;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -15,12 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import menus.Menu;
-import menus.Instrucciones;
-import menus.PantallaGanaste;
+import interfaces.Menu;
+import interfaces.Instrucciones;
+import interfaces.PantallaGanaste;
 import personajes.Enemigo;
 import personajes.Personaje;
-import entorno.PuertaLlegada;
+import niveles.entorno.PuertaLlegada;
+import io.github.timoria.Principal;
+import niveles.entorno.BotonActivador;
+import niveles.entorno.Plataforma;
 
 public class NivelBase extends EscenaBase {
 
@@ -82,18 +85,18 @@ public class NivelBase extends EscenaBase {
                     enemigo.aplicarDañoJugador(jugador);
                 }
 
-                if ((a instanceof Personaje && b instanceof entorno.BotonActivador) ||
-                    (b instanceof Personaje && a instanceof entorno.BotonActivador)) {
+                if ((a instanceof Personaje && b instanceof BotonActivador) ||
+                    (b instanceof Personaje && a instanceof BotonActivador)) {
 
-                    entorno.BotonActivador boton = (a instanceof entorno.BotonActivador)
-                        ? (entorno.BotonActivador) a
-                        : (entorno.BotonActivador) b;
+                    BotonActivador boton = (a instanceof BotonActivador)
+                        ? (BotonActivador) a
+                        : (BotonActivador) b;
 
                     boton.activar();
                 }
 
-                if ((a instanceof Personaje && b instanceof entorno.Plataforma) ||
-                    (b instanceof Personaje && a instanceof entorno.Plataforma)) {
+                if ((a instanceof Personaje && b instanceof Plataforma) ||
+                    (b instanceof Personaje && a instanceof Plataforma)) {
 
                     Personaje personaje = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
                     personaje.setEnElAire(false);
@@ -134,7 +137,7 @@ public class NivelBase extends EscenaBase {
         btnInstrucciones.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                juego.setScreen(new menus.Instrucciones(juego, NivelBase.this));
+                juego.setScreen(new Instrucciones(juego, NivelBase.this));
             }
         });
 
