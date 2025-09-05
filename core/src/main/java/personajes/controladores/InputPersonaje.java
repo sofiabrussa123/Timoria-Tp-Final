@@ -1,7 +1,9 @@
-package personajes;
+package personajes.controladores;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+
+import personajes.Personaje;
 
 public class InputPersonaje extends InputAdapter {
 
