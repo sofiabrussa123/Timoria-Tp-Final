@@ -1,12 +1,15 @@
-package io.github.timoria;
+package niveles;
 
 import com.badlogic.gdx.InputMultiplexer;
-import entorno.BotonActivador;
-import entorno.Plataforma;
-import entorno.PuertaLlegada;
+
+import io.github.timoria.Principal;
+import niveles.entorno.BotonActivador;
+import niveles.entorno.Plataforma;
+import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
-import personajes.InputPersonaje;
+import personajes.controladores.InputPersonaje;
 import personajes.Personaje;
+import io.github.timoria.Principal;
 
 public class Nivel1 extends NivelBase {
 
