@@ -2,7 +2,7 @@ package io.github.timoria;
 
 import com.badlogic.gdx.Game;
 
-import menus.Menu;
+import interfaces.Menu;
 
 public class Principal extends Game {
 	public static final float PPM = 100;
