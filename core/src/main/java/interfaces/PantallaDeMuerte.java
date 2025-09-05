@@ -1,4 +1,4 @@
-package menus;
+package interfaces;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.timoria.Principal;
-import io.github.timoria.Nivel1;
+import niveles.Nivel1;
 
 import java.util.Random;
 
