@@ -1,4 +1,4 @@
-package movimientos;
+package personajes.movimientos;
 
 import com.badlogic.gdx.audio.Sound;
 
