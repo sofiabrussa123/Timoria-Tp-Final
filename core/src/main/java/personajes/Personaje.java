@@ -13,12 +13,13 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import io.github.timoria.Principal;
-import menus.PantallaDeMuerte;
 
-import io.github.timoria.BarraVida;
-import io.github.timoria.NivelBase;
-import movimientos.MovimientoBase;
+import interfaces.PantallaDeMuerte;
+import io.github.timoria.Principal;
+import niveles.NivelBase;
+import niveles.entorno.BarraVida;
+import personajes.movimientos.Animaciones;
+import personajes.movimientos.MovimientoBase;
 
 public class Personaje extends Actor {
 
