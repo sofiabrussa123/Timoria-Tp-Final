@@ -1,4 +1,4 @@
-package menus;
+package interfaces;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -8,9 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import io.github.timoria.EscenaBase;
-import io.github.timoria.Nivel1;
 import io.github.timoria.Principal;
+import niveles.EscenaBase;
+import niveles.Nivel1;
 
 public class Menu extends EscenaBase {
 
