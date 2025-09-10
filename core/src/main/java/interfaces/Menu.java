@@ -1,4 +1,4 @@
-package menus;
+package interfaces;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -8,9 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import io.github.timoria.EscenaBase;
-import io.github.timoria.Nivel1;
+import globales.EsceneManager;
 import io.github.timoria.Principal;
+import niveles.EscenaBase;
+import niveles.Nivel1;
+import niveles.NivelBase;
 
 public class Menu extends EscenaBase {
 
@@ -22,49 +24,51 @@ public class Menu extends EscenaBase {
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         // Música de fondo
-        musica = Gdx.audio.newMusic(Gdx.files.internal("musica_fondo.mp3"));
-        musica.setLooping(true);
-        musica.setVolume(0.5f);
-        musica.play();
+        this.musica = Gdx.audio.newMusic(Gdx.files.internal("musica_fondo.mp3"));
+        this.musica.setLooping(true);
+        this.musica.setVolume(0.5f);
+        this.musica.play();
 
         // Crear una tabla para organizar los elementos
         Table table = new Table();
         table.setFillParent(true);
-        escena.addActor(table);
+        super.escena.addActor(table);
 
         // Botón Jugar
-        TextButton botonJugar = new TextButton("Jugar", fuenteTextos);
+        TextButton botonJugar = new TextButton("Jugar", super.fuenteTextos);
         botonJugar.addListener(new ClickListener() {
-            @Override
+            @Override	
             public void clicked(InputEvent event, float x, float y) {
-                musica.stop();
-                musica.dispose();
-                juego.setScreen(new Nivel1(juego));
+                Menu.this.musica.stop();
+                Menu.this.musica.dispose();
+                EsceneManager.setEscenaActual(new Nivel1(juego));
+                cambiarEscena((NivelBase)EsceneManager.getEscenaActual());
             }
         });
 
         // Botón de Música (activar/desactivar)
-        TextButton botonMusicaMenu = new TextButton("Silenciar Música", fuenteTextos);
+        TextButton botonMusicaMenu = new TextButton("Silenciar Música", super.fuenteTextos);
         botonMusicaMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                musicaActiva = !musicaActiva;
-                if (musicaActiva) {
-                    musica.play();
+                Menu.this.musicaActiva = !Menu.this.musicaActiva;
+                if (Menu.this.musicaActiva) {
+                    Menu.this.musica.play();
                     botonMusicaMenu.setText("Silenciar Música");
                 } else {
-                    musica.pause();
+                    Menu.this.musica.pause();
                     botonMusicaMenu.setText("Activar Música");
                 }
             }
         });
 
         // Botón con instrucciones básicas
-        TextButton btnInstrucciones = new TextButton("Instrucciones", fuenteTextos);
+        TextButton btnInstrucciones = new TextButton("Instrucciones", super.fuenteTextos);
         btnInstrucciones.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                juego.setScreen(new Instrucciones(juego, Menu.this)); // ← pasa esta pantalla como retorno
+            	EsceneManager.setEscenaActual(Menu.this);
+                cambiarEscena(new Instrucciones(juego));
             }
         });
 

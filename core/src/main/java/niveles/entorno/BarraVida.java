@@ -1,4 +1,4 @@
-package io.github.timoria;
+package niveles.entorno;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;

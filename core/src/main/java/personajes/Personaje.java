@@ -13,12 +13,13 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import io.github.timoria.Principal;
-import menus.PantallaDeMuerte;
 
-import io.github.timoria.BarraVida;
-import io.github.timoria.NivelBase;
-import movimientos.MovimientoBase;
+import interfaces.PantallaDeMuerte;
+import io.github.timoria.Principal;
+import niveles.NivelBase;
+import niveles.entorno.BarraVida;
+import personajes.movimientos.Animaciones;
+import personajes.movimientos.MovimientoBase;
 
 public class Personaje extends Actor {
 
@@ -209,30 +210,29 @@ public class Personaje extends Actor {
     public void recibirDaño(int cantidad) {
         if (cantidad <= 0 || vida <= 0) return;
 
-        int vidaAnterior = vida;
-        vida -= cantidad;
+        this.vida -= cantidad;
         if (vida < 0) vida = 0;
 
         if (
-            vida < vidaAnterior &&
-                vida < vidaMaxima &&
+        		vida < vidaMaxima &&
                 vida > 0 &&
                 efectosActivos &&
                 sonidoDaño != null
         ) {
             tiempoUltimoDaño = System.currentTimeMillis();
-
+            sonidoDaño.play();
+/*
             if (!sonidoReproduciéndose) {
-                sonidoDaño.loop();
+                sonidoDaño.play();
                 sonidoReproduciéndose = true;
             }
+            */
         }
-
+/*
         if (vida == 0) {
             sonidoDaño.stop(); 
             sonidoReproduciéndose = false;
-            principal.setScreen(new PantallaDeMuerte(principal));
-        }
+        }*/
     }
 
     public void setEnElAire(boolean valor) {

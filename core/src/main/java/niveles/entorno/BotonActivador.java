@@ -1,4 +1,4 @@
-package entorno;
+package niveles.entorno;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,13 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import io.github.timoria.Principal;
 
-public class PuertaLlegada extends Actor {
+public class BotonActivador extends Actor {
 
     private Texture textura;
     private Body cuerpo;
+    private PuertaLlegada puerta; // Referencia a la puerta que se va a desbloquear
+    private boolean fueActivado = false;
 
-    public PuertaLlegada(World mundo, float x, float y, float ancho, float alto) {
-        textura = new Texture(Gdx.files.internal("puerta.png")); 
+    public BotonActivador(World mundo, float x, float y, float ancho, float alto, PuertaLlegada puerta) {
+        this.puerta = puerta;
+        textura = new Texture(Gdx.files.internal("Boton.png"));
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.StaticBody;
@@ -27,7 +30,7 @@ public class PuertaLlegada extends Actor {
 
         FixtureDef defFixture = new FixtureDef();
         defFixture.shape = forma;
-        defFixture.isSensor = true; 
+        defFixture.isSensor = true;
         cuerpo.createFixture(defFixture);
         forma.dispose();
 
@@ -35,21 +38,18 @@ public class PuertaLlegada extends Actor {
         cuerpo.setUserData(this);
     }
 
-    private boolean estaBloqueada = true;
-
-    public boolean sePuedeCruzar() {
-        return !estaBloqueada;
+    public void activar() {
+        if (!fueActivado) {
+            puerta.desbloquear(); // desbloqueamos la puerta
+            fueActivado = true;
+        }
     }
-
-    public void desbloquear() {
-        estaBloqueada = false;
-        textura = new Texture(Gdx.files.internal("puertaAbierta.png"));
-    }
-
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(textura, getX(), getY(), getWidth(), getHeight());
+        if (!fueActivado) {
+            batch.draw(textura, getX(), getY(), getWidth(), getHeight());
+        }
     }
 
     @Override

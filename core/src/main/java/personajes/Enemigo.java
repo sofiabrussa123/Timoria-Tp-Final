@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import io.github.timoria.NivelBase;
+import niveles.NivelBase;
 
 public class Enemigo extends Actor {
 
