@@ -1,41 +1,40 @@
 package niveles.entorno;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+
 import personajes.Personaje;
 
-public class BarraVida {
+public class BarraVida extends Actor{
 
-    private ShapeRenderer renderer;
     private Personaje jugador;
+    private Texture fondo;
+    private Texture relleno;
 
     public BarraVida(Personaje jugador) {
         this.jugador = jugador;
-        this.renderer = new ShapeRenderer();
+        this.fondo = new Texture("barra_fondo.png");
+        this.relleno = new Texture("barra_vida.png");
+        setWidth(300);
+        setHeight(20);
     }
 
-    public void render() {
+    public void draw(Batch batch, float parentAlpha) {
         int vida = jugador.getVida();
         int vidaMax = jugador.getVidaMaxima();
-
         float porcentaje = (float) vida / vidaMax;
-        float anchoBarra = 200;
-        float altoBarra = 20;
-
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        float x = jugador.getStage().getViewport().getScreenX() + 10;
+        float y = jugador.getStage().getViewport().getScreenY() + jugador.getStage().getViewport().getScreenHeight() - 30;
 
         // Fondo gris
-        renderer.setColor(Color.DARK_GRAY);
-        renderer.rect(10, 760, anchoBarra, altoBarra); // esquina superior izquierda
+        batch.draw(fondo, x, y, getWidth(), getHeight());
 
-        // Vida roja
-        renderer.setColor(Color.RED);
-        renderer.rect(10, 760, anchoBarra * porcentaje, altoBarra);
+        // Barra roja
+        batch.draw(relleno, x, y, getWidth() * porcentaje, getHeight());
 
-        renderer.end();
-    }
-
-    public void dispose() {
-        renderer.dispose();
+        // Restaurar color a blanco para no afectar otros draws
+        batch.setColor(Color.WHITE);
     }
 }

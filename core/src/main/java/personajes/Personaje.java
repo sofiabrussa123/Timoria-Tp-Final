@@ -1,5 +1,7 @@
 package personajes;
 
+import java.util.concurrent.TimeUnit;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -14,7 +16,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import interfaces.PantallaDeMuerte;
 import io.github.timoria.Principal;
 import niveles.NivelBase;
 import niveles.entorno.BarraVida;
@@ -132,16 +133,9 @@ public class Personaje extends Actor {
         }
 
         batch.setColor(Color.WHITE);
-
-     // Posición de la barra
-        float xBarra = getStage().getViewport().getScreenX() + 10;
-        float yBarra = getStage().getViewport().getScreenY() + getStage().getViewport().getScreenHeight() - 30;
-
-        batch.draw(texturaBarraFondo, xBarra, yBarra, 200, 20);
-
-        float porcentaje = (float) vida / vidaMaxima;
-        batch.draw(texturaBarraVida, xBarra, yBarra, 200 * porcentaje, 20);
-
+        
+        barraVida.setPosition(10, 760);
+        barraVida.draw(batch, parentAlpha);
     }
 
     @Override
@@ -194,7 +188,7 @@ public class Personaje extends Actor {
         float umbralMuerteY = -5f;
 
         if (cuerpo.getPosition().y < umbralMuerteY) {
-            principal.setScreen(new PantallaDeMuerte(principal));
+            vida = 0;
         }
 
         if (sonidoReproduciéndose) {
@@ -213,26 +207,19 @@ public class Personaje extends Actor {
         this.vida -= cantidad;
         if (vida < 0) vida = 0;
 
-        if (
-        		vida < vidaMaxima &&
-                vida > 0 &&
-                efectosActivos &&
-                sonidoDaño != null
-        ) {
-            tiempoUltimoDaño = System.currentTimeMillis();
-            sonidoDaño.play();
-/*
+        if (vida < vidaMaxima && efectosActivos && sonidoDaño != null) {
+         
             if (!sonidoReproduciéndose) {
                 sonidoDaño.play();
                 sonidoReproduciéndose = true;
+                tiempoUltimoDaño = System.currentTimeMillis();
             }
-            */
         }
-/*
+        
         if (vida == 0) {
             sonidoDaño.stop(); 
             sonidoReproduciéndose = false;
-        }*/
+        }
     }
 
     public void setEnElAire(boolean valor) {
