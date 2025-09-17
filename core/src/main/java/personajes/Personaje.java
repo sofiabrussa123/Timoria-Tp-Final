@@ -1,11 +1,8 @@
 package personajes;
 
-import java.util.concurrent.TimeUnit;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -48,8 +45,6 @@ public class Personaje extends Actor {
     private int vida = 100;
     private int vidaMaxima = 100;
     private BarraVida barraVida;
-    private Texture texturaBarraFondo;
-    private Texture texturaBarraVida;
 
     private Sound sonidoDaño;
     private boolean efectosActivos = true;
@@ -64,12 +59,7 @@ public class Personaje extends Actor {
         this.principal = principal;
         this.animacionActual = animaciones.getAnimacionQuieto();
         this.barraVida = new BarraVida(this);
-
-
-        texturaBarraFondo = new Texture(Gdx.files.internal("barra_fondo.png"));
-        texturaBarraVida = new Texture(Gdx.files.internal("barra_vida.png"));
         sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));
-
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.DynamicBody;
