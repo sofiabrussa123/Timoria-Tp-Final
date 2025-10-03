@@ -1,5 +1,6 @@
 package niveles;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -24,7 +25,7 @@ public abstract class EscenaBase implements Screen {
     	
         this.juego = juego;
         this.escena = new Stage(new ScreenViewport());
-        this.batch = new SpriteBatch();
+        this.batch = new SpriteBatch(); //PROBABLEMENTE NI LO NECESITES
         this.fondo = new Texture(fondo);
     }
 
@@ -36,7 +37,7 @@ public abstract class EscenaBase implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //Dibujar todo
-        batch.begin();
+        batch.begin(); // NO 
         batch.draw(this.fondo, 0, 0, escena.getViewport().getWorldWidth(), escena.getViewport().getWorldHeight());
         batch.end();
         escena.act(delta);
@@ -54,7 +55,7 @@ public abstract class EscenaBase implements Screen {
     public void dispose() {
     	
         this.escena.dispose();
-        this.fondo.dispose();
+        this.fondo.dispose();// NO
         if (this.fuenteTextos != null) this.fuenteTextos.dispose();
         batch.dispose();
     }
@@ -79,7 +80,7 @@ public abstract class EscenaBase implements Screen {
     protected void cambiarEscena(EscenaBase nuevaEscena) {
     	
     	this.juego.setScreen(nuevaEscena);
-    	Gdx.input.setInputProcessor(nuevaEscena.escena);
+    	Gdx.input.setInputProcessor(nuevaEscena.escena);//-> Se hace en el constructor de la nueva pantalla
     }
     
     //Sobrecarga para asignar un Multiplexer al stage en caso de ser un nivel

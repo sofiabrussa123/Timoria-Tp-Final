@@ -76,6 +76,7 @@ public abstract class NivelBase extends EscenaBase {
                     PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
                     if (puerta.sePuedeCruzar()) {
                     	
+                    	NivelBase.this.jugador = null;
                         cambiarEscena(new PantallaGanaste(juego));
                     }
                 }
@@ -104,14 +105,14 @@ public abstract class NivelBase extends EscenaBase {
 
                     boton.activar();
                 }
-                /* Tiene pinta que no hace nada, pero lo dejo por si acaso
+                
                 if ((a instanceof Personaje && b instanceof Plataforma) ||
                     (b instanceof Personaje && a instanceof Plataforma)) {
 
                     Personaje personaje = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
                     personaje.setEnElAire(false);
                 }
-                */
+                
             }
 
             @Override public void endContact(Contact contact) {}
@@ -142,7 +143,11 @@ public abstract class NivelBase extends EscenaBase {
             if(juegoPausado) {
             	EsceneManager.setEscenaActual(this);
             	cambiarEscena(new MenuPausa(juego));
-            } 
+            }    
+        }
+        
+        if(this.jugador.getVida() == 0) {
+        	cambiarEscena(new PantallaDeMuerte(juego));
         }
 
 	    super.render(delta);

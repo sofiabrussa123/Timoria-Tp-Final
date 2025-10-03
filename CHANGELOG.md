@@ -4,6 +4,28 @@ Todos los cambios notorios de este proyecto serán documentados en este archivo.
 
 Este formato está basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealeased]
+- Solucionar bug de bucle de sonido en personaje.java
+- Revisar clase enemigo
+- Creación de clase InputManager e implementarla en todos los Screens
+- Eliminación de createMultiplexer
+- Cambiar el tipo de clase importada de juego, de Principal a Game
+- Incluir en el stage todos los Texture y Sprite que se impriman por Batch
+- Pasar el cambio de inputProcesor al constructor de EscenaBase
+- Añadir animación de salto
+- Añadir tienda
+- Añadir inventario
+- Añadir mecánicas cooperativas
+- Crear más niveles
+- Hacer que la cámara siga al personaje en un nivel más grande
+- Sacar imports innecesarios de la clase Principal
+
+##[v0.1.1] - 2025-10-3
+### Changed
+- Refactorización de personaje
+- Creación de clase crearCuerpo, llamada ne el constructor
+- 
+
 ## [v0.1.0] - 2025-08-24
 ### Added
 

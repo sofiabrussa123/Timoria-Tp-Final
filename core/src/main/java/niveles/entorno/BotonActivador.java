@@ -18,7 +18,7 @@ public class BotonActivador extends Actor {
 
     public BotonActivador(World mundo, float x, float y, float ancho, float alto, PuertaLlegada puerta) {
         this.puerta = puerta;
-        textura = new Texture(Gdx.files.internal("Boton.png"));
+        textura = new Texture(Gdx.files.internal("boton.png"));
 
         BodyDef defCuerpo = new BodyDef();
         defCuerpo.type = BodyDef.BodyType.StaticBody;

@@ -20,8 +20,8 @@ public class Animaciones {
 
     protected Animation<TextureRegion> crearAnimacionDesdeHoja(Texture hoja, float duracionFrame, int ancho, int alto) {
         TextureRegion[][] temporal = TextureRegion.split(hoja, ancho, alto);
+        
         Array<TextureRegion> cuadros = new Array<>();
-
         for (TextureRegion[] fila : temporal) {
             for (TextureRegion cuadro : fila) {
                 cuadros.add(cuadro);
@@ -41,9 +41,5 @@ public class Animaciones {
 
     public Animation<TextureRegion> getAnimacionQuieto() {
         return this.animacionQuieto;
-    }
-
-    public void setAnimacionQuieto(Animation<TextureRegion> animacionQuieto) {
-        this.animacionQuieto = animacionQuieto;
     }
 } 

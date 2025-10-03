@@ -1,5 +1,6 @@
 package interfaces;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,6 +22,7 @@ public class Menu extends EscenaBase {
 
     public Menu(Principal juego) {
         super(juego, "Fondo.jpeg");
+        
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         // Música de fondo

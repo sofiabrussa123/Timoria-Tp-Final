@@ -35,6 +35,9 @@ public class InputPersonaje extends InputAdapter {
         if (keycode == Input.Keys.D) {
             personaje.setMoverDerecha(false);
         }
+        if (keycode == Input.Keys.W) {
+            personaje.setSaltar(false);
+        }
         return true;
     }
 } 

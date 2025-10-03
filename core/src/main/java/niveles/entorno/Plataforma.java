@@ -28,6 +28,7 @@ public class Plataforma extends Actor {
         bodyDef.position.set((x + ancho / 2) / Principal.PPM, (y + alto / 2) / Principal.PPM);
         bodyDef.type = BodyDef.BodyType.StaticBody;
         cuerpo = mundo.createBody(bodyDef);
+        cuerpo.setUserData(this);
 
         // Definir la forma
         PolygonShape forma = new PolygonShape();
