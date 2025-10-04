@@ -173,7 +173,6 @@ public class Personaje extends Actor {
 
         this.vida -= cantidad;
         if (vida < 0) vida = 0;
-
         
         if (sonidoDaño != null) {
          
@@ -188,7 +187,6 @@ public class Personaje extends Actor {
             sonidoDaño.stop(); 
             sonidoReproduciéndose = false;
         }
-        
     }
 	
 	public void setEnElAire(boolean valor) {
