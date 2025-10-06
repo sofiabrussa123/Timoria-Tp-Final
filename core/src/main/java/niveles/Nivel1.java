@@ -17,7 +17,6 @@ public class Nivel1 extends NivelBase {
         // Crear jugador
         super.jugador = new Personaje(mundo, "Jugador1", 100, 85);
         super.escena.addActor(super.jugador);
-        //super.escena.addActor(super.jugador.getBarraVida());
 
         // Crear plataformas
         Plataforma plataforma1 = new Plataforma(mundo, 200, 130, 150, 20);
