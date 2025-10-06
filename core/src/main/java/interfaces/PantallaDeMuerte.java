@@ -2,6 +2,7 @@ package interfaces;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -36,7 +37,7 @@ public class PantallaDeMuerte extends EscenaBase {
 
     private Principal principal;
 
-    public PantallaDeMuerte(Principal principal) {
+    public PantallaDeMuerte(Game principal) {
         super(principal, "PantallaDeMuerte.png");
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 

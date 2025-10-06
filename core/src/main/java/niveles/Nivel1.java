@@ -1,6 +1,7 @@
 package niveles;
 
-import io.github.timoria.Principal;
+import com.badlogic.gdx.Game;
+
 import niveles.entorno.BotonActivador;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
@@ -9,12 +10,12 @@ import personajes.Personaje;
 
 public class Nivel1 extends NivelBase {
 
-    public Nivel1(Principal juego) {
+    public Nivel1(Game juego) {
     	
         super(juego, "FondoNivel1.jpeg");
 
         // Crear jugador
-        super.jugador = new Personaje(mundo, "Jugador1", 100, 85, juego);
+        super.jugador = new Personaje(mundo, "Jugador1", 100, 85);
         super.escena.addActor(super.jugador);
         //super.escena.addActor(super.jugador.getBarraVida());
 

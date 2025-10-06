@@ -20,7 +20,7 @@ public class Menu extends EscenaBase {
     private Music musica;
     private boolean musicaActiva = true;
 
-    public Menu(Principal juego) {
+    public Menu(Game juego) {
         super(juego, "Fondo.jpeg");
         
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));

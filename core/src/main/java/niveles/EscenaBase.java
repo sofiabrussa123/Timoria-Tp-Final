@@ -14,14 +14,14 @@ import io.github.timoria.Principal;
 
 public abstract class EscenaBase implements Screen {
 
-    protected Principal juego;
+    protected Game juego;
     protected Stage escena;
     protected Texture fondo;
     protected SpriteBatch batch;
     protected Skin fuenteTextos;
 
     //Constructor, inicializar variables
-    public EscenaBase(Principal juego, String fondo) {
+    public EscenaBase(Game juego, String fondo) {
     	
         this.juego = juego;
         this.escena = new Stage(new ScreenViewport());
