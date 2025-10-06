@@ -1,5 +1,6 @@
 package interfaces;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,12 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import io.github.timoria.Principal;
 import niveles.EscenaBase;
 
 public class PantallaGanaste extends EscenaBase {
 
-    public PantallaGanaste(Principal juego) {
+    public PantallaGanaste(Game juego) {
     	super(juego, "FondoTransparente.png");
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
@@ -44,9 +44,7 @@ public class PantallaGanaste extends EscenaBase {
     public void render(float delta) {
     	
     	//Convertir el fondo a sprite para hacerlo transparente
-    	Sprite fondoTransparente = new Sprite(this.fondo);
-
-    	
+    	Sprite fondoTransparente = new Sprite(this.fondo);    	
     	
         batch.begin();
         fondoTransparente.setSize(super.escena.getViewport().getWorldWidth(), super.escena.getViewport().getWorldHeight());

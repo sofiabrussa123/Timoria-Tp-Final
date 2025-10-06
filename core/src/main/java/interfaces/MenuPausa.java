@@ -1,5 +1,6 @@
 package interfaces;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,15 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import globales.EsceneManager;
-import io.github.timoria.Principal;
 import niveles.EscenaBase;
 import niveles.NivelBase;
 
 public class MenuPausa extends EscenaBase{
-    private Principal juego;
     private NivelBase nivelPausado;
 
-    public MenuPausa(Principal juego) {
+    public MenuPausa(Game juego) {
         super(juego, "FondoTransparente.png");
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
         

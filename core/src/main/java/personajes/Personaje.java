@@ -24,7 +24,6 @@ public class Personaje extends Actor {
 	private String nombre;
 	private BarraVida barraVida;
 	private Body cuerpo;
-	private Principal principal;
 	private Animaciones animaciones = new Animaciones();
 	private Animation<TextureRegion> animacionActual;
 	private Estado estado = Estado.QUIETO;
@@ -42,10 +41,9 @@ public class Personaje extends Actor {
     private boolean sonidoReproduciéndose = false;
     private final long DURACION_SONIDO_DAÑO = 1000;
 	
-	public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, Principal principal) {
+	public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
 		
 		this.nombre = nombre;
-		this.principal = principal;
 		this.barraVida = new BarraVida(this);
         
         TextureRegion primerFrame = animaciones.getAnimacionQuieto().getKeyFrame(0);

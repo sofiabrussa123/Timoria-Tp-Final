@@ -1,4 +1,5 @@
 package niveles;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -19,7 +20,6 @@ import globales.EsceneManager;
 import interfaces.MenuPausa;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
-import io.github.timoria.Principal;
 import niveles.entorno.BotonActivador;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
@@ -48,13 +48,12 @@ public abstract class NivelBase extends EscenaBase {
     protected Personaje personaje; // ← personaje seguido por la cámara
     protected SpriteBatch batch;   // ← batch local para renderizado
 
-    public NivelBase(Principal juego, String fondo) {
+    public NivelBase(Game juego, String fondo) {
     	
         super(juego, fondo);
         this.mundo = new World(new Vector2(0, -25f), true);
         this.depuradorBox2D = new Box2DDebugRenderer();
         this.viewport = new ExtendViewport(anchoPantalla, altoPantalla);
-        this.juego = juego;
         this.camaraBox2D = new OrthographicCamera();
         this.batch = new SpriteBatch(); // ← inicializado aquí
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
