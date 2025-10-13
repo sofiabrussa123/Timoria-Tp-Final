@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import io.github.timoria.Principal;
+import globales.InputManager;
 
 public abstract class EscenaBase implements Screen {
 
@@ -87,7 +87,6 @@ public abstract class EscenaBase implements Screen {
     protected void cambiarEscena(NivelBase nuevoNivel) {
     	
     	this.juego.setScreen(nuevoNivel);
-    	Gdx.input.setInputProcessor(nuevoNivel.crearMultiplexer());
     }
     
     public Stage getStage() {

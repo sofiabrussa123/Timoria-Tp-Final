@@ -13,11 +13,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import io.github.timoria.Principal;
 import niveles.NivelBase;
 import niveles.entorno.BarraVida;
 import personajes.movimientos.Animaciones;
 import personajes.movimientos.Estado;
+import globales.InputManager;
 
 public class Personaje extends Actor {
 	
@@ -30,9 +30,6 @@ public class Personaje extends Actor {
 	private float tiempoEstado = 0;
 	private boolean mirandoDerecha = true;
 	private boolean mirandoIzquierda = false;
-    private boolean moverIzquierda = false;
-    private boolean moverDerecha = false;
-    private boolean saltar = false;
     private boolean enElAire = false;
     private int vida = 100;
     private int vidaMaxima = 100;
@@ -68,12 +65,12 @@ public class Personaje extends Actor {
 		
 		float velocidadX = 0;
 
-		if (moverIzquierda) {
+		if (InputManager.getIsAPressed()) {
             velocidadX = -5f;
             mirandoIzquierda = true;
             mirandoDerecha = false;
             estado = estado.CORRIENDO;
-        } else if (moverDerecha) {
+        } else if (InputManager.getIsDPressed()) {
             velocidadX = 5f;
             mirandoIzquierda = false;
             mirandoDerecha = true;
@@ -82,7 +79,7 @@ public class Personaje extends Actor {
             estado = estado.QUIETO;
         }
             
-		if (saltar && !enElAire) {
+		if (InputManager.getIsWPressed() && !enElAire) {
         	cuerpo.applyLinearImpulse(new Vector2(0, 7f), cuerpo.getWorldCenter(), true);
             enElAire = true;
             estado = estado.SALTANDO;
@@ -203,16 +200,4 @@ public class Personaje extends Actor {
 	public int getVidaMaxima() {
 		return this.vidaMaxima;
 	}
-	
-	public void setMoverIzquierda(boolean valor) {
-        this.moverIzquierda = valor;
-    }
-	
-	public void setMoverDerecha(boolean valor) {
-        this.moverDerecha = valor;
-    }
-	
-	public void setSaltar(boolean valor) {
-        this.saltar = valor;
-    }
 }

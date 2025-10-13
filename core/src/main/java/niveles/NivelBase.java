@@ -1,8 +1,6 @@
 package niveles;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -17,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import globales.EsceneManager;
+import globales.InputManager;
 import interfaces.MenuPausa;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
@@ -25,7 +24,6 @@ import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
 import personajes.Personaje;
-import personajes.controladores.InputPersonaje;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -41,7 +39,7 @@ public abstract class NivelBase extends EscenaBase {
     protected float anchoViewport;
     protected float altoViewport;
     protected Body cuerpoPiso;
-    protected boolean juegoPausado = false;
+    private boolean juegoPausado = false;
     protected Screen pantallaRetorno;
     protected Personaje jugador;
 
@@ -58,6 +56,7 @@ public abstract class NivelBase extends EscenaBase {
         this.batch = new SpriteBatch(); // ← inicializado aquí
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
+        Gdx.input.setInputProcessor(new InputManager());
 
         //Todos los tipos de contacto
         mundo.setContactListener(new ContactListener() {
@@ -137,13 +136,15 @@ public abstract class NivelBase extends EscenaBase {
     @Override
     public void render(float delta) {
     	//Cambiar al menú de pausa si es aprieta escape o p
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        if (InputManager.getIsEscPressed() || InputManager.getIsPPressed()) {
             juegoPausado = !juegoPausado;
             if(juegoPausado) {
             	EsceneManager.setEscenaActual(this);
             	cambiarEscena(new MenuPausa(juego));
             }    
         }
+        
+        System.out.println(this.juegoPausado);
         
         if(this.jugador.getVida() == 0) {
         	cambiarEscena(new PantallaDeMuerte(juego));
@@ -178,11 +179,9 @@ public abstract class NivelBase extends EscenaBase {
 	    batch.end();
     }
     
-    //Añadir los inputs de jugador y escena
-    protected InputMultiplexer crearMultiplexer() {
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(new InputPersonaje(this.jugador));
-        multiplexer.addProcessor(escena);
-        return multiplexer;
+    public void despausar() {
+    	this.juegoPausado = false;
+    	InputManager.resetPausaKeys();
+    	Gdx.input.setInputProcessor(new InputManager());
     }
 }

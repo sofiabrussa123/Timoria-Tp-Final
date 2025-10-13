@@ -1,7 +1,9 @@
 package niveles;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 
+import globales.InputManager;
 import niveles.entorno.BotonActivador;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;

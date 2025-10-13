@@ -14,7 +14,7 @@ import niveles.EscenaBase;
 import niveles.NivelBase;
 
 public class MenuPausa extends EscenaBase{
-    private NivelBase nivelPausado;
+    private  NivelBase nivelPausado;
 
     public MenuPausa(Game juego) {
         super(juego, "FondoTransparente.png");
@@ -27,7 +27,8 @@ public class MenuPausa extends EscenaBase{
         TextButton btnSeguir = new TextButton("Seguir", super.fuenteTextos);
         btnSeguir.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                cambiarEscena(MenuPausa.this.nivelPausado);
+            	MenuPausa.this.nivelPausado.despausar();
+                cambiarEscena(MenuPausa.this.nivelPausado); 
             }
         });
 

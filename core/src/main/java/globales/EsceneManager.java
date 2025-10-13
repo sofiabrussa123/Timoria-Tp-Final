@@ -13,6 +13,4 @@ public abstract class EsceneManager {
 	public static EscenaBase getEscenaActual() {
 		return escenaActual;
 	}
-	
-
 }
