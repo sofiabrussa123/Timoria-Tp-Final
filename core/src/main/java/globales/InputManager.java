@@ -1,9 +1,7 @@
 package globales;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.math.Vector2;
 
 public class InputManager implements InputProcessor {
 
@@ -13,8 +11,6 @@ public class InputManager implements InputProcessor {
     private boolean isDPressed = false;
     private boolean isEscPressed = false;
     private boolean isPPressed = false;
-    private Vector2 posicionMouse = new Vector2();
-    private boolean isClicked = false;
 
     @Override
     public boolean keyDown(int keycode) {
@@ -50,25 +46,9 @@ public class InputManager implements InputProcessor {
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        posicionMouse.set(screenX, Gdx.graphics.getHeight() - screenY);
-        isClicked = true;
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        isClicked = false;
-        return false;
-    }
-    
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        posicionMouse.set(Gdx.graphics.getHeight() - screenX, Gdx.graphics.getHeight() - screenY);
-        return false;
-    }
-    
-    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
+    public boolean mouseMoved(int screenX, int screenY) { return false; }
     public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
 	public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
     public boolean keyTyped(char character) { return false; }
@@ -80,7 +60,4 @@ public class InputManager implements InputProcessor {
     public boolean getIsDPressed() { return isDPressed; }
     public boolean getIsEscPressed() { return isEscPressed; }
     public boolean getIsPPressed() { return isPPressed; }
-    public Vector2 getMousePosition() { return posicionMouse; }
-    public boolean getIsClicked() { return isClicked; }
-    public void resetClick() { isClicked = false; }
 }
