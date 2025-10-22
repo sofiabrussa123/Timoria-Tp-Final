@@ -98,4 +98,9 @@ public class PantallaDeMuerte extends EscenaBase {
 
         super.escena.addActor(table);
     }
+    
+    @Override
+    public void show() {
+    	Gdx.input.setInputProcessor(escena);
+    }
 }

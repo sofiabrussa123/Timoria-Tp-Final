@@ -12,12 +12,17 @@ public class Instrucciones extends EscenaBase {
     public Instrucciones(Game juego) {
     	super(juego, "instrucciones.png");
     }
+    
+    @Override
+    public void show() {
+    	Gdx.input.setInputProcessor(this.inputManager);
+    }
 
     @Override
     public void render(float delta) {
         super.render(delta);
 
-        if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+        if (this.inputManager.getIsEscPressed()) {
             cambiarEscena(EsceneManager.getEscenaActual());
         }
     }

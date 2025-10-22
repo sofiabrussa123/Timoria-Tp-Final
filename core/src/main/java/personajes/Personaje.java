@@ -17,7 +17,6 @@ import niveles.NivelBase;
 import niveles.entorno.BarraVida;
 import personajes.movimientos.Animaciones;
 import personajes.movimientos.Estado;
-import globales.InputManager;
 
 public class Personaje extends Actor {
 	
@@ -37,6 +36,7 @@ public class Personaje extends Actor {
     private long tiempoUltimoDaño = 0;
     private boolean sonidoReproduciéndose = false;
     private final long DURACION_SONIDO_DAÑO = 1000;
+    float velocidadX = 0;
 	
 	public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
 		
@@ -61,30 +61,7 @@ public class Personaje extends Actor {
 	@Override
 	public void act(float delta) {
 		
-		tiempoEstado += delta;
-		
-		float velocidadX = 0;
-
-		if (InputManager.getIsAPressed()) {
-            velocidadX = -5f;
-            mirandoIzquierda = true;
-            mirandoDerecha = false;
-            estado = estado.CORRIENDO;
-        } else if (InputManager.getIsDPressed()) {
-            velocidadX = 5f;
-            mirandoIzquierda = false;
-            mirandoDerecha = true;
-            estado = estado.CORRIENDO;
-        } else {
-            estado = estado.QUIETO;
-        }
-            
-		if (InputManager.getIsWPressed() && !enElAire) {
-        	cuerpo.applyLinearImpulse(new Vector2(0, 7f), cuerpo.getWorldCenter(), true);
-            enElAire = true;
-            estado = estado.SALTANDO;
-        }
-            
+		tiempoEstado += delta;    
 
         cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
         
@@ -184,6 +161,31 @@ public class Personaje extends Actor {
         }
     }
 	
+	public void moverDerecha() {
+		velocidadX = 5f;
+        mirandoIzquierda = false;
+        mirandoDerecha = true;
+        estado = estado.CORRIENDO;
+	}
+	
+	public void moverIzquierda() {
+		velocidadX = -5f;
+        mirandoIzquierda = true;
+        mirandoDerecha = false;
+        estado = estado.CORRIENDO;
+	}
+	
+	public void saltar() {
+		cuerpo.applyLinearImpulse(new Vector2(0, 7f), cuerpo.getWorldCenter(), true);
+        enElAire = true;
+        estado = estado.SALTANDO;
+	}
+	
+	public void detener() {
+		velocidadX = 0;
+		estado = estado.QUIETO;
+	}
+	
 	public void setEnElAire(boolean valor) {
         enElAire = valor;
     }
@@ -199,5 +201,9 @@ public class Personaje extends Actor {
 	
 	public int getVidaMaxima() {
 		return this.vidaMaxima;
+	}
+	
+	public boolean getEnElAire() {
+		return this.enElAire;
 	}
 }

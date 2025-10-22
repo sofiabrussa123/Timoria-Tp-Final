@@ -60,6 +60,8 @@ public class MenuPausa extends EscenaBase{
     
     @Override
     public void show() {
+    	Gdx.input.setInputProcessor(this.escena);
+    	
     	//Si se viene de un nivel, se guarda para mostrarlo de fondo
     	if(EsceneManager.getEscenaActual() instanceof NivelBase) {
     		this.nivelPausado = (NivelBase)EsceneManager.getEscenaActual();

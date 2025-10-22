@@ -54,4 +54,9 @@ public class PantallaGanaste extends EscenaBase {
     	super.escena.act(delta);
         super.escena.draw();
     }
+    
+    @Override
+    public void show() {
+    	Gdx.input.setInputProcessor(escena);
+    }
 }

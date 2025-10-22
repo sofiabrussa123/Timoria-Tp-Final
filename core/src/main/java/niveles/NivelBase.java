@@ -24,6 +24,7 @@ import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
 import personajes.Personaje;
+import personajes.movimientos.Estado;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -56,7 +57,6 @@ public abstract class NivelBase extends EscenaBase {
         this.batch = new SpriteBatch(); // ← inicializado aquí
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
-        Gdx.input.setInputProcessor(new InputManager());
 
         //Todos los tipos de contacto
         mundo.setContactListener(new ContactListener() {
@@ -75,6 +75,7 @@ public abstract class NivelBase extends EscenaBase {
                     if (puerta.sePuedeCruzar()) {
                     	
                     	NivelBase.this.jugador = null;
+                    	NivelBase.this.getStage().getActors().removeValue(jugador, true);
                         cambiarEscena(new PantallaGanaste(juego));
                     }
                 }
@@ -132,11 +133,16 @@ public abstract class NivelBase extends EscenaBase {
 
         camaraBox2D.update();
     }
+    
+    @Override
+    public void show() {
+    	Gdx.input.setInputProcessor(this.inputManager);
+    }
 
     @Override
     public void render(float delta) {
     	//Cambiar al menú de pausa si es aprieta escape o p
-        if (InputManager.getIsEscPressed() || InputManager.getIsPPressed()) {
+        if (this.inputManager.getIsEscPressed() || this.inputManager.getIsPPressed()) {
             juegoPausado = !juegoPausado;
             if(juegoPausado) {
             	EsceneManager.setEscenaActual(this);
@@ -144,10 +150,24 @@ public abstract class NivelBase extends EscenaBase {
             }    
         }
         
-        System.out.println(this.juegoPausado);
+        this.jugador.detener();
         
         if(this.jugador.getVida() == 0) {
         	cambiarEscena(new PantallaDeMuerte(juego));
+        }
+        
+        if(this.inputManager.getIsWPressed()) {
+        	if(!this.jugador.getEnElAire()) {
+        		this.jugador.saltar();
+        	}
+        }
+        
+        if(this.inputManager.getIsAPressed()) {
+        	jugador.moverIzquierda();
+        }
+        
+        if(this.inputManager.getIsDPressed()) {
+        	jugador.moverDerecha();
         }
 
 	    super.render(delta);
@@ -181,7 +201,7 @@ public abstract class NivelBase extends EscenaBase {
     
     public void despausar() {
     	this.juegoPausado = false;
-    	InputManager.resetPausaKeys();
-    	Gdx.input.setInputProcessor(new InputManager());
+    	this.inputManager.resetPauseKeys();
+    	Gdx.input.setInputProcessor(this.inputManager);
     }
 }

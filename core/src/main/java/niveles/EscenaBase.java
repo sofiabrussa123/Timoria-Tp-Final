@@ -6,8 +6,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import globales.InputManager;
@@ -19,6 +22,7 @@ public abstract class EscenaBase implements Screen {
     protected Texture fondo;
     protected SpriteBatch batch;
     protected Skin fuenteTextos;
+    protected InputManager inputManager;
 
     //Constructor, inicializar variables
     public EscenaBase(Game juego, String fondo) {
@@ -27,6 +31,8 @@ public abstract class EscenaBase implements Screen {
         this.escena = new Stage(new ScreenViewport());
         this.batch = new SpriteBatch(); //PROBABLEMENTE NI LO NECESITES
         this.fondo = new Texture(fondo);
+        this.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
+        this.inputManager = new InputManager();
     }
 
     @Override
@@ -80,7 +86,6 @@ public abstract class EscenaBase implements Screen {
     protected void cambiarEscena(EscenaBase nuevaEscena) {
     	
     	this.juego.setScreen(nuevaEscena);
-    	Gdx.input.setInputProcessor(nuevaEscena.escena);//-> Se hace en el constructor de la nueva pantalla
     }
     
     //Sobrecarga para asignar un Multiplexer al stage en caso de ser un nivel

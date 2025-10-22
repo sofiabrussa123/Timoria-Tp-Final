@@ -13,7 +13,6 @@ public class Principal extends Game {
     	
     	Menu menu = new Menu(this);
         setScreen(menu);
-        Gdx.input.setInputProcessor(menu.getStage());
     }
 
 }
