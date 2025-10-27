@@ -76,11 +76,13 @@ public class MenuPausa extends EscenaBase{
     	//Convertir el fondo a sprite para hacerlo transparente
     	Sprite fondoTransparente = new Sprite(fondo);
 
+    	/*
         batch.begin();
         fondoTransparente.setSize(super.escena.getViewport().getWorldWidth(), super.escena.getViewport().getWorldHeight());
         fondoTransparente.setPosition(0, 0);
         fondoTransparente.draw(batch); 
         batch.end();
+        */
     	super.escena.act(delta);
         super.escena.draw();
     }
