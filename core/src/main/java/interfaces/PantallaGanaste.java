@@ -35,24 +35,12 @@ public class PantallaGanaste extends EscenaBase {
         tabla.add(mensaje).pad(10);
         tabla.row();
         tabla.add(btnMenu).pad(10);
-        //> Gdx.setInputProcessor
 
         super.escena.addActor(tabla);
     }
 
     @Override
     public void render(float delta) {
-    	
-    	//Convertir el fondo a sprite para hacerlo transparente
-    	Sprite fondoTransparente = new Sprite(this.fondo);    	
-    	
-    	/*
-        batch.begin();
-        fondoTransparente.setSize(super.escena.getViewport().getWorldWidth(), super.escena.getViewport().getWorldHeight());
-        fondoTransparente.setPosition(0, 0);
-        fondoTransparente.draw(batch); 
-        batch.end();
-        */
     	super.escena.act(delta);
         super.escena.draw();
     }
