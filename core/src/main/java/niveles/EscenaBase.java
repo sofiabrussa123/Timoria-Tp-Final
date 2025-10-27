@@ -57,7 +57,6 @@ public abstract class EscenaBase implements Screen {
     public void dispose() {
     	
         this.escena.dispose();
-        this.fondo.dispose();// NO
         if (this.fuenteTextos != null) this.fuenteTextos.dispose();
     }
     
@@ -65,17 +64,6 @@ public abstract class EscenaBase implements Screen {
     protected void cambiarEscena(EscenaBase nuevaEscena) {
     	
     	this.juego.setScreen(nuevaEscena);
-    }
-    
-    //Sobrecarga para asignar un Multiplexer al stage en caso de ser un nivel
-    protected void cambiarEscena(NivelBase nuevoNivel) {
-    	
-    	this.juego.setScreen(nuevoNivel);
-    }
-    
-    public Stage getStage() {
-    	
-    	return this.escena;
     }
     
     @Override

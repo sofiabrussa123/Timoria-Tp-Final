@@ -75,7 +75,7 @@ public abstract class NivelBase extends EscenaBase {
                     if (puerta.sePuedeCruzar()) {
                     	
                     	NivelBase.this.jugador = null;
-                    	NivelBase.this.getStage().getActors().removeValue(jugador, true);
+                    	NivelBase.this.escena.getActors().removeValue(jugador, true);
                         cambiarEscena(new PantallaGanaste(juego));
                     }
                 }
