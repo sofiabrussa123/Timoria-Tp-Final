@@ -57,8 +57,25 @@ public abstract class NivelBase extends EscenaBase {
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
 
         //Todos los tipos de contacto
-        mundo.setContactListener(new ContactListener() {
-        	
+        establecerContactos();
+    }
+
+    public void setPersonaje(Personaje personaje) {
+        this.personaje = personaje;
+    }
+
+    protected void actualizarCamara() {
+        if (personaje == null) return;
+
+        Vector2 objetivo = personaje.getCuerpo().getPosition();
+        camaraBox2D.position.x += (objetivo.x - camaraBox2D.position.x) * 0.1f;
+        camaraBox2D.position.y += (objetivo.y - camaraBox2D.position.y) * 0.1f;
+
+        camaraBox2D.update();
+    }
+    
+    private void establecerContactos() {
+    	mundo.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
             
@@ -116,20 +133,6 @@ public abstract class NivelBase extends EscenaBase {
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
             @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
         });
-    }
-
-    public void setPersonaje(Personaje personaje) {
-        this.personaje = personaje;
-    }
-
-    protected void actualizarCamara() {
-        if (personaje == null) return;
-
-        Vector2 objetivo = personaje.getCuerpo().getPosition();
-        camaraBox2D.position.x += (objetivo.x - camaraBox2D.position.x) * 0.1f;
-        camaraBox2D.position.y += (objetivo.y - camaraBox2D.position.y) * 0.1f;
-
-        camaraBox2D.update();
     }
     
     @Override
