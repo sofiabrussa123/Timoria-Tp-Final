@@ -33,8 +33,5 @@ public class BarraVida extends Actor{
 
         // Barra roja
         batch.draw(relleno, x, y, getWidth() * porcentaje, getHeight());
-
-        // Restaurar color a blanco para no afectar otros draws
-        batch.setColor(Color.WHITE);
     }
 }
