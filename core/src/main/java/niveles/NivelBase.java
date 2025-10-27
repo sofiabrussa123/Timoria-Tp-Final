@@ -45,7 +45,6 @@ public abstract class NivelBase extends EscenaBase {
     protected Personaje jugador;
 
     protected Personaje personaje; // ← personaje seguido por la cámara
-    protected SpriteBatch batch;   // ← batch local para renderizado
 
     public NivelBase(Game juego, String fondo) {
     	
@@ -54,7 +53,6 @@ public abstract class NivelBase extends EscenaBase {
         this.depuradorBox2D = new Box2DDebugRenderer();
         this.viewport = new ExtendViewport(anchoPantalla, altoPantalla);
         this.camaraBox2D = new OrthographicCamera();
-        this.batch = new SpriteBatch(); // ← inicializado aquí
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
 
@@ -172,9 +170,7 @@ public abstract class NivelBase extends EscenaBase {
 
 	    super.render(delta);
 	    actualizarCamara();
-	    batch.setProjectionMatrix(camaraBox2D.combined); // ← usa el batch propio
-	    batch.begin();
-	    batch.end();
+	    escena.getViewport().getCamera().combined.set(camaraBox2D.combined);
 	    mundo.step(1 / 60f, 6, 2);
     }
 
@@ -194,9 +190,7 @@ public abstract class NivelBase extends EscenaBase {
     public void draw(float delta) {
         super.render(delta);   
         actualizarCamara();
-        batch.setProjectionMatrix(camaraBox2D.combined);
-        batch.begin();
-	    batch.end();
+        escena.getViewport().getCamera().combined.set(camaraBox2D.combined);
     }
     
     public void despausar() {
