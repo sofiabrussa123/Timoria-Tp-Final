@@ -114,7 +114,6 @@ public class Personaje extends Actor {
             getHeight()
         );
         
-        barraVida.setPosition(10, 760);
         barraVida.draw(batch, parentAlpha);
 	}
 	

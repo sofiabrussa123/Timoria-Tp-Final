@@ -15,6 +15,9 @@ public class Enemigo extends Actor {
     private float ancho;
     private float alto;
     private float daño;
+    private boolean puedeAtacar = true;
+    private int cooldown = 1;
+    private float tiempoTranscurrido = 0;
     private Personaje objetivo;
 
     public Enemigo(World mundo, float x, float y, float daño, Personaje jugador) {
@@ -53,6 +56,12 @@ public class Enemigo extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
+        
+        this.tiempoTranscurrido += delta;
+        
+        if(this.tiempoTranscurrido >= cooldown) {
+        	puedeAtacar = true;
+        } 
 
         // Movimiento hacia el jugador
         Vector2 posicionJugador = objetivo.getCuerpo().getPosition();
@@ -67,6 +76,11 @@ public class Enemigo extends Actor {
             cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - alto / 2
         );
     }
+    
+    public void iniciarCooldown() {
+    	this.tiempoTranscurrido = 0;
+    	this.puedeAtacar = false;
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -75,6 +89,10 @@ public class Enemigo extends Actor {
 
     public float getDaño() {
         return daño;
+    }
+    
+    public boolean getPuedeAtacar() {
+    	return this.puedeAtacar;
     }
 
     public void dispose() {

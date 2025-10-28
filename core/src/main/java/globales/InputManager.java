@@ -9,6 +9,10 @@ public class InputManager implements InputProcessor {
     private boolean isAPressed = false;
     private boolean isSPressed = false;
     private boolean isDPressed = false;
+    private boolean isUpPressed = false;
+    private boolean isLeftPressed = false;
+    private boolean isDownPressed = false;
+    private boolean isRightPressed = false;
     private boolean isEscPressed = false;
     private boolean isPPressed = false;
 
@@ -19,6 +23,10 @@ public class InputManager implements InputProcessor {
         	case Input.Keys.A:  isAPressed = true; break;
         	case Input.Keys.S:  isSPressed = true; break;
         	case Input.Keys.D:  isDPressed = true; break;
+        	case Input.Keys.UP:  isUpPressed = true; break;
+        	case Input.Keys.LEFT:  isLeftPressed = true; break;
+        	case Input.Keys.DOWN:  isDownPressed = true; break;
+        	case Input.Keys.RIGHT:  isRightPressed = true; break;
         	case Input.Keys.ESCAPE:  isEscPressed = true; break;
         	case Input.Keys.P:  isPPressed = true; break;
         }
@@ -33,6 +41,10 @@ public class InputManager implements InputProcessor {
 	    	case Input.Keys.A:  isAPressed = false; break;
 	    	case Input.Keys.S:  isSPressed = false; break;
 	    	case Input.Keys.D:  isDPressed = false; break;
+	    	case Input.Keys.UP:  isUpPressed = false; break;
+        	case Input.Keys.LEFT:  isLeftPressed = false; break;
+        	case Input.Keys.DOWN:  isDownPressed = false; break;
+        	case Input.Keys.RIGHT:  isRightPressed = false; break;
 	    	case Input.Keys.ESCAPE:  isEscPressed = false; break;
 	    	case Input.Keys.P:  isPPressed = false; break;
     	}
@@ -58,6 +70,10 @@ public class InputManager implements InputProcessor {
     public boolean getIsAPressed() { return isAPressed; }
     public boolean getIsSPressed() { return isSPressed; }
     public boolean getIsDPressed() { return isDPressed; }
+    public boolean getIsUpPressed() { return isUpPressed; }
+    public boolean getIsLeftPressed() { return isLeftPressed; }
+    public boolean getIsDownPressed() { return isDownPressed; }
+    public boolean getIsRightPressed() { return isRightPressed; }
     public boolean getIsEscPressed() { return isEscPressed; }
     public boolean getIsPPressed() { return isPPressed; }
 }

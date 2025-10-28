@@ -42,7 +42,8 @@ public abstract class NivelBase extends EscenaBase {
     protected Body cuerpoPiso;
     private boolean juegoPausado = false;
     protected Screen pantallaRetorno;
-    protected Personaje jugador;
+    protected Personaje jugador1;
+    protected Personaje jugador2;
 
     protected Personaje personaje; // ← personaje seguido por la cámara
 
@@ -89,8 +90,10 @@ public abstract class NivelBase extends EscenaBase {
                     PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
                     if (puerta.sePuedeCruzar()) {
                     	
-                    	NivelBase.this.jugador = null;
-                    	NivelBase.this.escena.getActors().removeValue(jugador, true);
+                    	NivelBase.this.jugador1 = null;
+                    	NivelBase.this.escena.getActors().removeValue(jugador1, true);
+                    	NivelBase.this.jugador2 = null;
+                    	NivelBase.this.escena.getActors().removeValue(jugador2, true);
                         cambiarEscena(new PantallaGanaste(juego));
                     }
                 }
@@ -102,10 +105,13 @@ public abstract class NivelBase extends EscenaBase {
                     Personaje jugadorColisionado = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
                     Enemigo enemigoColisionado = (a instanceof Enemigo) ? (Enemigo) a : (Enemigo) b;
 
-                    enemigoColisionado.aplicarDañoJugador(jugadorColisionado);
-                    
-                    if(jugadorColisionado.getVida() == 0) {
-                    	cambiarEscena(new PantallaDeMuerte(juego));
+                    if(enemigoColisionado.getPuedeAtacar()) {
+                    	enemigoColisionado.aplicarDañoJugador(jugadorColisionado);
+                    	enemigoColisionado.iniciarCooldown();
+                        
+                        if(jugadorColisionado.getVida() == 0) {
+                        	cambiarEscena(new PantallaDeMuerte(juego));
+                        }
                     }
                 }
 
@@ -151,24 +157,39 @@ public abstract class NivelBase extends EscenaBase {
             }    
         }
         
-        this.jugador.detener();
+        this.jugador1.detener();
+        this.jugador2.detener();
         
-        if(this.jugador.getVida() == 0) {
+        if(this.jugador1.getVida() == 0 || this.jugador2.getVida() == 0) {
         	cambiarEscena(new PantallaDeMuerte(juego));
         }
         
         if(this.inputManager.getIsWPressed()) {
-        	if(!this.jugador.getEnElAire()) {
-        		this.jugador.saltar();
+        	if(!this.jugador1.getEnElAire()) {
+        		this.jugador1.saltar();
         	}
         }
         
         if(this.inputManager.getIsAPressed()) {
-        	jugador.moverIzquierda();
+        	jugador1.moverIzquierda();
         }
         
         if(this.inputManager.getIsDPressed()) {
-        	jugador.moverDerecha();
+        	jugador1.moverDerecha();
+        }
+        
+        if(this.inputManager.getIsUpPressed()) {
+        	if(!this.jugador2.getEnElAire()) {
+        		this.jugador2.saltar();
+        	}
+        }
+        
+        if(this.inputManager.getIsLeftPressed()) {
+        	jugador2.moverIzquierda();
+        }
+        
+        if(this.inputManager.getIsRightPressed()) {
+        	jugador2.moverDerecha();
         }
 
 	    super.render(delta);
