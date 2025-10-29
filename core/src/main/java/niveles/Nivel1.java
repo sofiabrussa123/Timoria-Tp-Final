@@ -18,9 +18,7 @@ public class Nivel1 extends NivelBase {
 
         // Crear jugador
         super.jugador1 = new Personaje(mundo, "Jugador1", 100, 85);
-        super.jugador2 = new Personaje(mundo, "Jugador2", 120, 85);
-        super.escena.addActor(super.jugador1);
-        super.escena.addActor(super.jugador2);
+        super.jugador2 = new Personaje(mundo, "Jugador2", 120, 85); 
 
         // Crear plataformas
         Plataforma plataforma1 = new Plataforma(mundo, 200, 130, 150, 20);
@@ -35,12 +33,14 @@ public class Nivel1 extends NivelBase {
         BotonActivador boton = new BotonActivador(mundo, 532, 210, 30, 45, puerta);        
 
         // Crear enemigo
-        Enemigo enemigo1 = new Enemigo(mundo, 400, 150, 10, jugador1);        
+        super.enemigo = new Enemigo(mundo, 400, 150, 10, this);        
 
         // Agregar todos los actores
+        super.escena.addActor(super.jugador1);
+        super.escena.addActor(super.jugador2);
         super.escena.addActor(puerta);
         super.escena.addActor(boton);
-        super.escena.addActor(enemigo1);
+        super.escena.addActor(super.enemigo);
         super.escena.addActor(plataforma1);
         super.escena.addActor(plataforma2);
         super.escena.addActor(plataforma3);

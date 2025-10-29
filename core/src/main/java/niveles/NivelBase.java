@@ -3,7 +3,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import globales.EsceneManager;
-import globales.InputManager;
 import interfaces.MenuPausa;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
@@ -24,7 +22,6 @@ import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
 import personajes.Personaje;
-import personajes.movimientos.Estado;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -44,6 +41,7 @@ public abstract class NivelBase extends EscenaBase {
     protected Screen pantallaRetorno;
     protected Personaje jugador1;
     protected Personaje jugador2;
+    protected Enemigo enemigo;
 
     protected Personaje personaje; // ← personaje seguido por la cámara
 
@@ -139,6 +137,14 @@ public abstract class NivelBase extends EscenaBase {
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
             @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
         });
+    }
+    
+    public Personaje getJugador1() {
+    	return this.jugador1;
+    }
+    
+    public Personaje getJugador2() {
+    	return this.jugador2;
     }
     
     @Override

@@ -3,7 +3,11 @@ package personajes;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import niveles.NivelBase;
@@ -18,13 +22,13 @@ public class Enemigo extends Actor {
     private boolean puedeAtacar = true;
     private int cooldown = 1;
     private float tiempoTranscurrido = 0;
+    private NivelBase nivel;
     private Personaje objetivo;
 
-    public Enemigo(World mundo, float x, float y, float daño, Personaje jugador) {
+    public Enemigo(World mundo, float x, float y, float daño, NivelBase nivel) {
         this.textura = new Texture("enemigo.png");
-        this.objetivo = jugador;
         this.daño = daño;
-
+        this.nivel = nivel;
         this.ancho = 48;
         this.alto = 48;
 
@@ -57,6 +61,8 @@ public class Enemigo extends Actor {
     public void act(float delta) {
         super.act(delta);
         
+        calcularJugadorObjetivo();
+        
         this.tiempoTranscurrido += delta;
         
         if(this.tiempoTranscurrido >= cooldown) {
@@ -75,6 +81,18 @@ public class Enemigo extends Actor {
             cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - ancho / 2,
             cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - alto / 2
         );
+    }
+    
+    private void calcularJugadorObjetivo() {
+    	
+    	float posicionAbsolutaJugador1 = Math.abs((this.nivel.getJugador1().getX()));
+    	float posicionAbsolutaJugador2 = Math.abs((this.nivel.getJugador2().getX()));
+    	float posicionAbsolutaEnemigo = Math.abs(this.getX());
+    	
+    	if(Math.abs(posicionAbsolutaJugador1 - posicionAbsolutaEnemigo) > Math.abs(posicionAbsolutaJugador2 - posicionAbsolutaEnemigo)) {
+    		this.objetivo = this.nivel.getJugador2();
+    	} else this.objetivo = this.nivel.getJugador1();
+    
     }
     
     public void iniciarCooldown() {
