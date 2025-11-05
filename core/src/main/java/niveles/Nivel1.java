@@ -1,9 +1,7 @@
 package niveles;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 
-import globales.InputManager;
 import niveles.entorno.BotonActivador;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
@@ -33,14 +31,14 @@ public class Nivel1 extends NivelBase {
         BotonActivador boton = new BotonActivador(mundo, 532, 210, 30, 45, puerta);        
 
         // Crear enemigo
-        super.enemigo = new Enemigo(mundo, 400, 150, 10, this);        
+        Enemigo enemigo = new Enemigo(mundo, 400, 150, 10, this);        
 
         // Agregar todos los actores
         super.escena.addActor(super.jugador1);
         super.escena.addActor(super.jugador2);
         super.escena.addActor(puerta);
         super.escena.addActor(boton);
-        super.escena.addActor(super.enemigo);
+        super.escena.addActor(enemigo);
         super.escena.addActor(plataforma1);
         super.escena.addActor(plataforma2);
         super.escena.addActor(plataforma3);

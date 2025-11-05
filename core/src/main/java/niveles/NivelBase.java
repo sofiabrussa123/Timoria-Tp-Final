@@ -41,7 +41,6 @@ public abstract class NivelBase extends EscenaBase {
     protected Screen pantallaRetorno;
     protected Personaje jugador1;
     protected Personaje jugador2;
-    protected Enemigo enemigo;
 
     protected Personaje personaje; // ← personaje seguido por la cámara
 
