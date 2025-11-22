@@ -18,6 +18,8 @@ import interfaces.MenuPausa;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
 import niveles.entorno.BotonActivador;
+import niveles.entorno.BarraInventario;
+import niveles.entorno.BarraVida;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
@@ -30,12 +32,12 @@ public abstract class NivelBase extends EscenaBase {
     protected final int anchoPantalla = 800;
     protected final int altoPantalla = 800;
 
-    protected World mundo;
-    protected Box2DDebugRenderer depuradorBox2D;
-    protected OrthographicCamera camaraBox2D;
-    protected ExtendViewport viewport;
-    protected float anchoViewport;
-    protected float altoViewport;
+    protected World mundo = new World(new Vector2(0.0F, -25.0F), true);
+    protected Box2DDebugRenderer depuradorBox2D = new Box2DDebugRenderer();
+    protected OrthographicCamera camaraBox2D = new OrthographicCamera();
+    protected ExtendViewport viewport = new ExtendViewport(800.0F, 800.0F);
+    protected float anchoViewport = 8.0F;
+    protected float altoViewport = 8.0F;
     protected Body cuerpoPiso;
     private boolean juegoPausado = false;
     protected Screen pantallaRetorno;
@@ -45,7 +47,7 @@ public abstract class NivelBase extends EscenaBase {
     protected Personaje personaje; // ← personaje seguido por la cámara
 
     public NivelBase(Game juego, String fondo) {
-    	
+
         super(juego, fondo);
         this.mundo = new World(new Vector2(0, -25f), true);
         this.depuradorBox2D = new Box2DDebugRenderer();
@@ -55,7 +57,7 @@ public abstract class NivelBase extends EscenaBase {
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
 
         //Todos los tipos de contacto
-        establecerContactos();
+        this.establecerContactos();
     }
 
     public void setPersonaje(Personaje personaje) {
@@ -71,12 +73,12 @@ public abstract class NivelBase extends EscenaBase {
 
         camaraBox2D.update();
     }
-    
+
     private void establecerContactos() {
-    	mundo.setContactListener(new ContactListener() {
+        this.mundo.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
-            
+
                 Object a = contact.getFixtureA().getBody().getUserData();
                 Object b = contact.getFixtureB().getBody().getUserData();
 
@@ -86,7 +88,7 @@ public abstract class NivelBase extends EscenaBase {
 
                     PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
                     if (puerta.sePuedeCruzar()) {
-                    	
+
                     	NivelBase.this.jugador1 = null;
                     	NivelBase.this.escena.getActors().removeValue(jugador1, true);
                     	NivelBase.this.jugador2 = null;
@@ -105,7 +107,7 @@ public abstract class NivelBase extends EscenaBase {
                     if(enemigoColisionado.getPuedeAtacar()) {
                     	enemigoColisionado.aplicarDañoJugador(jugadorColisionado);
                     	enemigoColisionado.iniciarCooldown();
-                        
+
                         if(jugadorColisionado.getVida() == 0) {
                         	cambiarEscena(new PantallaDeMuerte(juego));
                         }
@@ -113,23 +115,19 @@ public abstract class NivelBase extends EscenaBase {
                 }
 
                 //Lógica activar el botón
-                if ((a instanceof Personaje && b instanceof BotonActivador) ||
-                    (b instanceof Personaje && a instanceof BotonActivador)) {
-
-                    BotonActivador boton = (a instanceof BotonActivador)
-                        ? (BotonActivador) a
-                        : (BotonActivador) b;
-
-                    boton.activar();
+                if (a instanceof Personaje && b instanceof BotonActivador || b instanceof Personaje && a instanceof BotonActivador) {
+                    BotonActivador boton = a instanceof BotonActivador ? (BotonActivador)a : (BotonActivador)b;
+                    Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
+                    boton.activarConJugador(personaje);
                 }
-                
+
                 if ((a instanceof Personaje && b instanceof Plataforma) ||
                     (b instanceof Personaje && a instanceof Plataforma)) {
 
                     Personaje personaje = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
                     personaje.setEnElAire(false);
                 }
-                
+
             }
 
             @Override public void endContact(Contact contact) {}
@@ -137,62 +135,81 @@ public abstract class NivelBase extends EscenaBase {
             @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
         });
     }
-    
+
     public Personaje getJugador1() {
     	return this.jugador1;
     }
-    
+
     public Personaje getJugador2() {
     	return this.jugador2;
     }
-    
+
     @Override
     public void show() {
-    	Gdx.input.setInputProcessor(this.inputManager);
+
+        Gdx.input.setInputProcessor(this.inputManager);
+        BarraVida barra1 = new BarraVida(this.jugador1, true);
+        BarraVida barra2 = new BarraVida(this.jugador2, false);
+        this.jugador1.setBarraVida(barra1);
+        this.jugador2.setBarraVida(barra2);
+        this.escena.addActor(barra1);
+        this.escena.addActor(barra2);
+        if (this.jugador1 != null) {
+            BarraInventario inventario1 = new BarraInventario(this.jugador1, true);
+            this.jugador1.setBarraInventario(inventario1);
+            this.escena.addActor(inventario1);
+        }
+
+        if (this.jugador2 != null) {
+            BarraInventario inventario2 = new BarraInventario(this.jugador2, false);
+            this.jugador2.setBarraInventario(inventario2);
+            this.escena.addActor(inventario2);
+        }
+
     }
 
     @Override
     public void render(float delta) {
     	//Cambiar al menú de pausa si es aprieta escape o p
         if (this.inputManager.getIsEscPressed() || this.inputManager.getIsPPressed()) {
-            juegoPausado = !juegoPausado;
-            if(juegoPausado) {
+            this.juegoPausado = !this.juegoPausado;
+            if(this.juegoPausado) {
             	EsceneManager.setEscenaActual(this);
-            	cambiarEscena(new MenuPausa(juego));
-            }    
+            	this.cambiarEscena(new MenuPausa(this.juego));
+            }
         }
-        
+
         this.jugador1.detener();
         this.jugador2.detener();
-        
+
         if(this.jugador1.getVida() == 0 || this.jugador2.getVida() == 0) {
-        	cambiarEscena(new PantallaDeMuerte(juego));
+        	this.cambiarEscena(new PantallaDeMuerte(this.juego));
         }
-        
+
         if(this.inputManager.getIsWPressed()) {
         	if(!this.jugador1.getEnElAire()) {
         		this.jugador1.saltar();
         	}
         }
-        
+
         if(this.inputManager.getIsAPressed()) {
         	jugador1.moverIzquierda();
         }
-        
+
         if(this.inputManager.getIsDPressed()) {
         	jugador1.moverDerecha();
         }
-        
+
         if(this.inputManager.getIsUpPressed()) {
         	if(!this.jugador2.getEnElAire()) {
         		this.jugador2.saltar();
         	}
         }
-        
+
         if(this.inputManager.getIsLeftPressed()) {
         	jugador2.moverIzquierda();
         }
-        
+
         if(this.inputManager.getIsRightPressed()) {
         	jugador2.moverDerecha();
         }
@@ -215,13 +232,13 @@ public abstract class NivelBase extends EscenaBase {
 
         camaraBox2D.update();
     }
-    
+
     public void draw(float delta) {
-        super.render(delta);   
-        actualizarCamara();
-        escena.getViewport().getCamera().combined.set(camaraBox2D.combined);
+        super.render(delta);
+        this.actualizarCamara();
+        this.escena.getViewport().getCamera().combined.set(this.camaraBox2D.combined);
     }
-    
+
     public void despausar() {
     	this.juegoPausado = false;
     	this.inputManager.resetPauseKeys();

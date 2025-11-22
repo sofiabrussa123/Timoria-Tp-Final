@@ -4,10 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-
 import io.github.timoria.Principal;
+import personajes.Personaje;
 
 public class BotonActivador extends Actor {
 
@@ -18,24 +23,20 @@ public class BotonActivador extends Actor {
 
     public BotonActivador(World mundo, float x, float y, float ancho, float alto, PuertaLlegada puerta) {
         this.puerta = puerta;
-        textura = new Texture(Gdx.files.internal("boton.png"));
-
+        this.textura = new Texture(Gdx.files.internal("boton.png"));
         BodyDef defCuerpo = new BodyDef();
-        defCuerpo.type = BodyDef.BodyType.StaticBody;
-        defCuerpo.position.set((x + ancho / 2) / Principal.PPM, (y + alto / 2) / Principal.PPM);
-        cuerpo = mundo.createBody(defCuerpo);
-
+        defCuerpo.type = BodyType.StaticBody;
+        defCuerpo.position.set((x + ancho / 2.0F) / 100.0F, (y + alto / 2.0F) / 100.0F);
+        this.cuerpo = mundo.createBody(defCuerpo);
         PolygonShape forma = new PolygonShape();
-        forma.setAsBox(ancho / 2 / Principal.PPM, alto / 2 / Principal.PPM);
-
+        forma.setAsBox(ancho / 2.0F / 100.0F, alto / 2.0F / 100.0F);
         FixtureDef defFixture = new FixtureDef();
         defFixture.shape = forma;
         defFixture.isSensor = true;
-        cuerpo.createFixture(defFixture);
+        this.cuerpo.createFixture(defFixture);
         forma.dispose();
-
-        setBounds(x, y, ancho, alto);
-        cuerpo.setUserData(this);
+        this.setBounds(x, y, ancho, alto);
+        this.cuerpo.setUserData(this);
     }
 
     public void activar() {
@@ -43,6 +44,22 @@ public class BotonActivador extends Actor {
             puerta.desbloquear(); // desbloqueamos la puerta
             fueActivado = true;
         }
+    }
+
+    public void activarConJugador(Personaje personaje) {
+        if (!this.fueActivado) {
+            int slotLibre = personaje.getBarraInventario().getPrimeraCasillaLibre();
+            if (slotLibre != -1) {
+                Texture texturaLlave = new Texture(Gdx.files.internal("boton.png"));
+                personaje.getBarraInventario().setIcono(slotLibre, texturaLlave);
+                this.puerta.desbloquear();
+                this.fueActivado = true;
+                this.remove();
+            } else {
+                System.out.println("Inventario lleno. No se puede recoger la llave.");
+            }
+        }
+
     }
 
     @Override
