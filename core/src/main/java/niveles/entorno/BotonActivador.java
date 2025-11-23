@@ -3,12 +3,9 @@ package niveles.entorno;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-
-import io.github.timoria.Principal;
+import personajes.Personaje;
 
 public class BotonActivador extends ElementoEntorno {
 
@@ -30,6 +27,22 @@ public class BotonActivador extends ElementoEntorno {
             puerta.desbloquear(); // desbloqueamos la puerta
             fueActivado = true;
         }
+    }
+
+    public void activarConJugador(Personaje personaje) {
+        if (!this.fueActivado) {
+            int slotLibre = personaje.getBarraInventario().getPrimeraCasillaLibre();
+            if (slotLibre != -1) {
+                Texture texturaLlave = new Texture(Gdx.files.internal("boton.png"));
+                personaje.getBarraInventario().setIcono(slotLibre, texturaLlave);
+                this.puerta.desbloquear();
+                this.fueActivado = true;
+                this.remove();
+            } else {
+                System.out.println("Inventario lleno. No se puede recoger la llave.");
+            }
+        }
+
     }
 
     @Override

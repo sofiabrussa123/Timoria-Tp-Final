@@ -66,6 +66,7 @@ animaciones/Weapon_Summon.png
 animaciones/Wind_Power.png
 animaciones/idle.png
 animaciones/run.png
+barraInventario.png
 barra_fondo.png
 barra_vida.png
 boton.png
