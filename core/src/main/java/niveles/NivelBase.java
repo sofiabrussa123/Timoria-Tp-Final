@@ -17,9 +17,10 @@ import globales.EsceneManager;
 import interfaces.MenuPausa;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
-import niveles.entorno.BotonActivador;
 import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
+import niveles.entorno.BotonActivador;
+import niveles.entorno.Palanca;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
@@ -120,7 +121,15 @@ public abstract class NivelBase extends EscenaBase {
                     Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
                     boton.activarConJugador(personaje);
                 }
+                
+                //Logica jugador activar palanca
+                if (a instanceof Personaje && b instanceof Palanca || b instanceof Personaje && a instanceof Palanca) {
+                    Palanca palanca = a instanceof Palanca ? (Palanca)a : (Palanca)b;
+                    Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
+                    palanca.activar();
+                }
 
+                //Lógica jugador apoyarse en plataforma
                 if ((a instanceof Personaje && b instanceof Plataforma) ||
                     (b instanceof Personaje && a instanceof Plataforma)) {
 
