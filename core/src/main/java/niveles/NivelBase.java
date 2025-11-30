@@ -19,7 +19,7 @@ import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
 import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
-import niveles.entorno.BotonActivador;
+import niveles.entorno.LlaveActivadora;
 import niveles.entorno.Palanca;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PlataformaMovil;
@@ -117,10 +117,10 @@ public abstract class NivelBase extends EscenaBase {
                 }
 
                 //Lógica activar el botón
-                if (a instanceof Personaje && b instanceof BotonActivador || b instanceof Personaje && a instanceof BotonActivador) {
-                    BotonActivador boton = a instanceof BotonActivador ? (BotonActivador)a : (BotonActivador)b;
+                if (a instanceof Personaje && b instanceof LlaveActivadora || b instanceof Personaje && a instanceof LlaveActivadora) {
+                    LlaveActivadora llave = a instanceof LlaveActivadora ? (LlaveActivadora)a : (LlaveActivadora)b;
                     Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
-                    boton.activarConJugador(personaje);
+                    llave.activarConJugador(personaje);
                 }
                 
                 //Logica jugador activar palanca

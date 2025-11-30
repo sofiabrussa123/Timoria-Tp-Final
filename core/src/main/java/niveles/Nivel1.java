@@ -2,7 +2,7 @@ package niveles;
 
 import com.badlogic.gdx.Game;
 
-import niveles.entorno.BotonActivador;
+import niveles.entorno.LlaveActivadora;
 import niveles.entorno.Palanca;
 import niveles.entorno.Plataforma;
 import niveles.entorno.PlataformaMovil;
@@ -32,7 +32,7 @@ public class Nivel1 extends NivelBase {
         PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, 50, 95);
 
         //Crear boton
-        BotonActivador boton = new BotonActivador(mundo, 532, 210, 30, 45, puerta);        
+        LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta);        
 
         // Crear enemigo
         Enemigo enemigo = new Enemigo(mundo, 400, 150, 10, this);        
@@ -41,7 +41,7 @@ public class Nivel1 extends NivelBase {
         super.escena.addActor(super.jugador1);
         super.escena.addActor(super.jugador2);
         super.escena.addActor(puerta);
-        super.escena.addActor(boton);
+        super.escena.addActor(llave);
         super.escena.addActor(enemigo);
         super.escena.addActor(plataformaMovil);
         super.escena.addActor(palanca);
