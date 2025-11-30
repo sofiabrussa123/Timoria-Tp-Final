@@ -80,7 +80,7 @@ public class PlataformaMovil extends ElementoEntorno {
 		}
 	}
 	
-	public void cambiarSentidoMovimiento(float posicion, float posicionInicial, int distanciaMovimiento) {
+	private void cambiarSentidoMovimiento(float posicion, float posicionInicial, int distanciaMovimiento) {
 		if(posicion >= posicionInicial + distanciaMovimiento || posicion <= posicionInicial) {
 			this.velocidadMovimiento = -this.velocidadMovimiento;
 		}

@@ -22,6 +22,7 @@ import niveles.entorno.BarraVida;
 import niveles.entorno.BotonActivador;
 import niveles.entorno.Palanca;
 import niveles.entorno.Plataforma;
+import niveles.entorno.PlataformaMovil;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
 import personajes.Personaje;
@@ -125,21 +126,20 @@ public abstract class NivelBase extends EscenaBase {
                 //Logica jugador activar palanca
                 if (a instanceof Personaje && b instanceof Palanca || b instanceof Personaje && a instanceof Palanca) {
                     Palanca palanca = a instanceof Palanca ? (Palanca)a : (Palanca)b;
-                    Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
                     palanca.activar();
                 }
 
                 //Lógica jugador apoyarse en plataforma
-                if ((a instanceof Personaje && b instanceof Plataforma) ||
-                    (b instanceof Personaje && a instanceof Plataforma)) {
+                if ((a instanceof Personaje && (b instanceof Plataforma || b instanceof PlataformaMovil)) ||
+                    (b instanceof Personaje && (b instanceof Plataforma || b instanceof PlataformaMovil))) {
 
                     Personaje personaje = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
                     personaje.setEnElAire(false);
                 }
-
             }
 
-            @Override public void endContact(Contact contact) {}
+            @Override
+            public void endContact(Contact contact) {}
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
             @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
         });

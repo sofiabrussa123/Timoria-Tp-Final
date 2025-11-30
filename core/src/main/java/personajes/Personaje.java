@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import niveles.NivelBase;
 import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
-import personajes.movimientos.Animaciones;
 import personajes.movimientos.Estado;
 
 public class Personaje extends Actor {
@@ -25,7 +24,6 @@ public class Personaje extends Actor {
     private BarraVida barraVida;
     private BarraInventario barraInventario;
     private Body cuerpo;
-    private Animaciones animaciones = new Animaciones();
     private Animation<TextureRegion> animacionActual;
     private Estado estado;
     private float tiempoEstado;
@@ -38,7 +36,7 @@ public class Personaje extends Actor {
     private long tiempoUltimoDaño;
     private boolean sonidoReproduciéndose;
     private final long DURACION_SONIDO_DAÑO;
-    float velocidadX;
+    private float velocidadX;
 
 	public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
 
@@ -57,7 +55,7 @@ public class Personaje extends Actor {
         this.nombre = nombre;
         this.barraVida = new BarraVida(this, true);
 
-        TextureRegion primerFrame = (TextureRegion)this.animaciones.getAnimacionQuieto().getKeyFrame(0.0F);
+        TextureRegion primerFrame = (TextureRegion)estado.QUIETO.crearAnimacion().getKeyFrame(0.0F);
 
         float anchoPersonaje = (float)primerFrame.getRegionWidth();
         float altoPersonaje = (float)primerFrame.getRegionHeight();
@@ -66,7 +64,7 @@ public class Personaje extends Actor {
 
         this.crearCuerpo(mundo, anchoHitbox, altoHitbox, coordenadaXAparicion, coordenadaYAparicion);
         this.setSize(anchoPersonaje, altoPersonaje);
-        this.animacionActual = this.animaciones.getAnimacionQuieto();
+        this.animacionActual = estado.QUIETO.crearAnimacion();
 	}
 
     public void setBarraInventario(BarraInventario barraInventario) {
@@ -86,18 +84,20 @@ public class Personaje extends Actor {
 
         cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
 
-        switch (estado) {
+        animacionActual = estado.crearAnimacion();
+        /*
+         switch (estado) {
         case CORRIENDO:
             animacionActual = animaciones.getAnimacionCorrer();
             break;
         case QUIETO:
             animacionActual = animaciones.getAnimacionQuieto();
             break;
-            /*
+            
         case SALTANDO:
             animacionActual = animaciones.getAnimacionSaltar();
-            break;*/
-    }
+            break;
+    }*/
 
         if (this.sonidoReproduciéndose) {
             long ahora = System.currentTimeMillis();
@@ -198,7 +198,7 @@ public class Personaje extends Actor {
 	public void saltar() {
 		cuerpo.applyLinearImpulse(new Vector2(0, 7f), cuerpo.getWorldCenter(), true);
         enElAire = true;
-        estado = estado.SALTANDO;
+        /*estado = estado.SALTANDO*/;
 	}
 
 	public void detener() {
