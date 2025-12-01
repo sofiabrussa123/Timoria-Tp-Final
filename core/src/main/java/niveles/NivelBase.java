@@ -14,18 +14,9 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import globales.EsceneManager;
-import interfaces.MenuPausa;
-import interfaces.PantallaDeMuerte;
-import interfaces.PantallaGanaste;
-import niveles.entorno.BarraInventario;
-import niveles.entorno.BarraVida;
-import niveles.entorno.LlaveActivadora;
-import niveles.entorno.Palanca;
-import niveles.entorno.Plataforma;
-import niveles.entorno.PlataformaMovil;
-import niveles.entorno.PuertaLlegada;
-import personajes.Enemigo;
-import personajes.Personaje;
+import interfaces.*;
+import niveles.entorno.*;
+import personajes.*;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -107,11 +98,11 @@ public abstract class NivelBase extends EscenaBase {
                     Enemigo enemigoColisionado = (a instanceof Enemigo) ? (Enemigo) a : (Enemigo) b;
 
                     if(enemigoColisionado.getPuedeAtacar()) {
-                    	enemigoColisionado.aplicarDañoJugador(jugadorColisionado);
-                    	enemigoColisionado.iniciarCooldown();
+                        enemigoColisionado.aplicarDañoJugador(jugadorColisionado);
+                        enemigoColisionado.iniciarCooldown();
 
                         if(jugadorColisionado.getVida() == 0) {
-                        	cambiarEscena(new PantallaDeMuerte(juego));
+                            cambiarEscena(new PantallaDeMuerte(juego, jugadorColisionado, NivelBase.this));
                         }
                     }
                 }
@@ -122,7 +113,7 @@ public abstract class NivelBase extends EscenaBase {
                     Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
                     llave.activarConJugador(personaje);
                 }
-                
+
                 //Logica jugador activar palanca
                 if (a instanceof Personaje && b instanceof Palanca || b instanceof Personaje && a instanceof Palanca) {
                     Palanca palanca = a instanceof Palanca ? (Palanca)a : (Palanca)b;
@@ -191,8 +182,12 @@ public abstract class NivelBase extends EscenaBase {
         this.jugador1.detener();
         this.jugador2.detener();
 
-        if(this.jugador1.getVida() == 0 || this.jugador2.getVida() == 0) {
-        	this.cambiarEscena(new PantallaDeMuerte(this.juego));
+        if(this.jugador1.getVida() == 0) {
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this));
+        }
+
+        if(this.jugador2.getVida() == 0) {
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this));
         }
 
         if(this.inputManager.getIsWPressed()) {
