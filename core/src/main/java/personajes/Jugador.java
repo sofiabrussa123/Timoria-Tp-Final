@@ -17,11 +17,13 @@ import niveles.NivelBase;
 import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
 import personajes.movimientos.Estado;
+import personajes.MejoraTemporal;
 
 public class Jugador extends Actor {
 
     private String nombre;
     private BarraVida barraVida;
+    private int idJugador; // 1 o 2
     private BarraInventario barraInventario;
     private Body cuerpo;
     private Animation<TextureRegion> animacionActual;
@@ -44,9 +46,15 @@ public class Jugador extends Actor {
     private float cooldown = 0.4f;
     private float duracionAtaque = 0.015f;
     private boolean enCooldown = false;
+    private MejoraTemporal mejoras;
 
-	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
+	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, int idJugador) {
 
+		this.mejoras = new MejoraTemporal();
+		this.idJugador = idJugador;
+        this.velocidadX = 5f + mejoras.getBonusVelocidad();
+        this.velocidadX = -5f - mejoras.getBonusVelocidad();
+        this.velocidadX = 0.0F;
         this.nombre = nombre;
         this.barraVida = new BarraVida(this, true);
 
@@ -61,16 +69,6 @@ public class Jugador extends Actor {
         this.setSize(anchoPersonaje, altoPersonaje);
         this.animacionActual = estado.QUIETO.crearAnimacion();
 	}
-
-    public void setBarraInventario(BarraInventario barraInventario) {
-
-        this.barraInventario = barraInventario;
-    }
-
-    public BarraInventario getBarraInventario() {
-
-        return this.barraInventario;
-    }
 
 	@Override
 	public void act(float delta) {
@@ -165,29 +163,23 @@ public class Jugador extends Actor {
         }
     }
 
-	public void moverDerecha() {
-		velocidadX = 5f;
+    public void actualizarVidaConMejoras() {
+        vidaMaxima = 100 + (int) mejoras.getBonusVida(); // Base fija + mejoras
+        vida = vidaMaxima; // Restaurar vida completa
+    }
+
+    public void moverDerecha() {
+        velocidadX = 5f + mejoras.getBonusVelocidad();
         mirandoIzquierda = false;
         mirandoDerecha = true;
         estado = estado.CORRIENDO;
-	}
+    }
 
-	public void moverIzquierda() {
-		velocidadX = -5f;
+    public void moverIzquierda() {
+        velocidadX = -5f - mejoras.getBonusVelocidad();
         mirandoIzquierda = true;
         mirandoDerecha = false;
         estado = estado.CORRIENDO;
-	}
-
-	public void saltar() {
-		cuerpo.applyLinearImpulse(new Vector2(0, 7f), cuerpo.getWorldCenter(), true);
-        enElAire = true;
-        /*estado = estado.SALTANDO*/;
-	}
-
-	public void detener() {
-		velocidadX = 0;
-		estado = estado.QUIETO;
 	}
 	
 	// Clase Jugador
@@ -241,40 +233,75 @@ public class Jugador extends Actor {
 		this.atacando = false;
 		this.enCooldown = false;
 	}
-
-	public void setEnElAire(boolean valor) {
-        enElAire = valor;
-    }
 	
 	public float getAlcanceAtaque() {
 		return this.alcanceAtaque;
 	}
 
-	public Body getCuerpo() {
-
-		return this.cuerpo;
-	}
-
-	public int getVida() {
-
-        return this.vida;
-	}
-	
-	public int getDañoAtaque() {
-		return this.dañoAtaque;
-	}
-
-	public int getVidaMaxima() {
-
-        return this.vidaMaxima;
-	}
-
-	public boolean getEnElAire() {
-
-        return this.enElAire;
-	}
-
-    public void setBarraVida(BarraVida barra1) {
+    public void saltar() {
+        float potenciaSalto = 7f + mejoras.getBonusSalto();
+        cuerpo.applyLinearImpulse(new Vector2(0, potenciaSalto), cuerpo.getWorldCenter(), true);
+        enElAire = true;
+        /* estado = estado.SALTANDO; */
     }
 
+    public void detener() {
+        velocidadX = 0;
+        estado = estado.QUIETO;
+    }
+
+
+    public Body getCuerpo() {
+
+        return this.cuerpo;
+    }
+
+    public int getVida() {
+
+        return this.vida;
+    }
+
+    public BarraInventario getBarraInventario() {
+
+        return this.barraInventario;
+    }
+
+    public MejoraTemporal getMejoras() {
+
+        return mejoras;
+    }
+
+    public int getVidaMaximaMejorada() {
+
+        return vidaMaxima; // Ya incluye las mejoras aplicadas
+    }
+
+    public int getVidaMaxima() {
+
+        return this.vidaMaxima;
+    }
+
+    public boolean getEnElAire() {
+
+        return this.enElAire;
+    }
+
+    public int getIdJugador() {
+
+        return this.idJugador;
+    }
+
+    public void setBarraInventario(BarraInventario barraInventario) {
+
+        this.barraInventario = barraInventario;
+    }
+
+    public void setBarraVida(BarraVida barra1) {
+    	this.barraVida = barra1;
+    }
+
+    public void setEnElAire(boolean valor) {
+
+        enElAire = valor;
+    }
 }

@@ -16,18 +16,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import globales.EsceneManager;
-import interfaces.MenuPausa;
-import interfaces.PantallaDeMuerte;
-import interfaces.PantallaGanaste;
-import niveles.entorno.BarraInventario;
-import niveles.entorno.BarraVida;
-import niveles.entorno.LlaveActivadora;
-import niveles.entorno.Palanca;
-import niveles.entorno.Plataforma;
-import niveles.entorno.PlataformaMovil;
-import niveles.entorno.PuertaLlegada;
-import personajes.Enemigo;
-import personajes.Jugador;
+import interfaces.*;
+import niveles.entorno.*;
+import personajes.*;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -107,7 +98,7 @@ public abstract class NivelBase extends EscenaBase {
                     Jugador personaje = a instanceof Jugador ? (Jugador)a : (Jugador)b;
                     llave.activarConJugador(personaje);
                 }
-                
+
                 //Logica jugador activar palanca
                 if (a instanceof Jugador && b instanceof Palanca || b instanceof Jugador && a instanceof Palanca) {
                     Palanca palanca = a instanceof Palanca ? (Palanca)a : (Palanca)b;
@@ -176,8 +167,12 @@ public abstract class NivelBase extends EscenaBase {
         this.jugador1.detener();
         this.jugador2.detener();
 
-        if(this.jugador1.getVida() == 0 || this.jugador2.getVida() == 0) {
-        	this.cambiarEscena(new PantallaDeMuerte(this.juego));
+        if(this.jugador1.getVida() == 0) {
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this));
+        }
+
+        if(this.jugador2.getVida() == 0) {
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this));
         }
 
         if(this.inputManager.getIsWPressed()) {

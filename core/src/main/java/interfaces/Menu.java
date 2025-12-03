@@ -22,7 +22,7 @@ public class Menu extends EscenaBase {
 
     public Menu(Game juego) {
         super(juego, "Fondo.jpeg");
-        
+
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         // Música de fondo
@@ -35,16 +35,16 @@ public class Menu extends EscenaBase {
         Table table = new Table();
         table.setFillParent(true);
         super.escena.addActor(table);
-        
+
         // Botón Jugar
         TextButton botonJugar = new TextButton("Jugar", super.fuenteTextos);
         botonJugar.addListener(new ClickListener() {
-            @Override	
+            @Override
             public void clicked(InputEvent event, float x, float y) {
                 Menu.this.musica.stop();
                 Menu.this.musica.dispose();
-                EsceneManager.setEscenaActual(new Nivel1(juego));
-                cambiarEscena((NivelBase)EsceneManager.getEscenaActual());
+
+                cambiarEscena(new Nivel1(juego));
             }
         });
 
@@ -79,9 +79,9 @@ public class Menu extends EscenaBase {
         table.row();
         table.add(botonMusicaMenu).width(350).height(40).padBottom(15);
         table.row();
-        table.add(btnInstrucciones).width(350).height(40);  
+        table.add(btnInstrucciones).width(350).height(40);
     }
-    
+
     @Override
     public void show() {
     	Gdx.input.setInputProcessor(this.escena);
