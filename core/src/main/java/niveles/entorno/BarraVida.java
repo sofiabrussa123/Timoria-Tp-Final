@@ -3,16 +3,16 @@ package niveles.entorno;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import personajes.Personaje;
+import personajes.Jugador;
 
 public class BarraVida extends Actor {
     private final Texture relleno;
-    private Personaje jugador;
+    private Jugador jugador;
     private Texture fondo;
     private Texture vidaLlena;
     private boolean posicionIzquierda;
 
-    public BarraVida(Personaje jugador, boolean posicionIzquierda) {
+    public BarraVida(Jugador jugador, boolean posicionIzquierda) {
         this.jugador = jugador;
         this.posicionIzquierda = posicionIzquierda;
         this.fondo = new Texture("barra_fondo.png");

@@ -18,40 +18,35 @@ import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
 import personajes.movimientos.Estado;
 
-public class Personaje extends Actor {
+public class Jugador extends Actor {
 
     private String nombre;
     private BarraVida barraVida;
     private BarraInventario barraInventario;
     private Body cuerpo;
     private Animation<TextureRegion> animacionActual;
-    private Estado estado;
-    private float tiempoEstado;
-    private boolean mirandoDerecha;
-    private boolean mirandoIzquierda;
-    private boolean enElAire;
-    private int vida;
-    private int vidaMaxima;
-    private Sound sonidoDaño;
-    private long tiempoUltimoDaño;
-    private boolean sonidoReproduciéndose;
-    private final long DURACION_SONIDO_DAÑO;
-    private float velocidadX;
+    private Estado estado = Estado.QUIETO;
+    private float tiempoEstado = 0f;
+    private boolean mirandoDerecha = true;
+    private boolean mirandoIzquierda = false;
+    private boolean enElAire = false;
+    private int vida = 100;
+    private int vidaMaxima = 100;
+    private Sound sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));;
+    private long tiempoUltimoDaño = 0l;
+    private boolean sonidoReproduciéndose = false;
+    private float velocidadX = 0f;
+    private float alcanceAtaque = 0.5f;
+    private int dañoAtaque = 20;
+    private float tiempoAtacando = 0f;
+    private boolean atacando = false;
+    private float cargaAtaque = 0.2f;
+    private float cooldown = 0.4f;
+    private float duracionAtaque = 0.015f;
+    private boolean enCooldown = false;
 
-	public Personaje(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
+	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion) {
 
-        this.estado = Estado.QUIETO;
-        this.tiempoEstado = 0.0F;
-        this.mirandoDerecha = true;
-        this.mirandoIzquierda = false;
-        this.enElAire = false;
-        this.vida = 100;
-        this.vidaMaxima = 100;
-        this.sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));
-        this.tiempoUltimoDaño = 0L;
-        this.sonidoReproduciéndose = false;
-        this.DURACION_SONIDO_DAÑO = 1000L;
-        this.velocidadX = 0.0F;
         this.nombre = nombre;
         this.barraVida = new BarraVida(this, true);
 
@@ -81,23 +76,12 @@ public class Personaje extends Actor {
 	public void act(float delta) {
 
 		tiempoEstado += delta;
+		
+		this.tiempoAtacando += delta;
 
         cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
 
         animacionActual = estado.crearAnimacion();
-        /*
-         switch (estado) {
-        case CORRIENDO:
-            animacionActual = animaciones.getAnimacionCorrer();
-            break;
-        case QUIETO:
-            animacionActual = animaciones.getAnimacionQuieto();
-            break;
-            
-        case SALTANDO:
-            animacionActual = animaciones.getAnimacionSaltar();
-            break;
-    }*/
 
         if (this.sonidoReproduciéndose) {
             long ahora = System.currentTimeMillis();
@@ -157,7 +141,7 @@ public class Personaje extends Actor {
         forma.dispose();
 
 		this.cuerpo = body;
-		this.cuerpo.setUserData(Personaje.this);
+		this.cuerpo.setUserData(Jugador.this);
 	}
 
 	public void recibirDaño(int cantidad) {
@@ -205,10 +189,66 @@ public class Personaje extends Actor {
 		velocidadX = 0;
 		estado = estado.QUIETO;
 	}
+	
+	// Clase Jugador
+	public void atacar(World mundo) { 
+	    estado = estado.ATACANDO;
+
+	    Vector2 posicionJugador = this.cuerpo.getPosition();
+	    
+	    float anchoAreaAtaque = this.alcanceAtaque; 
+	    float altoAreaAtaque = 1.4f; 
+	    
+	    float centroXAreaAtaque = posicionJugador.x + (anchoAreaAtaque / 2 + (this.getWidth() * NivelBase.PIXELES_A_METROS) / 2) * (mirandoDerecha ? 1 : -1);
+	    float centroYAreaAtaque = posicionJugador.y;
+	    
+	    float lowerX = centroXAreaAtaque - (anchoAreaAtaque / 2);
+	    float upperX = centroXAreaAtaque + (anchoAreaAtaque / 2);
+	    float lowerY = centroYAreaAtaque - (altoAreaAtaque / 2); 
+	    float upperY = centroYAreaAtaque + (altoAreaAtaque / 2); 
+	    
+	    if(!enCooldown) {
+			if(this.tiempoAtacando >= cargaAtaque && this.tiempoAtacando < this.cargaAtaque + this.duracionAtaque) {
+				this.atacando = true;
+				mundo.QueryAABB(fixture -> {
+			        Object userData = fixture.getBody().getUserData();
+			        
+			        if (userData instanceof Enemigo) {
+			            Enemigo enemigo = (Enemigo) userData;
+			            
+			            enemigo.recibirDaño(this.dañoAtaque);
+			            
+			            return false; 
+			        }
+			        return true; 
+			    }, lowerX, lowerY, upperX, upperY);
+			}
+			else if (this.tiempoAtacando >= this.cargaAtaque + this.duracionAtaque){
+				this.atacando = false;
+				this.enCooldown = true;
+				this.tiempoAtacando = 0f;
+			}
+		} else {
+			if(this.tiempoAtacando >= cooldown) {
+				this.enCooldown = false;
+				this.tiempoAtacando = 0f;
+			}
+		}
+	}
+	
+	public void resetearGolpe() {
+		this.tiempoAtacando = 0;
+		this.atacando = false;
+		this.enCooldown = false;
+	}
 
 	public void setEnElAire(boolean valor) {
         enElAire = valor;
     }
+	
+	public float getAlcanceAtaque() {
+		return this.alcanceAtaque;
+	}
 
 	public Body getCuerpo() {
 
@@ -218,6 +258,10 @@ public class Personaje extends Actor {
 	public int getVida() {
 
         return this.vida;
+	}
+	
+	public int getDañoAtaque() {
+		return this.dañoAtaque;
 	}
 
 	public int getVidaMaxima() {

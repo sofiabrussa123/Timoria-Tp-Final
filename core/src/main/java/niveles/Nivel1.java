@@ -8,7 +8,7 @@ import niveles.entorno.Plataforma;
 import niveles.entorno.PlataformaMovil;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
-import personajes.Personaje;
+import personajes.Jugador;
 
 public class Nivel1 extends NivelBase {
 
@@ -17,8 +17,8 @@ public class Nivel1 extends NivelBase {
         super(juego, "FondoNivel1.jpeg");
 
         // Crear jugador
-        super.jugador1 = new Personaje(mundo, "Jugador1", 100, 85);
-        super.jugador2 = new Personaje(mundo, "Jugador2", 120, 85); 
+        super.jugador1 = new Jugador(mundo, "Jugador1", 100, 85);
+        super.jugador2 = new Jugador(mundo, "Jugador2", 120, 85); 
 
         // Crear plataformas
         //Plataforma plataforma1 = new Plataforma(mundo, 200, 130, 150, 20);
@@ -35,7 +35,7 @@ public class Nivel1 extends NivelBase {
         LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta);        
 
         // Crear enemigo
-        Enemigo enemigo = new Enemigo(mundo, 400, 150, 10, this);        
+        Enemigo enemigo = new Enemigo(mundo, 400, 150, this);        
 
         // Agregar todos los actores
         super.escena.addActor(super.jugador1);

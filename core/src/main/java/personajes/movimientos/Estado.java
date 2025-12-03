@@ -7,8 +7,9 @@ import com.badlogic.gdx.utils.Array;
 
 public enum Estado {
     QUIETO("animaciones/idle.png", 0.1f, 128, 128), 
-    CORRIENDO("animaciones/run.png", 0.1f, 128, 128);
+    CORRIENDO("animaciones/run.png", 0.1f, 128, 128),
     /*SALTANDO("animaciones/jump.png", 0.1f, 128, 128);*/ 
+	ATACANDO("animaciones/Punch_1.png", 0.1f, 128, 128);
 
     // 2. Campos del Enum (datos asociados a cada estado):
     private final String rutaHoja;

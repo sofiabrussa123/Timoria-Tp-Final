@@ -11,6 +11,8 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import globales.EsceneManager;
@@ -25,7 +27,7 @@ import niveles.entorno.Plataforma;
 import niveles.entorno.PlataformaMovil;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
-import personajes.Personaje;
+import personajes.Jugador;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -43,10 +45,10 @@ public abstract class NivelBase extends EscenaBase {
     protected Body cuerpoPiso;
     private boolean juegoPausado = false;
     protected Screen pantallaRetorno;
-    protected Personaje jugador1;
-    protected Personaje jugador2;
+    protected Jugador jugador1;
+    protected Jugador jugador2;
 
-    protected Personaje personaje; // ← personaje seguido por la cámara
+    protected Jugador personaje; // ← personaje seguido por la cámara
 
     public NivelBase(Game juego, String fondo) {
 
@@ -62,7 +64,7 @@ public abstract class NivelBase extends EscenaBase {
         this.establecerContactos();
     }
 
-    public void setPersonaje(Personaje personaje) {
+    public void setPersonaje(Jugador personaje) {
         this.personaje = personaje;
     }
 
@@ -85,8 +87,8 @@ public abstract class NivelBase extends EscenaBase {
                 Object b = contact.getFixtureB().getBody().getUserData();
 
                 //Lógica puerta
-                if ((a instanceof Personaje && b instanceof PuertaLlegada) ||
-                    (b instanceof Personaje && a instanceof PuertaLlegada)) {
+                if ((a instanceof Jugador && b instanceof PuertaLlegada) ||
+                    (b instanceof Jugador && a instanceof PuertaLlegada)) {
 
                     PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
                     if (puerta.sePuedeCruzar()) {
@@ -99,41 +101,24 @@ public abstract class NivelBase extends EscenaBase {
                     }
                 }
 
-                //Lógica enemigo daña al jugador
-                if ((a instanceof Personaje && b instanceof Enemigo) ||
-                    (b instanceof Personaje && a instanceof Enemigo)) {
-
-                    Personaje jugadorColisionado = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
-                    Enemigo enemigoColisionado = (a instanceof Enemigo) ? (Enemigo) a : (Enemigo) b;
-
-                    if(enemigoColisionado.getPuedeAtacar()) {
-                    	enemigoColisionado.aplicarDañoJugador(jugadorColisionado);
-                    	enemigoColisionado.iniciarCooldown();
-
-                        if(jugadorColisionado.getVida() == 0) {
-                        	cambiarEscena(new PantallaDeMuerte(juego));
-                        }
-                    }
-                }
-
-                //Lógica activar el botón
-                if (a instanceof Personaje && b instanceof LlaveActivadora || b instanceof Personaje && a instanceof LlaveActivadora) {
+                //Lógica activar la llave
+                if (a instanceof Jugador && b instanceof LlaveActivadora || b instanceof Jugador && a instanceof LlaveActivadora) {
                     LlaveActivadora llave = a instanceof LlaveActivadora ? (LlaveActivadora)a : (LlaveActivadora)b;
-                    Personaje personaje = a instanceof Personaje ? (Personaje)a : (Personaje)b;
+                    Jugador personaje = a instanceof Jugador ? (Jugador)a : (Jugador)b;
                     llave.activarConJugador(personaje);
                 }
                 
                 //Logica jugador activar palanca
-                if (a instanceof Personaje && b instanceof Palanca || b instanceof Personaje && a instanceof Palanca) {
+                if (a instanceof Jugador && b instanceof Palanca || b instanceof Jugador && a instanceof Palanca) {
                     Palanca palanca = a instanceof Palanca ? (Palanca)a : (Palanca)b;
                     palanca.activar();
                 }
 
                 //Lógica jugador apoyarse en plataforma
-                if ((a instanceof Personaje && (b instanceof Plataforma || b instanceof PlataformaMovil)) ||
-                    (b instanceof Personaje && (b instanceof Plataforma || b instanceof PlataformaMovil))) {
+                if ((a instanceof Jugador && (b instanceof Plataforma || b instanceof PlataformaMovil)) ||
+                    (b instanceof Jugador && (b instanceof Plataforma || b instanceof PlataformaMovil))) {
 
-                    Personaje personaje = (a instanceof Personaje) ? (Personaje) a : (Personaje) b;
+                    Jugador personaje = (a instanceof Jugador) ? (Jugador) a : (Jugador) b;
                     personaje.setEnElAire(false);
                 }
             }
@@ -145,11 +130,11 @@ public abstract class NivelBase extends EscenaBase {
         });
     }
 
-    public Personaje getJugador1() {
+    public Jugador getJugador1() {
     	return this.jugador1;
     }
 
-    public Personaje getJugador2() {
+    public Jugador getJugador2() {
     	return this.jugador2;
     }
 
@@ -200,6 +185,14 @@ public abstract class NivelBase extends EscenaBase {
         		this.jugador1.saltar();
         	}
         }
+        
+        if(this.inputManager.getIsEPressed()) {
+        	jugador2.atacar(this.mundo);
+        } else jugador2.resetearGolpe();
+        
+        if(this.inputManager.getIsOPressed()) {
+        	jugador1.atacar(this.mundo);
+        } else jugador1.resetearGolpe();
 
         if(this.inputManager.getIsAPressed()) {
         	jugador1.moverIzquierda();
@@ -222,11 +215,34 @@ public abstract class NivelBase extends EscenaBase {
         if(this.inputManager.getIsRightPressed()) {
         	jugador2.moverDerecha();
         }
+        
+        limpiarEntidades();
 
 	    super.render(delta);
 	    actualizarCamara();
 	    escena.getViewport().getCamera().combined.set(camaraBox2D.combined);
 	    mundo.step(1 / 60f, 6, 2);
+    }
+    
+    private void limpiarEntidades() {
+        // Obtenemos los actores para iterar.
+        Array<Actor> actores = escena.getActors();
+        
+        // Iteramos en reversa para eliminar de forma segura del Array
+        for (int i = actores.size - 1; i >= 0; i--) {
+            Actor actor = actores.get(i);
+            
+            if (actor instanceof Enemigo) {
+                Enemigo enemigo = (Enemigo) actor;
+                
+                if (enemigo.getMuerto()) {
+                    // 1. Eliminar el cuerpo de Box2D y del Stage
+                    enemigo.eliminar(); 
+                    // 2. Liberar recursos (Texturas)
+                    enemigo.dispose();
+                }
+            }
+        }
     }
 
     @Override

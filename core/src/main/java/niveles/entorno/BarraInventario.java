@@ -3,15 +3,15 @@ package niveles.entorno;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import personajes.Personaje;
+import personajes.Jugador;
 
 public class BarraInventario extends Actor {
-    private Personaje jugador;
+    private Jugador jugador;
     private Texture slotVacio;
     private Texture[] iconos;
     private boolean posicionIzquierda;
 
-    public BarraInventario(Personaje jugador, boolean posicionIzquierda) {
+    public BarraInventario(Jugador jugador, boolean posicionIzquierda) {
         this.jugador = jugador;
         this.posicionIzquierda = posicionIzquierda;
         this.slotVacio = new Texture("barraInventario.png");

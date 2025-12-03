@@ -15,6 +15,8 @@ public class InputManager implements InputProcessor {
     private boolean isRightPressed = false;
     private boolean isEscPressed = false;
     private boolean isPPressed = false;
+    private boolean isEPressed = false;
+    private boolean isOPressed = false;
 
     @Override
     public boolean keyDown(int keycode) {
@@ -29,6 +31,8 @@ public class InputManager implements InputProcessor {
         	case Input.Keys.RIGHT:  isRightPressed = true; break;
         	case Input.Keys.ESCAPE:  isEscPressed = true; break;
         	case Input.Keys.P:  isPPressed = true; break;
+        	case Input.Keys.E: isEPressed = true; break;
+        	case Input.Keys.O: isOPressed = true; break;
         }
         
         return false;
@@ -47,6 +51,8 @@ public class InputManager implements InputProcessor {
         	case Input.Keys.RIGHT:  isRightPressed = false; break;
 	    	case Input.Keys.ESCAPE:  isEscPressed = false; break;
 	    	case Input.Keys.P:  isPPressed = false; break;
+	    	case Input.Keys.E: isEPressed = false; break;
+	    	case Input.Keys.O: isOPressed = false; break;
     	}
     	
         return false;
@@ -76,4 +82,6 @@ public class InputManager implements InputProcessor {
     public boolean getIsRightPressed() { return isRightPressed; }
     public boolean getIsEscPressed() { return isEscPressed; }
     public boolean getIsPPressed() { return isPPressed; }
+    public boolean getIsEPressed() { return isEPressed; }
+    public boolean getIsOPressed() { return isOPressed; }
 }

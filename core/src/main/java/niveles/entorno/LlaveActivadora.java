@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.World;
-import personajes.Personaje;
+import personajes.Jugador;
 
 public class LlaveActivadora extends ElementoActivador {
 
@@ -19,7 +19,7 @@ public class LlaveActivadora extends ElementoActivador {
         super.crearYPosicionarCuerpo(this.ancho, this.alto);
     }
 
-    public void activarConJugador(Personaje personaje) {
+    public void activarConJugador(Jugador personaje) {
         if (!this.activado) {
             int slotLibre = personaje.getBarraInventario().getPrimeraCasillaLibre();
             if (slotLibre != -1) {
