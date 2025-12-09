@@ -13,11 +13,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import Red.HiloServidor;
 import niveles.NivelBase;
 import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
-import personajes.movimientos.Estado;
-import personajes.MejoraTemporal;
+import personajes.accesorios.Estado;
+import personajes.accesorios.MejoraTemporal;
 
 public class Jugador extends Actor {
 
@@ -47,6 +48,7 @@ public class Jugador extends Actor {
     private float duracionAtaque = 0.015f;
     private boolean enCooldown = false;
     private MejoraTemporal mejoras;
+    private HiloServidor hiloServidor;
 
 	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, int idJugador) {
 
@@ -74,6 +76,7 @@ public class Jugador extends Actor {
 	public void act(float delta) {
 
 		tiempoEstado += delta;
+		this.hiloServidor.enviarMensajeATodos("CambiarFrame:"+this.idJugador+":"+tiempoEstado);
 		
 		this.tiempoAtacando += delta;
 
@@ -93,6 +96,8 @@ public class Jugador extends Actor {
                 (cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS) - getWidth() / 2,
                 (cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS) - getHeight() / 2
         );
+        
+        this.hiloServidor.enviarMensajeATodos("CambiarPosicion:Jugador:"+this.cuerpo.getPosition().x+":"+this.cuerpo.getPosition().y);
 	}
 
 	@Override
@@ -146,6 +151,7 @@ public class Jugador extends Actor {
         if (cantidad <= 0 || vida <= 0) return;
 
         this.vida -= cantidad;
+        this.hiloServidor.enviarMensajeATodos("ActualizarVidaJugador:"+this.idJugador+":"+this.vida);
         if (vida < 0) vida = 0;
 
         if (sonidoDaño != null) {
@@ -160,12 +166,14 @@ public class Jugador extends Actor {
         if (vida == 0) {
             sonidoDaño.stop();
             sonidoReproduciéndose = false;
+            this.hiloServidor.enviarMensajeATodos("EliminarEntidad:Jugador:"+this.idJugador);
         }
     }
 
     public void actualizarVidaConMejoras() {
         vidaMaxima = 100 + (int) mejoras.getBonusVida(); // Base fija + mejoras
         vida = vidaMaxima; // Restaurar vida completa
+        this.hiloServidor.enviarMensajeATodos("ActualizarVidaJugador:"+this.idJugador+":"+this.vida);
     }
 
     public void moverDerecha() {

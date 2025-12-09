@@ -12,20 +12,22 @@ public class LlaveActivadora extends ElementoActivador {
     private float ancho = 30;
     private float alto = 45;
 
-    public LlaveActivadora(World mundo, float x, float y, PuertaLlegada puerta) {
-    	super(mundo, x, y);
+    public LlaveActivadora(World mundo, float x, float y, PuertaLlegada puerta, int id) {
+    	super(mundo, x, y, id);
         this.puerta = puerta;
         super.textura = new Texture(Gdx.files.internal("boton.png"));
         super.crearYPosicionarCuerpo(this.ancho, this.alto);
     }
 
-    public void activarConJugador(Jugador personaje) {
+    public void activarConJugador(Jugador jugador) {
         if (!this.activado) {
-            int slotLibre = personaje.getBarraInventario().getPrimeraCasillaLibre();
+            int slotLibre = jugador.getBarraInventario().getPrimeraCasillaLibre();
             if (slotLibre != -1) {
+            	super.hiloServidor.enviarMensajeATodos("Desaparecer:LlaveActivadora");
+            	super.hiloServidor.enviarMensajeATodos("ActualizarInventario:LlaveActivadora:"+jugador.getIdJugador()+":"+slotLibre);
                 Texture texturaLlave = new Texture(Gdx.files.internal("boton.png"));
-                personaje.getBarraInventario().setIcono(slotLibre, texturaLlave);
-                this.puerta.desbloquear();
+                jugador.getBarraInventario().setIcono(slotLibre, texturaLlave);
+                this.puerta.desbloquear(super.hiloServidor);
                 this.activado = true;
                 this.remove();
             } else {

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import Red.HiloServidor;
 import io.github.timoria.Principal;
 
 public class PlataformaMovil extends ElementoEntorno {
@@ -16,9 +17,10 @@ public class PlataformaMovil extends ElementoEntorno {
 	private float posicionInicial;
 	private float dx = 0;
 	private float dy = 0;
+	private HiloServidor hiloServidor;
 	
-	public PlataformaMovil(World mundo, float x, float y, int direccionMovimiento, int distanciaMovimiento, Palanca palanca){
-		super(mundo, x, y, 150, 20);
+	public PlataformaMovil(World mundo, float x, float y, int direccionMovimiento, int distanciaMovimiento, Palanca palanca, int id){
+		super(mundo, x, y, 150, 20, id);
 		super.textura = new Texture(Gdx.files.internal("PlataformaActivable.png"));
 		this.direccionMovimiento = direccionMovimiento;
 		this.distanciaMovimiento = (int) (distanciaMovimiento / Principal.PPM);
@@ -78,6 +80,8 @@ public class PlataformaMovil extends ElementoEntorno {
 			
 			cambiarSentidoMovimiento(posicion, posicionInicial, distanciaMovimiento);
 		}
+	   
+	   this.hiloServidor.enviarMensajeATodos("CambiarPosicion:Enemigo:"+this.cuerpo.getPosition().x);
 	}
 	
 	private void cambiarSentidoMovimiento(float posicion, float posicionInicial, int distanciaMovimiento) {

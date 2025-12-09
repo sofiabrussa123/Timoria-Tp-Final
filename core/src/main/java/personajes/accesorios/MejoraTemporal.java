@@ -1,4 +1,4 @@
-package personajes;
+package personajes.accesorios;
 
 public class MejoraTemporal {
 

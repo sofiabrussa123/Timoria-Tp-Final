@@ -4,7 +4,11 @@ FondoNivel1.jpeg
 FondoTransparente.png
 Instrucciones.png
 Muerte.mp3
+Palanca1.png
+Palanca2.png
 PantallaDeMuerte.png
+PlataformaActivable.png
+PlataformaMovil.png
 animaciones/Ability_Use.png
 animaciones/Aerial_Charge.png
 animaciones/Aerial_Strike.png

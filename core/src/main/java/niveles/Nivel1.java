@@ -1,10 +1,20 @@
 package niveles;
 
 import com.badlogic.gdx.Game;
-import niveles.entorno.*;
-import personajes.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+
+import niveles.entorno.LlaveActivadora;
+import niveles.entorno.Palanca;
+import niveles.entorno.Plataforma;
+import niveles.entorno.PlataformaMovil;
+import niveles.entorno.PuertaLlegada;
+import personajes.Enemigo;
+import personajes.Jugador;
+import personajes.accesorios.MejoraTemporal;
 
 public class Nivel1 extends NivelBase {
+	
+	private int cantActores = 0;
 
     public Nivel1(Game juego) {
 
@@ -33,21 +43,21 @@ public class Nivel1 extends NivelBase {
 
         // Crear plataformas
         //Plataforma plataforma1 = new Plataforma(mundo, 200, 130, 150, 20);
-        Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20);
-        Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20);
-        Plataforma piso = new Plataforma(mundo, 0, 10, 800, 50);
+        Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20, asignarIDActor());
+        Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20, asignarIDActor());
+        Plataforma piso = new Plataforma(mundo, 0, 10, 800, 50, asignarIDActor());
 
-        Palanca palanca = new Palanca(mundo, 170, 120);
-        PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, 2, 200, palanca);
+        Palanca palanca = new Palanca(mundo, 170, 120, asignarIDActor());
+        PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, 2, 200, palanca, asignarIDActor());
 
         // Crear puerta
-        PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, 50, 95);
+        PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, asignarIDActor());
 
         //Crear boton
-        LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta);
+        LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta, asignarIDActor());
 
         // Crear enemigo
-        Enemigo enemigo = new Enemigo(mundo, 400, 150, this);        
+        Enemigo enemigo = new Enemigo(mundo, 400, 150, this, asignarIDActor());        
 
         // Agregar todos los actores
         super.escena.addActor(super.jugador1);
@@ -82,4 +92,8 @@ public class Nivel1 extends NivelBase {
         }
     }
 
+    private int asignarIDActor() {
+    	this.cantActores++;
+    	return this.cantActores;
+    }
 }

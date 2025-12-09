@@ -13,9 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
+import Red.HiloServidor;
 import io.github.timoria.Principal;
-import niveles.*;
-import personajes.*;
+import niveles.EscenaBase;
+import niveles.Nivel1;
+import niveles.NivelBase;
+import personajes.Jugador;
+import personajes.accesorios.MejoraTemporal;
 
 public class PantallaDeMuerte extends EscenaBase {
 
@@ -28,7 +32,7 @@ public class PantallaDeMuerte extends EscenaBase {
         "El velo entre mundos se cierra… vuelve a intentarlo.",
         "Caíste, pero el vacío aún te llama.",
         "Tu viaje ha terminado, pero tu alma aún busca redención.",
-        "Has cruzado el umbral… pero no estabas listo.",
+        "Has cruzado el umbral, pero no estabas listo.",
         "Un susurro apagó tu llama."
     };
 
@@ -40,7 +44,7 @@ public class PantallaDeMuerte extends EscenaBase {
 
     private Principal principal;
 
-    public PantallaDeMuerte(Game principal, Jugador jugadorMuerto, NivelBase nivelAnterior) {
+    public PantallaDeMuerte(Game principal, Jugador jugadorMuerto, NivelBase nivelAnterior, HiloServidor hiloServidor) {
         super(principal, "PantallaDeMuerte.png");
         this.jugador = jugadorMuerto;
         this.idJugadorMuerto = jugadorMuerto.getIdJugador();
@@ -68,6 +72,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     jugador.actualizarVidaConMejoras();
                     actualizarMejorasGuardadas();
                     actualizarBotones(btnMejorarVida, btnMejorarVelocidad, btnMejorarSalto);
+                    hiloServidor.enviarMensajeATodos("MejorarJugador:Vida:"+jugadorMuerto.getIdJugador());
                 }
             }
         });
@@ -78,6 +83,7 @@ public class PantallaDeMuerte extends EscenaBase {
                 if (jugador.getMejoras().mejorarVelocidad()) {
                     actualizarMejorasGuardadas();
                     actualizarBotones(btnMejorarVida, btnMejorarVelocidad, btnMejorarSalto);
+                    hiloServidor.enviarMensajeATodos("MejorarJugador:Velcidad:"+jugadorMuerto.getIdJugador());
                 }
             }
         });
@@ -88,6 +94,7 @@ public class PantallaDeMuerte extends EscenaBase {
                 if (jugador.getMejoras().mejorarSalto()) {
                     actualizarMejorasGuardadas();
                     actualizarBotones(btnMejorarVida, btnMejorarVelocidad, btnMejorarSalto);
+                    hiloServidor.enviarMensajeATodos("MejorarJugador:Salto:"+jugadorMuerto.getIdJugador());
                 }
             }
         });

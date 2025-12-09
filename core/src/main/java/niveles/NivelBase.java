@@ -1,4 +1,6 @@
 package niveles;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -15,10 +17,18 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import globales.EsceneManager;
-import interfaces.*;
-import niveles.entorno.*;
-import personajes.*;
+import Red.HiloServidor;
+import interfaces.PantallaDeMuerte;
+import interfaces.PantallaGanaste;
+import niveles.entorno.BarraInventario;
+import niveles.entorno.BarraVida;
+import niveles.entorno.LlaveActivadora;
+import niveles.entorno.Palanca;
+import niveles.entorno.Plataforma;
+import niveles.entorno.PlataformaMovil;
+import niveles.entorno.PuertaLlegada;
+import personajes.Enemigo;
+import personajes.Jugador;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -26,7 +36,6 @@ public abstract class NivelBase extends EscenaBase {
     private static final float ALTO_VIEWPORT_INICIAL = 15f;
     protected final int anchoPantalla = 800;
     protected final int altoPantalla = 800;
-
     protected World mundo = new World(new Vector2(0.0F, -25.0F), true);
     protected Box2DDebugRenderer depuradorBox2D = new Box2DDebugRenderer();
     protected OrthographicCamera camaraBox2D = new OrthographicCamera();
@@ -38,6 +47,7 @@ public abstract class NivelBase extends EscenaBase {
     protected Screen pantallaRetorno;
     protected Jugador jugador1;
     protected Jugador jugador2;
+    protected HiloServidor hiloServidor;
 
     protected Jugador personaje; // ← personaje seguido por la cámara
 
@@ -89,6 +99,7 @@ public abstract class NivelBase extends EscenaBase {
                     	NivelBase.this.jugador2 = null;
                     	NivelBase.this.escena.getActors().removeValue(jugador2, true);
                         cambiarEscena(new PantallaGanaste(juego));
+                        hiloServidor.enviarMensajeATodos("CambiarEscena:PantallaGanaste");
                     }
                 }
 
@@ -132,6 +143,7 @@ public abstract class NivelBase extends EscenaBase {
     @Override
     public void show() {
 
+    	hiloServidor = new HiloServidor();
         Gdx.input.setInputProcessor(this.inputManager);
         BarraVida barra1 = new BarraVida(this.jugador1, true);
         BarraVida barra2 = new BarraVida(this.jugador2, false);
@@ -151,10 +163,12 @@ public abstract class NivelBase extends EscenaBase {
             this.escena.addActor(inventario2);
         }
 
+        this.hiloServidor.start();
     }
 
     @Override
     public void render(float delta) {
+    	/*
     	//Cambiar al menú de pausa si es aprieta escape o p
         if (this.inputManager.getIsEscPressed() || this.inputManager.getIsPPressed()) {
             this.juegoPausado = !this.juegoPausado;
@@ -162,17 +176,19 @@ public abstract class NivelBase extends EscenaBase {
             	EsceneManager.setEscenaActual(this);
             	this.cambiarEscena(new MenuPausa(this.juego));
             }
-        }
+        }*/
 
         this.jugador1.detener();
         this.jugador2.detener();
 
+        
+        //Discutir pantalla muerte
         if(this.jugador1.getVida() == 0) {
-            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this));
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this, this.hiloServidor));
         }
 
         if(this.jugador2.getVida() == 0) {
-            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador1, this));
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, this.jugador2, this, this.hiloServidor));
         }
 
         if(this.inputManager.getIsWPressed()) {
@@ -231,10 +247,9 @@ public abstract class NivelBase extends EscenaBase {
                 Enemigo enemigo = (Enemigo) actor;
                 
                 if (enemigo.getMuerto()) {
-                    // 1. Eliminar el cuerpo de Box2D y del Stage
                     enemigo.eliminar(); 
-                    // 2. Liberar recursos (Texturas)
                     enemigo.dispose();
+                    this.hiloServidor.enviarMensajeATodos("Eliminar:Enemigo:"+enemigo.getID()+":"+enemigo.getPosicionX()+":"+enemigo.getPosicionY());
                 }
             }
         }

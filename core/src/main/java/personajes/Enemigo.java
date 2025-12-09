@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import Red.HiloServidor;
 import niveles.NivelBase;
 
 public class Enemigo extends Actor {
@@ -31,8 +32,11 @@ public class Enemigo extends Actor {
     private float tiempoAtaqueVisual = 0.1f; 
     private float contadorAtaqueVisual = 0f;
     private boolean muerto = false;
+    private HiloServidor hiloServidor;
+    private final int ID;
 
-    public Enemigo(World mundo, float x, float y, NivelBase nivel) {
+    public Enemigo(World mundo, float x, float y, NivelBase nivel, int id) {
+    	this.ID = id;
         this.textura = new Texture("enemigo.png");
         this.nivel = nivel;
         this.anchoHitbox = 48;
@@ -82,6 +86,8 @@ public class Enemigo extends Actor {
         super.act(delta);
         
         determinarDireccionMovimiento(calcularJugadorObjetivo());
+        
+        this.hiloServidor.enviarMensajeATodos("CambiarPosicion:Enemigo:"+getPosicionX()+":"+getPosicionY());
         
         this.tiempoTranscurrido += delta;
         
@@ -145,6 +151,8 @@ public class Enemigo extends Actor {
             cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
             cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
         );
+        
+        this.hiloServidor.enviarMensajeATodos("CambiarPosicion:Enemigo:"+this.cuerpo.getPosition().x);
 	}
     
     private Jugador calcularJugadorObjetivo() {
@@ -168,6 +176,18 @@ public class Enemigo extends Actor {
     
     public boolean getMuerto() {
     	return this.muerto;
+    }
+    
+    public int getID() {
+    	return this.ID;
+    }
+    
+    public float getPosicionX() {
+    	return this.cuerpo.getPosition().x;
+    }
+    
+    public float getPosicionY() {
+    	return this.cuerpo.getPosition().y;
     }
 
     @Override
