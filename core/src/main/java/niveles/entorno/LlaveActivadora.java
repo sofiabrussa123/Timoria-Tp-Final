@@ -4,41 +4,48 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.World;
+
 import personajes.Jugador;
 
+// Llave que puede ser recogida por el jugador para desbloquear una puerta
 public class LlaveActivadora extends ElementoActivador {
 
-    private PuertaLlegada puerta; // Referencia a la puerta que se va a desbloquear
-    private float ancho = 30;
-    private float alto = 45;
+    private PuertaLlegada puerta;
+    private float ancho = 30f;
+    private float alto = 45f;
 
     public LlaveActivadora(World mundo, float x, float y, PuertaLlegada puerta, int id) {
-    	super(mundo, x, y, id);
+        super(mundo, x, y, id);
         this.puerta = puerta;
         super.textura = new Texture(Gdx.files.internal("boton.png"));
         super.crearYPosicionarCuerpo(this.ancho, this.alto);
     }
 
-    public void activarConJugador(Jugador jugador) {
+    // Intenta activar la llave cuando un jugador colisiona con ella
+    public void activarConJugador(Jugador personaje) {
         if (!this.activado) {
-            int slotLibre = jugador.getBarraInventario().getPrimeraCasillaLibre();
+            int slotLibre = personaje.getBarraInventario().getPrimeraCasillaLibre();
+            
             if (slotLibre != -1) {
-            	super.hiloServidor.enviarMensajeATodos("Desaparecer:LlaveActivadora");
-            	super.hiloServidor.enviarMensajeATodos("ActualizarInventario:LlaveActivadora:"+jugador.getIdJugador()+":"+slotLibre);
+                // Agregar llave al inventario
                 Texture texturaLlave = new Texture(Gdx.files.internal("boton.png"));
-                jugador.getBarraInventario().setIcono(slotLibre, texturaLlave);
-                this.puerta.desbloquear(super.hiloServidor);
+                personaje.getBarraInventario().setIcono(slotLibre, texturaLlave);
+                
+                // Desbloquear puerta
+                this.puerta.desbloquear();
                 this.activado = true;
+                
+                // Remover del escenario
                 this.remove();
             } else {
                 System.out.println("Inventario lleno. No se puede recoger la llave.");
             }
         }
-
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        // Solo dibujar si no ha sido activada
         if (!activado) {
             super.draw(batch, parentAlpha);
         }
