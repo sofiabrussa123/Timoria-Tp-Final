@@ -25,7 +25,7 @@ public class Nivel1 extends NivelBase {
         // Crear plataformas
         Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20);
         Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20);
-        Plataforma piso = new Plataforma(mundo, 0, 10, 800, 50);
+        Plataforma piso = new Plataforma(mundo, 0, 10, 1000, 50);
         Palanca palanca = new Palanca(mundo, 170, 120);
         PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, 2, 200, palanca);
 
