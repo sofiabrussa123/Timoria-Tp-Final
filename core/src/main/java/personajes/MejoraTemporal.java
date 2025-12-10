@@ -4,7 +4,6 @@ public class MejoraTemporal {
 
     private static final int MAX_MEJORAS = 3;
 
-    // Bonuses por mejora
     private static final float BONUS_VIDA = 20f;
     private static final float BONUS_VELOCIDAD = 1f;
     private static final float BONUS_SALTO = 0.5f;
@@ -16,10 +15,10 @@ public class MejoraTemporal {
     private int mejorasDaño;
 
     public MejoraTemporal() {
-        mejorasVida = 0;
-        mejorasVelocidad = 0;
-        mejorasSalto = 0;
-        mejorasDaño = 0;
+        this.mejorasVida = 0;
+        this.mejorasVelocidad = 0;
+        this.mejorasSalto = 0;
+        this.mejorasDaño = 0;
     }
 
     public boolean mejorarVida() {
@@ -70,13 +69,25 @@ public class MejoraTemporal {
         return mejorasDaño * BONUS_DAÑO;
     }
 
-    // Para la UI
-    public int getMejorasVida() { return mejorasVida; }
-    public int getMejorasVelocidad() { return mejorasVelocidad; }
-    public int getMejorasSalto() { return mejorasSalto; }
-    public int getMejorasDaño() { return mejorasDaño; }
+    public int getMejorasVida() {
+        return mejorasVida;
+    }
 
-    public int getMaxMejoras() { return MAX_MEJORAS; }
+    public int getMejorasVelocidad() {
+        return mejorasVelocidad;
+    }
+
+    public int getMejorasSalto() {
+        return mejorasSalto;
+    }
+
+    public int getMejorasDaño() {
+        return mejorasDaño;
+    }
+
+    public int getMaxMejoras() {
+        return MAX_MEJORAS;
+    }
 
     public void reset() {
         mejorasVida = 0;

@@ -34,7 +34,7 @@ public class InputManager implements InputProcessor {
         	case Input.Keys.E: isEPressed = true; break;
         	case Input.Keys.O: isOPressed = true; break;
         }
-        
+
         return false;
     }
 
@@ -54,34 +54,90 @@ public class InputManager implements InputProcessor {
 	    	case Input.Keys.E: isEPressed = false; break;
 	    	case Input.Keys.O: isOPressed = false; break;
     	}
-    	
+
         return false;
     }
-    
+
     public void resetPauseKeys() {
     	isEscPressed = false;
     	isPPressed = false;
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
-    public boolean mouseMoved(int screenX, int screenY) { return false; }
-    public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
-	public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
-    public boolean keyTyped(char character) { return false; }
-    public boolean scrolled(float amountX, float amountY) { return false; }
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
 
-    public boolean getIsWPressed() { return isWPressed; }
-    public boolean getIsAPressed() { return isAPressed; }
-    public boolean getIsSPressed() { return isSPressed; }
-    public boolean getIsDPressed() { return isDPressed; }
-    public boolean getIsUpPressed() { return isUpPressed; }
-    public boolean getIsLeftPressed() { return isLeftPressed; }
-    public boolean getIsDownPressed() { return isDownPressed; }
-    public boolean getIsRightPressed() { return isRightPressed; }
-    public boolean getIsEscPressed() { return isEscPressed; }
-    public boolean getIsPPressed() { return isPPressed; }
-    public boolean getIsEPressed() { return isEPressed; }
-    public boolean getIsOPressed() { return isOPressed; }
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+	public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    public boolean getIsWPressed() {
+        return isWPressed;
+    }
+
+    public boolean getIsAPressed() {
+        return isAPressed;
+    }
+
+    public boolean getIsSPressed() {
+        return isSPressed;
+    }
+
+    public boolean getIsDPressed() {
+        return isDPressed;
+    }
+
+    public boolean getIsUpPressed() {
+        return isUpPressed;
+    }
+
+    public boolean getIsLeftPressed() {
+        return isLeftPressed;
+    }
+
+    public boolean getIsDownPressed() {
+        return isDownPressed;
+    }
+
+    public boolean getIsRightPressed() {
+        return isRightPressed;
+    }
+
+    public boolean getIsEscPressed() {
+        return isEscPressed;
+    }
+
+    public boolean getIsPPressed() {
+        return isPPressed;
+    }
+
+    public boolean getIsEPressed() {
+        return isEPressed;
+    }
+
+    public boolean getIsOPressed() {
+        return isOPressed;
+    }
+
 }

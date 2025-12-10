@@ -2,7 +2,6 @@ package interfaces;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -15,7 +14,8 @@ import niveles.EscenaBase;
 public class PantallaGanaste extends EscenaBase {
 
     public PantallaGanaste(Game juego) {
-    	super(juego, "FondoTransparente.png");
+        super(juego, "FondoTransparente.png");
+
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         Label mensaje = new Label("¡Ganaste!", super.fuenteTextos);
@@ -32,8 +32,7 @@ public class PantallaGanaste extends EscenaBase {
         Table tabla = new Table();
         tabla.setFillParent(true);
         tabla.center();
-        tabla.add(mensaje).pad(10);
-        tabla.row();
+        tabla.add(mensaje).pad(10).row();
         tabla.add(btnMenu).pad(10);
 
         super.escena.addActor(tabla);
@@ -41,12 +40,12 @@ public class PantallaGanaste extends EscenaBase {
 
     @Override
     public void render(float delta) {
-    	super.escena.act(delta);
+        super.escena.act(delta);
         super.escena.draw();
     }
-    
+
     @Override
     public void show() {
-    	Gdx.input.setInputProcessor(escena);
+        Gdx.input.setInputProcessor(escena);
     }
 }

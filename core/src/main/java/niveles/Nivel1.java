@@ -13,32 +13,25 @@ import personajes.Jugador;
 public class Nivel1 extends NivelBase {
 
     public Nivel1(Game juego) {
-
         super(juego, "FondoNivel1.jpeg");
 
         this.setFriendlyFire(true);
 
-        // Crear jugadores con IDs y sus mejoras persistentes
         super.jugador1 = new Jugador(mundo, "Jugador1", 100, 85, 1, NivelBase.getMejorasJugador1());
         super.jugador2 = new Jugador(mundo, "Jugador2", 120, 85, 2, NivelBase.getMejorasJugador2());
 
-        // Crear plataformas
         Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20);
         Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20);
         Plataforma piso = new Plataforma(mundo, 0, 10, 1000, 50);
+
         Palanca palanca = new Palanca(mundo, 170, 120);
         PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, 2, 200, palanca);
 
-        // Crear puerta
         PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, 50, 95);
-
-        //Crear boton
         LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta);
 
-        // Crear enemigo
         Enemigo enemigo = new Enemigo(mundo, 400, 150, this);
 
-        // Agregar todos los actores
         super.escena.addActor(super.jugador1);
         super.escena.addActor(super.jugador2);
         super.escena.addActor(puerta);

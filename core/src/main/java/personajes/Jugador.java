@@ -34,10 +34,9 @@ public class Jugador extends Actor {
     private int vida = 100;
     private int vidaMaxima = 100;
     private Sound sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));
-    private long tiempoUltimoDaño = 0l;
+    private long tiempoUltimoDaño = 0L;
     private boolean sonidoReproduciéndose = false;
 
-    // Stats base
     private float velocidadBase = 5f;
     private float fuerzaSaltoBase = 7f;
     private int dañoBase = 20;
@@ -61,13 +60,12 @@ public class Jugador extends Actor {
         this.mejoras = mejoras;
         this.barraVida = new BarraVida(this, true);
 
-        // Aplicar mejoras a stats
         aplicarMejoras();
 
-        TextureRegion primerFrame = (TextureRegion)estado.QUIETO.crearAnimacion().getKeyFrame(0.0F);
+        TextureRegion primerFrame = (TextureRegion) estado.QUIETO.crearAnimacion().getKeyFrame(0.0F);
 
-        float anchoPersonaje = (float)primerFrame.getRegionWidth();
-        float altoPersonaje = (float)primerFrame.getRegionHeight();
+        float anchoPersonaje = primerFrame.getRegionWidth();
+        float altoPersonaje = primerFrame.getRegionHeight();
 
         this.crearCuerpo(mundo, anchoHitbox, altoHitbox, coordenadaXAparicion, coordenadaYAparicion);
         this.setSize(anchoPersonaje, altoPersonaje);
@@ -75,36 +73,17 @@ public class Jugador extends Actor {
     }
 
     private void aplicarMejoras() {
-        // Aplicar bonus de vida
-        this.vidaMaxima = 100 + (int)mejoras.getBonusVida();
+        this.vidaMaxima = 100 + (int) mejoras.getBonusVida();
         this.vida = this.vidaMaxima;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public MejoraTemporal getMejoras() {
-        return this.mejoras;
-    }
-
-    public void setBarraInventario(BarraInventario barraInventario) {
-        this.barraInventario = barraInventario;
-    }
-
-    public BarraInventario getBarraInventario() {
-        return this.barraInventario;
     }
 
     @Override
     public void act(float delta) {
         tiempoEstado += delta;
 
-        // Gestión del ataque y cooldown
         if (atacando) {
             tiempoTranscurridoAtaque += delta;
 
-            // Terminar animación de ataque
             if (tiempoTranscurridoAtaque >= duracionAnimacionAtaque) {
                 atacando = false;
                 tiempoTranscurridoAtaque = 0f;
@@ -112,7 +91,6 @@ public class Jugador extends Actor {
             }
         }
 
-        // Cooldown independiente
         if (!puedeAtacar) {
             tiempoTranscurridoAtaque += delta;
             if (tiempoTranscurridoAtaque >= cooldownAtaque) {
@@ -123,7 +101,6 @@ public class Jugador extends Actor {
 
         cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
 
-        // Actualizar animación solo si no está atacando
         if (!atacando) {
             animacionActual = estado.crearAnimacion();
         }
@@ -137,8 +114,8 @@ public class Jugador extends Actor {
         }
 
         setPosition(
-            (cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS) - getWidth() / 2,
-            (cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS) - getHeight() / 2
+            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - getWidth() / 2,
+            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - getHeight() / 2
         );
     }
 
@@ -239,21 +216,18 @@ public class Jugador extends Actor {
     }
 
     public void atacar(World mundo, boolean friendlyFire) {
-        // Solo atacar si puede atacar y la tecla no estaba presionada antes
         if (puedeAtacar && !teclaPresionada) {
             teclaPresionada = true;
             atacando = true;
             puedeAtacar = false;
             tiempoTranscurridoAtaque = 0f;
 
-            // Cambiar a animación de ataque
             estado = Estado.ATACANDO;
             animacionActual = Estado.ATACANDO.crearAnimacion();
             tiempoEstado = 0f;
 
             Vector2 posicionJugador = this.cuerpo.getPosition();
 
-            // Área de ataque
             float anchoAreaAtaque = this.alcanceAtaque;
             float altoAreaAtaque = this.altoHitbox;
 
@@ -266,19 +240,17 @@ public class Jugador extends Actor {
             float lowerY = centroYAreaAtaque - (altoAreaAtaque / 2);
             float upperY = centroYAreaAtaque + (altoAreaAtaque / 2);
 
-            int dañoActual = dañoBase + (int)mejoras.getBonusDaño();
+            int dañoActual = dañoBase + (int) mejoras.getBonusDaño();
 
             mundo.QueryAABB(fixture -> {
                 Object userData = fixture.getBody().getUserData();
 
-                // Ataque normal a enemigos
                 if (userData instanceof Enemigo) {
                     Enemigo enemigo = (Enemigo) userData;
                     enemigo.recibirDaño(dañoActual);
                     return false;
                 }
 
-                // Fuego amigo: daño a otros jugadores
                 if (friendlyFire && userData instanceof Jugador && userData != this) {
                     Jugador otroJugador = (Jugador) userData;
                     otroJugador.recibirDaño(dañoActual);
@@ -298,6 +270,22 @@ public class Jugador extends Actor {
         enElAire = valor;
     }
 
+    public int getId() {
+        return this.id;
+    }
+
+    public MejoraTemporal getMejoras() {
+        return this.mejoras;
+    }
+
+    public void setBarraInventario(BarraInventario barraInventario) {
+        this.barraInventario = barraInventario;
+    }
+
+    public BarraInventario getBarraInventario() {
+        return this.barraInventario;
+    }
+
     public float getAlcanceAtaque() {
         return this.alcanceAtaque;
     }
@@ -311,7 +299,7 @@ public class Jugador extends Actor {
     }
 
     public int getDañoAtaque() {
-        return dañoBase + (int)mejoras.getBonusDaño();
+        return dañoBase + (int) mejoras.getBonusDaño();
     }
 
     public int getVidaMaxima() {

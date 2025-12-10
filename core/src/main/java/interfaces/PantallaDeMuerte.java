@@ -37,19 +37,17 @@ public class PantallaDeMuerte extends EscenaBase {
 
     private String fraseElegida;
     private Principal principal;
-
     private int idJugadorMuerto;
     private MejoraTemporal mejorasJugador;
 
     public PantallaDeMuerte(Game principal, int idJugadorMuerto) {
         super(principal, "PantallaDeMuerte.png");
+
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         this.fraseElegida = frases[new Random().nextInt(frases.length)];
-
         this.idJugadorMuerto = idJugadorMuerto;
 
-        // Obtener las mejoras del jugador que murió
         if (idJugadorMuerto == 1) {
             this.mejorasJugador = NivelBase.getMejorasJugador1();
         } else {
@@ -67,13 +65,11 @@ public class PantallaDeMuerte extends EscenaBase {
 
         if (this.musicaMuerteActiva) this.musicaMuerte.play();
 
-        // Título que indica qué jugador murió
         Label tituloJugador = new Label("=== JUGADOR " + idJugadorMuerto + " - ELIGE UNA MEJORA ===", super.fuenteTextos);
         tituloJugador.setAlignment(Align.center);
         tituloJugador.setColor(Color.YELLOW);
         tituloJugador.setFontScale(1.1f);
 
-        // Botones de mejora - Crear primero sin lambdas
         TextButton botonMejorarVida = crearBotonMejora("Mejorar Vida (+20)",
             mejorasJugador.getMejorasVida(), mejorasJugador.getMaxMejoras());
 
@@ -86,8 +82,6 @@ public class PantallaDeMuerte extends EscenaBase {
         TextButton botonMejorarDaño = crearBotonMejora("Mejorar Daño (+10)",
             mejorasJugador.getMejorasDaño(), mejorasJugador.getMaxMejoras());
 
-
-        // Ahora agregar los listeners que los referencian
         botonMejorarVida.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -128,7 +122,6 @@ public class PantallaDeMuerte extends EscenaBase {
             }
         });
 
-        // Botones de control
         TextButton botonVolver = new TextButton("Volver a jugar", super.fuenteTextos);
         botonVolver.addListener(new ClickListener() {
             @Override
@@ -162,23 +155,17 @@ public class PantallaDeMuerte extends EscenaBase {
             }
         });
 
-        // Construir layout
         Table table = new Table();
         table.setFillParent(true);
         table.center();
         table.padTop(30);
 
         table.add(tituloJugador).padBottom(15).row();
-
-        // Botones de mejora
         table.add(botonMejorarVida).width(250).padBottom(8).row();
         table.add(botonMejorarVelocidad).width(250).padBottom(8).row();
         table.add(botonMejorarSalto).width(250).padBottom(8).row();
         table.add(botonMejorarDaño).width(250).padBottom(20).row();
-
         table.add(frase).width(600).padBottom(25).row();
-
-        // Botones de control
         table.add(botonVolver).width(200).padBottom(10).row();
         table.add(botonMusica).width(200).padBottom(10).row();
         table.add(botonMenu).width(200);

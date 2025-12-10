@@ -23,7 +23,7 @@ public class Enemigo extends Actor {
     private int cooldown = 1;
     private float tiempoTranscurrido = 0;
     private NivelBase nivel;
-    private float alcanceAtaque = 0.15f; // Reducido para evitar ataques desde arriba
+    private float alcanceAtaque = 0.15f;
     private boolean enCooldown = false;
     private boolean encontroJugador;
     private World mundo;
@@ -47,7 +47,10 @@ public class Enemigo extends Actor {
         this.cuerpo = this.mundo.createBody(def);
 
         PolygonShape forma = new PolygonShape();
-        forma.setAsBox(anchoHitbox / 2 * NivelBase.PIXELES_A_METROS, altoHitbox / 2 * NivelBase.PIXELES_A_METROS);
+        forma.setAsBox(
+            anchoHitbox / 2 * NivelBase.PIXELES_A_METROS,
+            altoHitbox / 2 * NivelBase.PIXELES_A_METROS
+        );
 
         FixtureDef fixture = new FixtureDef();
         fixture.shape = forma;
@@ -58,23 +61,6 @@ public class Enemigo extends Actor {
 
         setSize(anchoHitbox, altoHitbox);
         cuerpo.setUserData(this);
-    }
-
-    public void aplicarDañoJugador(Jugador jugador) {
-        jugador.recibirDaño((int) daño);
-    }
-
-    public void recibirDaño(int dañoAtaque) {
-        if (dañoAtaque <= 0 || vida <= 0) return;
-
-        if(vida - dañoAtaque < 0) {
-            this.vida = 0;
-        }
-        else {
-            this.vida -= dañoAtaque;
-        }
-
-        if(vida == 0) muerto = true;
     }
 
     @Override
@@ -93,18 +79,17 @@ public class Enemigo extends Actor {
             }
         }
 
-        if(this.tiempoTranscurrido >= cooldown && enCooldown) {
+        if (this.tiempoTranscurrido >= cooldown && enCooldown) {
             enCooldown = false;
         }
 
-        if(!enCooldown) {
+        if (!enCooldown) {
             encontroJugador = false;
 
             Vector2 posicionEnemigo = this.cuerpo.getPosition();
 
-            // Área de ataque reducida y SOLO a los lados (no arriba/abajo)
             float anchoAreaAtaque = (anchoHitbox * NivelBase.PIXELES_A_METROS) + (2 * alcanceAtaque);
-            float altoAreaAtaque = altoHitbox * NivelBase.PIXELES_A_METROS * 0.6f; // Solo 60% de altura
+            float altoAreaAtaque = altoHitbox * NivelBase.PIXELES_A_METROS * 0.6f;
 
             float centroXAreaAtaque = posicionEnemigo.x;
             float centroYAreaAtaque = posicionEnemigo.y;
@@ -121,10 +106,8 @@ public class Enemigo extends Actor {
                     Jugador jugador = (Jugador) userData;
                     Vector2 posJugador = jugador.getCuerpo().getPosition();
 
-                    // Verificación adicional: solo atacar si el jugador está a la misma altura aproximada
                     float diferenciaY = Math.abs(posJugador.y - posicionEnemigo.y);
 
-                    // Solo atacar si la diferencia vertical es menor a 0.3 unidades
                     if (diferenciaY < 0.3f) {
                         jugador.recibirDaño(this.daño);
                         this.encontroJugador = true;
@@ -135,49 +118,12 @@ public class Enemigo extends Actor {
                 return true;
             }, lowerX, lowerY, upperX, upperY);
 
-            if(encontroJugador) {
+            if (encontroJugador) {
                 this.enCooldown = true;
                 this.tiempoTranscurrido = 0f;
                 this.atacandoVisualmente = true;
             }
         }
-    }
-
-    private void determinarDireccionMovimiento(Jugador objetivo) {
-        // Movimiento hacia el jugador
-        Vector2 posicionJugador = objetivo.getCuerpo().getPosition();
-        Vector2 posicionEnemigo = cuerpo.getPosition();
-
-        Vector2 direccion = posicionJugador.cpy().sub(posicionEnemigo).nor().scl(1.5f);
-        cuerpo.setLinearVelocity(direccion.x, cuerpo.getLinearVelocity().y);
-
-        // Actualizar posición del actor
-        setPosition(
-            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
-            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
-        );
-    }
-
-    private Jugador calcularJugadorObjetivo() {
-        float posicionAbsolutaJugador1 = Math.abs((this.nivel.getJugador1().getX()));
-        float posicionAbsolutaJugador2 = Math.abs((this.nivel.getJugador2().getX()));
-        float posicionAbsolutaEnemigo = Math.abs(this.getX());
-
-        if(Math.abs(posicionAbsolutaJugador1 - posicionAbsolutaEnemigo) > Math.abs(posicionAbsolutaJugador2 - posicionAbsolutaEnemigo)) {
-            return this.nivel.getJugador2();
-        } else return this.nivel.getJugador1();
-    }
-
-    public void eliminar() {
-        if (this.cuerpo != null && this.mundo != null) {
-            this.mundo.destroyBody(this.cuerpo);
-            this.cuerpo = null;
-        }
-        this.remove();
-    }
-
-    public boolean getMuerto() {
-        return this.muerto;
     }
 
     @Override
@@ -200,7 +146,61 @@ public class Enemigo extends Actor {
         batch.draw(this.textura, xDraw, yDraw, anchoDraw, altoDraw);
     }
 
+    public void aplicarDañoJugador(Jugador jugador) {
+        jugador.recibirDaño(daño);
+    }
+
+    public void recibirDaño(int dañoAtaque) {
+        if (dañoAtaque <= 0 || vida <= 0) return;
+
+        if (vida - dañoAtaque < 0) {
+            this.vida = 0;
+        } else {
+            this.vida -= dañoAtaque;
+        }
+
+        if (vida == 0) muerto = true;
+    }
+
+    public void eliminar() {
+        if (this.cuerpo != null && this.mundo != null) {
+            this.mundo.destroyBody(this.cuerpo);
+            this.cuerpo = null;
+        }
+        this.remove();
+    }
+
+    public boolean getMuerto() {
+        return this.muerto;
+    }
+
     public void dispose() {
         textura.dispose();
+    }
+
+    private void determinarDireccionMovimiento(Jugador objetivo) {
+        Vector2 posicionJugador = objetivo.getCuerpo().getPosition();
+        Vector2 posicionEnemigo = cuerpo.getPosition();
+
+        Vector2 direccion = posicionJugador.cpy().sub(posicionEnemigo).nor().scl(1.5f);
+        cuerpo.setLinearVelocity(direccion.x, cuerpo.getLinearVelocity().y);
+
+        setPosition(
+            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
+            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
+        );
+    }
+
+    private Jugador calcularJugadorObjetivo() {
+        float posicionAbsolutaJugador1 = Math.abs(this.nivel.getJugador1().getX());
+        float posicionAbsolutaJugador2 = Math.abs(this.nivel.getJugador2().getX());
+        float posicionAbsolutaEnemigo = Math.abs(this.getX());
+
+        if (Math.abs(posicionAbsolutaJugador1 - posicionAbsolutaEnemigo) >
+            Math.abs(posicionAbsolutaJugador2 - posicionAbsolutaEnemigo)) {
+            return this.nivel.getJugador2();
+        } else {
+            return this.nivel.getJugador1();
+        }
     }
 }

@@ -10,19 +10,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import globales.EsceneManager;
-import globales.InputManager;
 import niveles.EscenaBase;
 import niveles.Nivel1;
-import niveles.NivelBase;
 
 public class Menu extends EscenaBase {
 
-    private Music musica;
+    // Valores fijos o con estado inicial conocido
     private boolean musicaActiva = true;
+
+    // Objetos dependientes del contexto → se inicializan en el constructor
+    private Music musica;
 
     public Menu(Game juego) {
         super(juego, "Fondo.jpeg");
 
+        // Fuente / Skin
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         // Música de fondo
@@ -31,29 +33,27 @@ public class Menu extends EscenaBase {
         this.musica.setVolume(0.5f);
         this.musica.play();
 
-        // Crear una tabla para organizar los elementos
+        // Tabla principal de layout
         Table table = new Table();
         table.setFillParent(true);
         super.escena.addActor(table);
 
-        // Botón Jugar
         TextButton botonJugar = new TextButton("Jugar", super.fuenteTextos);
         botonJugar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Menu.this.musica.stop();
                 Menu.this.musica.dispose();
-
                 cambiarEscena(new Nivel1(juego));
             }
         });
 
-        // Botón de Música (activar/desactivar)
         TextButton botonMusicaMenu = new TextButton("Silenciar Música", super.fuenteTextos);
         botonMusicaMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Menu.this.musicaActiva = !Menu.this.musicaActiva;
+
                 if (Menu.this.musicaActiva) {
                     Menu.this.musica.play();
                     botonMusicaMenu.setText("Silenciar Música");
@@ -64,26 +64,26 @@ public class Menu extends EscenaBase {
             }
         });
 
-        // Botón con instrucciones básicas
         TextButton btnInstrucciones = new TextButton("Instrucciones", super.fuenteTextos);
         btnInstrucciones.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-            	EsceneManager.setEscenaActual(Menu.this);
+                EsceneManager.setEscenaActual(Menu.this);
                 cambiarEscena(new Instrucciones(juego));
             }
         });
 
-        // Agregar elementos a la tabla
         table.add(botonJugar).width(350).height(40).padBottom(15);
         table.row();
+
         table.add(botonMusicaMenu).width(350).height(40).padBottom(15);
         table.row();
+
         table.add(btnInstrucciones).width(350).height(40);
     }
 
     @Override
     public void show() {
-    	Gdx.input.setInputProcessor(this.escena);
+        Gdx.input.setInputProcessor(this.escena);
     }
 }
