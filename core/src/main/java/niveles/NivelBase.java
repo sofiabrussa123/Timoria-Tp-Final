@@ -15,10 +15,20 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import Red.HiloCliente;
 import globales.EsceneManager;
-import interfaces.*;
-import niveles.entorno.*;
-import personajes.*;
+import interfaces.MenuPausa;
+import interfaces.PantallaDeMuerte;
+import interfaces.PantallaGanaste;
+import niveles.entorno.BarraInventario;
+import niveles.entorno.BarraVida;
+import niveles.entorno.LlaveActivadora;
+import niveles.entorno.Palanca;
+import niveles.entorno.Plataforma;
+import niveles.entorno.PlataformaMovil;
+import niveles.entorno.PuertaLlegada;
+import personajes.Enemigo;
+import personajes.Jugador;
 
 public abstract class NivelBase extends EscenaBase {
 
@@ -38,6 +48,7 @@ public abstract class NivelBase extends EscenaBase {
     protected Screen pantallaRetorno;
     protected Jugador jugador1;
     protected Jugador jugador2;
+    protected HiloCliente hiloCliente;
 
     protected Jugador personaje; // ← personaje seguido por la cámara
 
@@ -150,6 +161,9 @@ public abstract class NivelBase extends EscenaBase {
             this.jugador2.setBarraInventario(inventario2);
             this.escena.addActor(inventario2);
         }
+        this.hiloCliente = new HiloCliente();
+        hiloCliente.start();
+        hiloCliente.enviarMensaje("Conectar");
 
     }
 
@@ -183,6 +197,7 @@ public abstract class NivelBase extends EscenaBase {
         
         if(this.inputManager.getIsEPressed()) {
         	jugador2.atacar(this.mundo);
+        	this.hiloCliente.enviarMensaje("Jugador:Atacar:2");
         } else jugador2.resetearGolpe();
         
         if(this.inputManager.getIsOPressed()) {

@@ -13,11 +13,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import Red.HiloCliente;
 import niveles.NivelBase;
 import niveles.entorno.BarraInventario;
 import niveles.entorno.BarraVida;
 import personajes.movimientos.Estado;
-import personajes.MejoraTemporal;
 
 public class Jugador extends Actor {
 
@@ -47,9 +47,11 @@ public class Jugador extends Actor {
     private float duracionAtaque = 0.015f;
     private boolean enCooldown = false;
     private MejoraTemporal mejoras;
+    private HiloCliente hiloCliente;
 
-	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, int idJugador) {
+	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, int idJugador, HiloCliente hiloCliente) {
 
+		this.hiloCliente = hiloCliente;
 		this.mejoras = new MejoraTemporal();
 		this.idJugador = idJugador;
         this.velocidadX = 5f + mejoras.getBonusVelocidad();
@@ -76,6 +78,8 @@ public class Jugador extends Actor {
 		tiempoEstado += delta;
 		
 		this.tiempoAtacando += delta;
+		
+		this.hiloCliente.enviarMensaje("Jugador:ActualizarPosicion:"+this.idJugador+":"+this.cuerpo.getPosition().x+":"+this.cuerpo.getPosition().y);
 
         cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
 
@@ -183,7 +187,9 @@ public class Jugador extends Actor {
 	}
 	
 	// Clase Jugador
-	public void atacar(World mundo) { 
+	public void atacar(World mundo) {
+		hiloCliente.enviarMensaje("Jugador:Atacar:"+this.idJugador);
+		
 	    estado = estado.ATACANDO;
 
 	    Vector2 posicionJugador = this.cuerpo.getPosition();
