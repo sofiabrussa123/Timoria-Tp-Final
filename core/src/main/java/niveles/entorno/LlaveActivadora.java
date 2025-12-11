@@ -8,12 +8,12 @@ import personajes.Jugador;
 
 public class LlaveActivadora extends ElementoActivador {
 
-    private PuertaLlegada puerta; // Referencia a la puerta que se va a desbloquear
-    private float ancho = 30;
-    private float alto = 45;
+    private PuertaLlegada puerta;
+    private float ancho = 30f;
+    private float alto = 45f;
 
     public LlaveActivadora(World mundo, float x, float y, PuertaLlegada puerta) {
-    	super(mundo, x, y);
+        super(mundo, x, y);
         this.puerta = puerta;
         super.textura = new Texture(Gdx.files.internal("boton.png"));
         super.crearYPosicionarCuerpo(this.ancho, this.alto);
@@ -32,7 +32,6 @@ public class LlaveActivadora extends ElementoActivador {
                 System.out.println("Inventario lleno. No se puede recoger la llave.");
             }
         }
-
     }
 
     @Override

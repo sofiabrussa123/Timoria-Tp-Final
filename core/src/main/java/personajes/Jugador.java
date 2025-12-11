@@ -21,69 +21,94 @@ import personajes.movimientos.Estado;
 
 public class Jugador extends Actor {
 
+    private int id;
     private String nombre;
     private BarraVida barraVida;
-    private int idJugador; // 1 o 2
     private BarraInventario barraInventario;
     private Body cuerpo;
     private Animation<TextureRegion> animacionActual;
     private Estado estado = Estado.QUIETO;
+    private HiloCliente hiloCliente;
     private float tiempoEstado = 0f;
     private boolean mirandoDerecha = true;
     private boolean mirandoIzquierda = false;
     private boolean enElAire = false;
     private int vida = 100;
     private int vidaMaxima = 100;
-    private Sound sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));;
-    private long tiempoUltimoDaño = 0l;
+    private Sound sonidoDaño = Gdx.audio.newSound(Gdx.files.internal("Daño.mp3"));
+    private long tiempoUltimoDaño = 0L;
     private boolean sonidoReproduciéndose = false;
+
+    private float velocidadBase = 5f;
+    private float fuerzaSaltoBase = 7f;
+    private int dañoBase = 20;
+
     private float velocidadX = 0f;
     private float alcanceAtaque = 0.5f;
-    private int dañoAtaque = 20;
-    private float tiempoAtacando = 0f;
+    private float tiempoTranscurridoAtaque = 0f;
+    private float duracionAnimacionAtaque = 0.4f;
+    private float cooldownAtaque = 0.5f;
+    private boolean puedeAtacar = true;
+    private boolean teclaPresionada = false;
     private boolean atacando = false;
-    private float cargaAtaque = 0.2f;
-    private float cooldown = 0.4f;
-    private float duracionAtaque = 0.015f;
-    private boolean enCooldown = false;
+    private float anchoHitbox = 0.4f;
+    private float altoHitbox = 0.7f;
+
     private MejoraTemporal mejoras;
-    private HiloCliente hiloCliente;
 
-	public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, int idJugador, HiloCliente hiloCliente) {
-
-		this.hiloCliente = hiloCliente;
-		this.mejoras = new MejoraTemporal();
-		this.idJugador = idJugador;
-        this.velocidadX = 5f + mejoras.getBonusVelocidad();
-        this.velocidadX = -5f - mejoras.getBonusVelocidad();
-        this.velocidadX = 0.0F;
+    public Jugador(World mundo, String nombre, int coordenadaXAparicion, int coordenadaYAparicion, int id, MejoraTemporal mejoras, HiloCliente hiloCliente) {
+        this.id = id;
         this.nombre = nombre;
+        this.mejoras = mejoras;
         this.barraVida = new BarraVida(this, true);
+        this.hiloCliente = hiloCliente;
 
-        TextureRegion primerFrame = (TextureRegion)estado.QUIETO.crearAnimacion().getKeyFrame(0.0F);
+        aplicarMejoras();
 
-        float anchoPersonaje = (float)primerFrame.getRegionWidth();
-        float altoPersonaje = (float)primerFrame.getRegionHeight();
-        float anchoHitbox = 0.39999998F;
-        float altoHitbox = 0.7F;
+        TextureRegion primerFrame = (TextureRegion) estado.QUIETO.crearAnimacion().getKeyFrame(0.0F);
+
+        float anchoPersonaje = primerFrame.getRegionWidth();
+        float altoPersonaje = primerFrame.getRegionHeight();
 
         this.crearCuerpo(mundo, anchoHitbox, altoHitbox, coordenadaXAparicion, coordenadaYAparicion);
         this.setSize(anchoPersonaje, altoPersonaje);
         this.animacionActual = estado.QUIETO.crearAnimacion();
-	}
+    }
 
-	@Override
-	public void act(float delta) {
+    private void aplicarMejoras() {
+        this.vidaMaxima = 100 + (int) mejoras.getBonusVida();
+        this.vida = this.vidaMaxima;
+    }
 
-		tiempoEstado += delta;
-		
-		this.tiempoAtacando += delta;
-		
-		this.hiloCliente.enviarMensaje("Jugador:ActualizarPosicion:"+this.idJugador+":"+this.cuerpo.getPosition().x+":"+this.cuerpo.getPosition().y);
+    @Override
+    public void act(float delta) {
+        tiempoEstado += delta;
+        
+        this.hiloCliente.enviarMensaje("Jugador:ActualizarPosicion:"+this.id+":"+this.cuerpo.getPosition().x+":"+this.cuerpo.getPosition().y);
+
+        if (atacando) {
+            tiempoTranscurridoAtaque += delta;
+
+            if (tiempoTranscurridoAtaque >= duracionAnimacionAtaque) {
+                atacando = false;
+                tiempoTranscurridoAtaque = 0f;
+                estado = Estado.QUIETO;
+            }
+        }
+
+        if (!puedeAtacar) {
+            tiempoTranscurridoAtaque += delta;
+            if (tiempoTranscurridoAtaque >= cooldownAtaque) {
+                puedeAtacar = true;
+                tiempoTranscurridoAtaque = 0f;
+            }
+        }
 
         cuerpo.setLinearVelocity(velocidadX, cuerpo.getLinearVelocity().y);
 
-        animacionActual = estado.crearAnimacion();
+        if (!atacando) {
+            animacionActual = estado.crearAnimacion();
+        }
 
         if (this.sonidoReproduciéndose) {
             long ahora = System.currentTimeMillis();
@@ -94,21 +119,20 @@ public class Jugador extends Actor {
         }
 
         setPosition(
-                (cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS) - getWidth() / 2,
-                (cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS) - getHeight() / 2
+            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - getWidth() / 2,
+            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - getHeight() / 2
         );
-	}
+    }
 
-	@Override
-	public void draw(Batch batch, float parentAlpha) {
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        TextureRegion frameActual = animacionActual.getKeyFrame(tiempoEstado, true);
 
-		TextureRegion frameActual = animacionActual.getKeyFrame(tiempoEstado, true);
-
-		if (mirandoIzquierda && !frameActual.isFlipX()) {
-	        frameActual.flip(true, false);
-	    } else if (mirandoDerecha && frameActual.isFlipX()) {
-	        frameActual.flip(true, false);
-	    }
+        if (mirandoIzquierda && !frameActual.isFlipX()) {
+            frameActual.flip(true, false);
+        } else if (mirandoDerecha && frameActual.isFlipX()) {
+            frameActual.flip(true, false);
+        }
 
         float posXPx = cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS;
         float posYPx = cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS;
@@ -122,15 +146,14 @@ public class Jugador extends Actor {
         );
 
         this.barraVida.draw(batch, parentAlpha);
-	}
+    }
 
-	private void crearCuerpo(World mundo, float anchoHitbox, float altoHitbox, int coordenadaXAparicion, int coordenadaYAparicion) {
-
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		bodyDef.position.set(coordenadaXAparicion * NivelBase.PIXELES_A_METROS, coordenadaYAparicion * NivelBase.PIXELES_A_METROS);
-		bodyDef.fixedRotation = true;
-		Body body = mundo.createBody(bodyDef);
+    private void crearCuerpo(World mundo, float anchoHitbox, float altoHitbox, int coordenadaXAparicion, int coordenadaYAparicion) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(coordenadaXAparicion * NivelBase.PIXELES_A_METROS, coordenadaYAparicion * NivelBase.PIXELES_A_METROS);
+        bodyDef.fixedRotation = true;
+        Body body = mundo.createBody(bodyDef);
 
         PolygonShape forma = new PolygonShape();
         forma.setAsBox(anchoHitbox / 2, altoHitbox / 2);
@@ -142,18 +165,17 @@ public class Jugador extends Actor {
         body.createFixture(fixtureDef);
         forma.dispose();
 
-		this.cuerpo = body;
-		this.cuerpo.setUserData(Jugador.this);
-	}
+        this.cuerpo = body;
+        this.cuerpo.setUserData(Jugador.this);
+    }
 
-	public void recibirDaño(int cantidad) {
+    public void recibirDaño(int cantidad) {
         if (cantidad <= 0 || vida <= 0) return;
 
         this.vida -= cantidad;
         if (vida < 0) vida = 0;
 
         if (sonidoDaño != null) {
-
             if (!sonidoReproduciéndose) {
                 sonidoDaño.play();
                 sonidoReproduciéndose = true;
@@ -167,147 +189,134 @@ public class Jugador extends Actor {
         }
     }
 
-    public void actualizarVidaConMejoras() {
-        vidaMaxima = 100 + (int) mejoras.getBonusVida(); // Base fija + mejoras
-        vida = vidaMaxima; // Restaurar vida completa
-    }
-
     public void moverDerecha() {
-        velocidadX = 5f + mejoras.getBonusVelocidad();
-        mirandoIzquierda = false;
-        mirandoDerecha = true;
-        estado = estado.CORRIENDO;
+        if (!atacando) {
+            velocidadX = velocidadBase + mejoras.getBonusVelocidad();
+            mirandoIzquierda = false;
+            mirandoDerecha = true;
+            estado = Estado.CORRIENDO;
+        }
     }
 
     public void moverIzquierda() {
-        velocidadX = -5f - mejoras.getBonusVelocidad();
-        mirandoIzquierda = true;
-        mirandoDerecha = false;
-        estado = estado.CORRIENDO;
-	}
-	
-	// Clase Jugador
-	public void atacar(World mundo) {
-		hiloCliente.enviarMensaje("Jugador:Atacar:"+this.idJugador);
-		
-	    estado = estado.ATACANDO;
-
-	    Vector2 posicionJugador = this.cuerpo.getPosition();
-	    
-	    float anchoAreaAtaque = this.alcanceAtaque; 
-	    float altoAreaAtaque = 1.4f; 
-	    
-	    float centroXAreaAtaque = posicionJugador.x + (anchoAreaAtaque / 2 + (this.getWidth() * NivelBase.PIXELES_A_METROS) / 2) * (mirandoDerecha ? 1 : -1);
-	    float centroYAreaAtaque = posicionJugador.y;
-	    
-	    float lowerX = centroXAreaAtaque - (anchoAreaAtaque / 2);
-	    float upperX = centroXAreaAtaque + (anchoAreaAtaque / 2);
-	    float lowerY = centroYAreaAtaque - (altoAreaAtaque / 2); 
-	    float upperY = centroYAreaAtaque + (altoAreaAtaque / 2); 
-	    
-	    if(!enCooldown) {
-			if(this.tiempoAtacando >= cargaAtaque && this.tiempoAtacando < this.cargaAtaque + this.duracionAtaque) {
-				this.atacando = true;
-				mundo.QueryAABB(fixture -> {
-			        Object userData = fixture.getBody().getUserData();
-			        
-			        if (userData instanceof Enemigo) {
-			            Enemigo enemigo = (Enemigo) userData;
-			            
-			            enemigo.recibirDaño(this.dañoAtaque);
-			            
-			            return false; 
-			        }
-			        return true; 
-			    }, lowerX, lowerY, upperX, upperY);
-			}
-			else if (this.tiempoAtacando >= this.cargaAtaque + this.duracionAtaque){
-				this.atacando = false;
-				this.enCooldown = true;
-				this.tiempoAtacando = 0f;
-			}
-		} else {
-			if(this.tiempoAtacando >= cooldown) {
-				this.enCooldown = false;
-				this.tiempoAtacando = 0f;
-			}
-		}
-	}
-	
-	public void resetearGolpe() {
-		this.tiempoAtacando = 0;
-		this.atacando = false;
-		this.enCooldown = false;
-	}
-	
-	public float getAlcanceAtaque() {
-		return this.alcanceAtaque;
-	}
+        if (!atacando) {
+            velocidadX = -(velocidadBase + mejoras.getBonusVelocidad());
+            mirandoIzquierda = true;
+            mirandoDerecha = false;
+            estado = Estado.CORRIENDO;
+        }
+    }
 
     public void saltar() {
-        float potenciaSalto = 7f + mejoras.getBonusSalto();
-        cuerpo.applyLinearImpulse(new Vector2(0, potenciaSalto), cuerpo.getWorldCenter(), true);
+        float fuerzaSalto = fuerzaSaltoBase + mejoras.getBonusSalto();
+        cuerpo.applyLinearImpulse(new Vector2(0, fuerzaSalto), cuerpo.getWorldCenter(), true);
         enElAire = true;
-        /* estado = estado.SALTANDO; */
     }
 
     public void detener() {
-        velocidadX = 0;
-        estado = estado.QUIETO;
+        if (!atacando) {
+            velocidadX = 0;
+            estado = Estado.QUIETO;
+        }
     }
 
+    public void atacar(World mundo, boolean friendlyFire) {
+        if (puedeAtacar && !teclaPresionada) {
+        	hiloCliente.enviarMensaje("Jugador:Atacar:"+this.id);
+            teclaPresionada = true;
+            atacando = true;
+            puedeAtacar = false;
+            tiempoTranscurridoAtaque = 0f;
+
+            estado = Estado.ATACANDO;
+            animacionActual = Estado.ATACANDO.crearAnimacion();
+            tiempoEstado = 0f;
+
+            Vector2 posicionJugador = this.cuerpo.getPosition();
+
+            float anchoAreaAtaque = this.alcanceAtaque;
+            float altoAreaAtaque = this.altoHitbox;
+
+            float offsetX = (this.anchoHitbox / 2) + (anchoAreaAtaque / 2);
+            float centroXAreaAtaque = posicionJugador.x + (offsetX * (mirandoDerecha ? 1 : -1));
+            float centroYAreaAtaque = posicionJugador.y;
+
+            float lowerX = centroXAreaAtaque - (anchoAreaAtaque / 2);
+            float upperX = centroXAreaAtaque + (anchoAreaAtaque / 2);
+            float lowerY = centroYAreaAtaque - (altoAreaAtaque / 2);
+            float upperY = centroYAreaAtaque + (altoAreaAtaque / 2);
+
+            int dañoActual = dañoBase + (int) mejoras.getBonusDaño();
+
+            mundo.QueryAABB(fixture -> {
+                Object userData = fixture.getBody().getUserData();
+
+                if (userData instanceof Enemigo) {
+                    Enemigo enemigo = (Enemigo) userData;
+                    enemigo.recibirDaño(dañoActual);
+                    return false;
+                }
+
+                if (friendlyFire && userData instanceof Jugador && userData != this) {
+                    Jugador otroJugador = (Jugador) userData;
+                    otroJugador.recibirDaño(dañoActual);
+                    return false;
+                }
+
+                return true;
+            }, lowerX, lowerY, upperX, upperY);
+        }
+    }
+
+    public void resetearTeclaAtaque() {
+        teclaPresionada = false;
+    }
+
+    public void setEnElAire(boolean valor) {
+        enElAire = valor;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public MejoraTemporal getMejoras() {
+        return this.mejoras;
+    }
+
+    public void setBarraInventario(BarraInventario barraInventario) {
+        this.barraInventario = barraInventario;
+    }
+
+    public BarraInventario getBarraInventario() {
+        return this.barraInventario;
+    }
+
+    public float getAlcanceAtaque() {
+        return this.alcanceAtaque;
+    }
 
     public Body getCuerpo() {
-
         return this.cuerpo;
     }
 
     public int getVida() {
-
         return this.vida;
     }
 
-    public BarraInventario getBarraInventario() {
-
-        return this.barraInventario;
-    }
-
-    public MejoraTemporal getMejoras() {
-
-        return mejoras;
-    }
-
-    public int getVidaMaximaMejorada() {
-
-        return vidaMaxima; // Ya incluye las mejoras aplicadas
+    public int getDañoAtaque() {
+        return dañoBase + (int) mejoras.getBonusDaño();
     }
 
     public int getVidaMaxima() {
-
         return this.vidaMaxima;
     }
 
     public boolean getEnElAire() {
-
         return this.enElAire;
     }
 
-    public int getIdJugador() {
-
-        return this.idJugador;
-    }
-
-    public void setBarraInventario(BarraInventario barraInventario) {
-
-        this.barraInventario = barraInventario;
-    }
-
     public void setBarraVida(BarraVida barra1) {
-    	this.barraVida = barra1;
-    }
-
-    public void setEnElAire(boolean valor) {
-
-        enElAire = valor;
+        this.barraVida = barra1;
     }
 }

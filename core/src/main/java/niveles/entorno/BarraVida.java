@@ -3,44 +3,69 @@ package niveles.entorno;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Color;
+
 import personajes.Jugador;
 
 public class BarraVida extends Actor {
+
     private final Texture relleno;
     private Jugador jugador;
     private Texture fondo;
     private Texture vidaLlena;
     private boolean posicionIzquierda;
+    private BitmapFont fuente;
 
     public BarraVida(Jugador jugador, boolean posicionIzquierda) {
         this.jugador = jugador;
         this.posicionIzquierda = posicionIzquierda;
         this.fondo = new Texture("barra_fondo.png");
         this.relleno = new Texture("barra_vida.png");
-        this.setWidth(300.0F);
-        this.setHeight(20.0F);
+        this.fuente = new BitmapFont();      // texto por defecto
+        this.fuente.setColor(Color.WHITE);   // color visible
+        this.setWidth(300f);
+        this.setHeight(20f);
     }
 
+    @Override
     public void draw(Batch batch, float parentAlpha) {
-        int vida = this.jugador.getVida();
-        int vidaMax = this.jugador.getVidaMaxima();
-        float porcentaje = (float)vida / (float)vidaMax;
-        float y = (float)(this.jugador.getStage().getViewport().getScreenY() + this.jugador.getStage().getViewport().getScreenHeight() - 30);
-        if (this.posicionIzquierda) {
-            float x = (float)(this.jugador.getStage().getViewport().getScreenX() + 10);
-            batch.draw(this.fondo, x, y, this.getWidth(), this.getHeight());
-            batch.draw(this.relleno, x, y, this.getWidth() * porcentaje, this.getHeight());
+        int vida = jugador.getVida();
+        int vidaMax = jugador.getVidaMaxima();
+        float porcentaje = (float) vida / (float) vidaMax;
+
+        float y = jugador.getStage().getViewport().getScreenY()
+            + jugador.getStage().getViewport().getScreenHeight() - 30;
+
+        float x;
+
+        if (posicionIzquierda) {
+            x = jugador.getStage().getViewport().getScreenX() + 10;
+            batch.draw(fondo, x, y, getWidth(), getHeight());
+            batch.draw(relleno, x, y, getWidth() * porcentaje, getHeight());
         } else {
-            float x = (float)(this.jugador.getStage().getViewport().getScreenX() + this.jugador.getStage().getViewport().getScreenWidth()) - this.getWidth() - 10.0F;
-            batch.draw(this.fondo, x, y, this.getWidth(), this.getHeight());
-            float rellenoX = x + this.getWidth() - this.getWidth() * porcentaje;
-            batch.draw(this.relleno, rellenoX, y, this.getWidth() * porcentaje, this.getHeight());
+            x = jugador.getStage().getViewport().getScreenX()
+                + jugador.getStage().getViewport().getScreenWidth()
+                - getWidth() - 10;
+
+            batch.draw(fondo, x, y, getWidth(), getHeight());
+
+            float rellenoX = x + getWidth() - (getWidth() * porcentaje);
+            batch.draw(relleno, rellenoX, y, getWidth() * porcentaje, getHeight());
         }
 
+        // ===== DIBUJAR VIDA ENCIMA DE LA BARRA =====
+        String textoVida = vida + " / " + vidaMax;
+
+        float textoX = x + getWidth() / 2f - 20; // ajuste visual
+        float textoY = y + getHeight() / 2f + 5;
+
+        fuente.draw(batch, textoVida, textoX, textoY);
     }
 
     public void dispose() {
-        this.fondo.dispose();
-        this.vidaLlena.dispose();
+        fondo.dispose();
+        if (vidaLlena != null) vidaLlena.dispose();
+        fuente.dispose();
     }
 }

@@ -31,50 +31,51 @@ public abstract class ElementoEntorno extends Actor {
         this.ancho = ancho;
         this.alto = alto;
     }
-    
+
     protected ElementoEntorno(World mundo, float x, float y) {
         this.mundo = mundo;
         this.x = x;
         this.y = y;
     }
-    
+
     protected void crearYPosicionarCuerpo() {
-    	// Definir el cuerpo estático
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set((x + this.ancho / 2) / Principal.PPM, (y + this.alto / 2) / Principal.PPM);
-        bodyDef.type = this.tipoCuerpo;
+        bodyDef.position.set(
+            (x + ancho / 2) / Principal.PPM,
+            (y + alto / 2) / Principal.PPM
+        );
+        bodyDef.type = tipoCuerpo;
+
         cuerpo = mundo.createBody(bodyDef);
         cuerpo.setUserData(this);
 
-        // Definir la forma
         PolygonShape forma = new PolygonShape();
         forma.setAsBox(
-        	ancho / 2 / Principal.PPM,
-        	(alto / 2 - 2) / Principal.PPM
+            ancho / 2 / Principal.PPM,
+            (alto / 2 - 2) / Principal.PPM
         );
 
-        // Definir la fixture
         fixtureDef.shape = forma;
         fixtureDef.friction = 0.5f;
-        this.cuerpo.createFixture(fixtureDef);
+        cuerpo.createFixture(fixtureDef);
         forma.dispose();
 
-        setBounds(x, y, this.ancho, this.alto);
+        setBounds(x, y, ancho, alto);
         cuerpo.setUserData(this);
     }
-    
+
     public Body getCuerpo() {
-    	return this.cuerpo;
+        return cuerpo;
     }
-    
+
     protected void setTipoCuerpo(BodyDef.BodyType tipo) {
         this.tipoCuerpo = tipo;
     }
-    
+
     protected void setFixtureDef(FixtureDef fixtureDef) {
-    	this.fixtureDef = fixtureDef;
+        this.fixtureDef = fixtureDef;
     }
-    
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(textura, getX(), getY(), getWidth(), getHeight());
@@ -83,7 +84,10 @@ public abstract class ElementoEntorno extends Actor {
     @Override
     public void act(float delta) {
         Vector2 posicion = cuerpo.getPosition();
-        setPosition(posicion.x * Principal.PPM - this.ancho / 2, posicion.y * Principal.PPM - this.alto / 2);
+        setPosition(
+            posicion.x * Principal.PPM - ancho / 2,
+            posicion.y * Principal.PPM - alto / 2
+        );
     }
 
     public void dispose() {

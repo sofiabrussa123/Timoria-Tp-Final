@@ -34,7 +34,6 @@ public class InputManager implements InputProcessor {
         	case Input.Keys.E: isEPressed = true; break;
         	case Input.Keys.O: isOPressed = true; break;
         }
-        
         return false;
     }
 
@@ -54,7 +53,6 @@ public class InputManager implements InputProcessor {
 	    	case Input.Keys.E: isEPressed = false; break;
 	    	case Input.Keys.O: isOPressed = false; break;
     	}
-    	
         return false;
     }
     
