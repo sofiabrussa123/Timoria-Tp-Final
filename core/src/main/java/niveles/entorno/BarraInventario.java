@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import personajes.Jugador;
-import interfaces.IdManager;
 
 public class BarraInventario extends Actor{
 	

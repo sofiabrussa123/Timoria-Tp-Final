@@ -3,7 +3,7 @@ package interfaces;
 public interface GameController {
 	void procesarAccionesEntidades(String[] mensaje);
 	void cambiarPantalla();
-	void recogerItem();
+	void recogerLlave(int idLlave, int idJugador);
 	void dañarJugador(int idJugador, int nuevaVida);
 	void moverPlataformaMovil(int id, int posX, int posY);
 	void abrirPuerta(int id);

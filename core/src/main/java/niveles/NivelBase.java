@@ -343,7 +343,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
  }
 
  @Override
- public void recogerItem() {
+ public void recogerLlave(int idLlave, int idJugador) {
+	 LlaveActivadora llave = (LlaveActivadora) this.entidades.get(idLlave);
+	 if (idJugador == 1) llave.activarConJugador(jugador1); 
+	 else llave.activarConJugador(jugador2);
  }
 
  @Override
@@ -365,7 +368,6 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	 Actor entidad = this.entidades.get(id);
 
 	    if (entidad != null) {
-	        // 2. Verificación y casting seguro
 	        if (entidad instanceof PuertaLlegada) {
 	            PuertaLlegada puerta = (PuertaLlegada) entidad;
 	            
