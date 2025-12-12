@@ -10,9 +10,10 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import interfaces.IdManager;
 import io.github.timoria.Principal;
 
-public abstract class ElementoEntorno extends Actor {
+public abstract class ElementoEntorno extends Actor implements IdManager{
 
     protected World mundo;
     protected float x;
@@ -23,8 +24,10 @@ public abstract class ElementoEntorno extends Actor {
     protected float alto;
     protected BodyDef.BodyType tipoCuerpo = BodyDef.BodyType.StaticBody;
     protected FixtureDef fixtureDef = new FixtureDef();
+    protected int id;
 
-    protected ElementoEntorno(World mundo, float x, float y, float ancho, float alto) {
+    protected ElementoEntorno(World mundo, float x, float y, float ancho, float alto, int id) {
+    	this.id = id;
         this.mundo = mundo;
         this.x = x;
         this.y = y;
@@ -32,7 +35,8 @@ public abstract class ElementoEntorno extends Actor {
         this.alto = alto;
     }
 
-    protected ElementoEntorno(World mundo, float x, float y) {
+    protected ElementoEntorno(World mundo, float x, float y, int id) {
+    	this.id = id;
         this.mundo = mundo;
         this.x = x;
         this.y = y;
@@ -92,5 +96,10 @@ public abstract class ElementoEntorno extends Actor {
 
     public void dispose() {
         textura.dispose();
+    }
+    
+    @Override
+    public int getId() {
+    	return this.id;
     }
 }

@@ -12,8 +12,8 @@ public class LlaveActivadora extends ElementoActivador {
     private float ancho = 30f;
     private float alto = 45f;
 
-    public LlaveActivadora(World mundo, float x, float y, PuertaLlegada puerta) {
-        super(mundo, x, y);
+    public LlaveActivadora(World mundo, float x, float y, PuertaLlegada puerta, int id) {
+        super(mundo, x, y, id);
         this.puerta = puerta;
         super.textura = new Texture(Gdx.files.internal("boton.png"));
         super.crearYPosicionarCuerpo(this.ancho, this.alto);

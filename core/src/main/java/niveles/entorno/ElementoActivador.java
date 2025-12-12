@@ -10,8 +10,8 @@ public abstract class ElementoActivador extends ElementoEntorno {
     protected boolean activado = false;
     protected Texture textura;
 
-    protected ElementoActivador(World mundo, float x, float y) {
-        super(mundo, x, y);
+    protected ElementoActivador(World mundo, float x, float y, int id) {
+        super(mundo, x, y, id);
     }
 
     protected void crearYPosicionarCuerpo(float ancho, float alto) {

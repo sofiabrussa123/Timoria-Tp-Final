@@ -2,10 +2,6 @@ package interfaces;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-<<<<<<< HEAD
-import com.badlogic.gdx.graphics.g2d.Sprite;
-=======
->>>>>>> 8871f18b59420b4c8a0c71542cbf4fab419b7a46
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;

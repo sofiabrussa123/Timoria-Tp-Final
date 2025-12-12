@@ -1,19 +1,27 @@
 package Red;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
+import interfaces.GameController;
 
 public class HiloCliente extends Thread {
 
     private DatagramSocket socket;
     private int puertoServidor = 5555;
     private String puertoServidorStr = "255.255.255.255";
-    private InetAddress ipServer;
+    private InetAddress ipServidor;
     private boolean end = false;
+    private GameController gameController;
 
-    public HiloCliente() {
+    public HiloCliente(GameController gameController) {
+    	this.gameController = gameController;
         try {
-            ipServer = InetAddress.getByName(puertoServidorStr);
+        	ipServidor = InetAddress.getByName(puertoServidorStr);
             socket = new DatagramSocket();
         } catch (SocketException | UnknownHostException e) {
 //            throw new RuntimeException(e);
@@ -40,47 +48,37 @@ public class HiloCliente extends Thread {
         System.out.println("Mensaje recibido: " + message);
 
         switch(parts[0]){
-            case "AlreadyConnected":
+            case "YaConectado":
                 System.out.println("Ya estas conectado");
                 break;
-            case "Connected":
+            case "Conectado":
                 System.out.println("Conectado al servidor");
-                this.ipServer = packet.getAddress();
-                //gameController.connect(Integer.parseInt(parts[1]));
+                this.ipServidor = packet.getAddress();
+                gameController.conectar(Integer.parseInt(parts[1]));
                 break;
-            case "Full":
+            case "Lleno":
                 System.out.println("Servidor lleno");
                 this.end = true;
                 break;
-            case "Start":
-                //this.gameController.start();
+            case "Empezar":
+                this.gameController.empezarJuego();
                 break;
-            case "UpdatePosition":
-                switch(parts[1]){
-                    case "Pad":
-                        //this.gameController.updatePadPosition(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
-                        break;
-                    case "Ball":
-                        //this.gameController.updateBallPosition(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
-                        break;
-                }
+            case "TerminarJuego":
+                this.gameController.terminarJuego();
                 break;
-            case "UpdateScore":
-                //this.gameController.updateScore(parts[1]);
+            case "Desconectar":
+                this.gameController.desconectar();
                 break;
-            case "EndGame":
-                //this.gameController.endGame(Integer.parseInt(parts[1]));
-                break;
-            case "Disconnect":
-                //this.gameController.backToMenu();
-                break;
+            default: 
+            	this.gameController.procesarAccionesEntidades(parts);
+            	break;
         }
 
     }
 
     public void enviarMensaje(String message) {
         byte[] byteMessage = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(byteMessage, byteMessage.length, ipServer, puertoServidor);
+        DatagramPacket packet = new DatagramPacket(byteMessage, byteMessage.length, ipServidor, puertoServidor);
         try {
             socket.send(packet);
         } catch (IOException e) {
@@ -88,7 +86,7 @@ public class HiloCliente extends Thread {
         }
     }
 
-    public void terminate() {
+    public void terminar() {
         this.end = true;
         socket.close();
         this.interrupt();

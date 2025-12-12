@@ -6,8 +6,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Plataforma extends ElementoEntorno {
 
-    public Plataforma(World mundo, float x, float y, int ancho, int alto) {
-    	super(mundo, x, y, ancho, alto);
+    public Plataforma(World mundo, float x, float y, int ancho, int alto, int id) {
+    	super(mundo, x, y, ancho, alto, id);
 
         textura = new Texture(Gdx.files.internal("plataforma.jpg"));
 

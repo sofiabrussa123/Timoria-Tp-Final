@@ -9,8 +9,8 @@ public class Palanca extends ElementoActivador {
     private float ancho = 20f;
     private float alto = 20f;
 
-    public Palanca(World mundo, float x, float y) {
-        super(mundo, x, y);
+    public Palanca(World mundo, float x, float y, int id) {
+        super(mundo, x, y, id);
         super.textura = new Texture(Gdx.files.internal("Palanca1.png"));
         super.crearYPosicionarCuerpo(this.ancho, this.alto);
     }

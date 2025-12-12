@@ -10,9 +10,10 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import interfaces.IdManager;
 import niveles.NivelBase;
 
-public class Enemigo extends Actor {
+public class Enemigo extends Actor implements IdManager{
 
 	private int vida = 50;
     private Texture textura;
@@ -22,19 +23,18 @@ public class Enemigo extends Actor {
     private int daño = 10;
     private int cooldown = 1;
     private float tiempoTranscurrido = 0;
-    private NivelBase nivel;
     private float alcanceAtaque = 0.15f;
     private boolean enCooldown = false;
-    private boolean encontroJugador;
     private World mundo;
     private boolean atacandoVisualmente = false;
     private float tiempoAtaqueVisual = 0.1f;
     private float contadorAtaqueVisual = 0f;
     private boolean muerto = false;
+    private int id;
 
-    public Enemigo(World mundo, float x, float y, NivelBase nivel) {
+    public Enemigo(World mundo, float x, float y, int id) {
+    	this.id = id;
         this.textura = new Texture("enemigo.png");
-        this.nivel = nivel;
         this.anchoHitbox = 48;
         this.altoHitbox = 48;
         this.mundo = mundo;
@@ -67,8 +67,6 @@ public class Enemigo extends Actor {
     public void act(float delta) {
         super.act(delta);
 
-        determinarDireccionMovimiento(calcularJugadorObjetivo());
-
         this.tiempoTranscurrido += delta;
 
         if (atacandoVisualmente) {
@@ -83,47 +81,10 @@ public class Enemigo extends Actor {
             enCooldown = false;
         }
 
-        if (!enCooldown) {
-            encontroJugador = false;
-
-            Vector2 posicionEnemigo = this.cuerpo.getPosition();
-
-            float anchoAreaAtaque = (anchoHitbox * NivelBase.PIXELES_A_METROS) + (2 * alcanceAtaque);
-            float altoAreaAtaque = altoHitbox * NivelBase.PIXELES_A_METROS * 0.6f;
-
-            float centroXAreaAtaque = posicionEnemigo.x;
-            float centroYAreaAtaque = posicionEnemigo.y;
-
-            float lowerX = centroXAreaAtaque - (anchoAreaAtaque / 2);
-            float upperX = centroXAreaAtaque + (anchoAreaAtaque / 2);
-            float lowerY = centroYAreaAtaque - (altoAreaAtaque / 2);
-            float upperY = centroYAreaAtaque + (altoAreaAtaque / 2);
-
-            this.mundo.QueryAABB(fixture -> {
-                Object userData = fixture.getBody().getUserData();
-
-                if (userData instanceof Jugador) {
-                    Jugador jugador = (Jugador) userData;
-                    Vector2 posJugador = jugador.getCuerpo().getPosition();
-
-                    float diferenciaY = Math.abs(posJugador.y - posicionEnemigo.y);
-
-                    if (diferenciaY < 0.3f) {
-                        jugador.recibirDaño(this.daño);
-                        this.encontroJugador = true;
-                    }
-
-                    return true;
-                }
-                return true;
-            }, lowerX, lowerY, upperX, upperY);
-
-            if (encontroJugador) {
-                this.enCooldown = true;
-                this.tiempoTranscurrido = 0f;
-                this.atacandoVisualmente = true;
-            }
-        }
+        setPosition(
+            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
+            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
+        );
     }
 
     @Override
@@ -169,6 +130,16 @@ public class Enemigo extends Actor {
         }
         this.remove();
     }
+    
+    public void mover(int posX, int posY) {
+        if (this.cuerpo != null) {
+            this.cuerpo.setTransform(
+                posX * NivelBase.PIXELES_A_METROS, 
+                posY * NivelBase.PIXELES_A_METROS, 
+                this.cuerpo.getAngle()
+            );
+        }
+    }
 
     public boolean getMuerto() {
         return this.muerto;
@@ -177,30 +148,9 @@ public class Enemigo extends Actor {
     public void dispose() {
         textura.dispose();
     }
-
-    private void determinarDireccionMovimiento(Jugador objetivo) {
-        Vector2 posicionJugador = objetivo.getCuerpo().getPosition();
-        Vector2 posicionEnemigo = cuerpo.getPosition();
-
-        Vector2 direccion = posicionJugador.cpy().sub(posicionEnemigo).nor().scl(1.5f);
-        cuerpo.setLinearVelocity(direccion.x, cuerpo.getLinearVelocity().y);
-
-        setPosition(
-            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
-            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
-        );
-    }
-
-    private Jugador calcularJugadorObjetivo() {
-        float posicionAbsolutaJugador1 = Math.abs(this.nivel.getJugador1().getX());
-        float posicionAbsolutaJugador2 = Math.abs(this.nivel.getJugador2().getX());
-        float posicionAbsolutaEnemigo = Math.abs(this.getX());
-
-        if (Math.abs(posicionAbsolutaJugador1 - posicionAbsolutaEnemigo) >
-            Math.abs(posicionAbsolutaJugador2 - posicionAbsolutaEnemigo)) {
-            return this.nivel.getJugador2();
-        } else {
-            return this.nivel.getJugador1();
-        }
+    
+    @Override
+    public int getId() {
+    	return this.id;
     }
 }

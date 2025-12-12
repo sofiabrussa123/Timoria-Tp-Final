@@ -3,9 +3,11 @@ package niveles.entorno;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import personajes.Jugador;
 
-public class BarraInventario extends Actor {
+import personajes.Jugador;
+import interfaces.IdManager;
+
+public class BarraInventario extends Actor{
 	
     private Jugador jugador;
     private Texture slotVacio;

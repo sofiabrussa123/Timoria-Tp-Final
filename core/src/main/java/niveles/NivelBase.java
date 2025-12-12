@@ -1,17 +1,29 @@
 package niveles;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import Red.HiloCliente;
 import globales.EsceneManager;
+import interfaces.GameController;
+import interfaces.IdManager;
+import interfaces.Menu;
 import interfaces.MenuPausa;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
@@ -26,7 +38,7 @@ import personajes.Enemigo;
 import personajes.Jugador;
 import personajes.MejoraTemporal;
 
-public abstract class NivelBase extends EscenaBase {
+public abstract class NivelBase extends EscenaBase implements GameController{
 
     public static final float PIXELES_A_METROS = 1 / 100f;
     private static final float ALTO_VIEWPORT_INICIAL = 15f;
@@ -50,7 +62,10 @@ public abstract class NivelBase extends EscenaBase {
     protected Jugador jugador2;
     protected Jugador personaje;
     protected boolean friendlyFire = false;
+    protected Map<Integer, Actor> entidades = new HashMap<>();
     protected HiloCliente hiloCliente;
+    protected int cantEntidades = 0;
+    protected int idJugadorActivo;
 
     public NivelBase(Game juego, String fondo) {
         super(juego, fondo);
@@ -173,7 +188,7 @@ public abstract class NivelBase extends EscenaBase {
             this.escena.addActor(inventario2);
         }
         
-        this.hiloCliente = new HiloCliente();
+        this.hiloCliente = new HiloCliente(this);
         hiloCliente.start();
         hiloCliente.enviarMensaje("Conectar");
 
@@ -198,44 +213,47 @@ public abstract class NivelBase extends EscenaBase {
             this.cambiarEscena(new PantallaDeMuerte(this.juego, idJugadorMuerto));
         }
 
-        if (this.inputManager.getIsWPressed()) {
-            if (!this.jugador1.getEnElAire()) {
-                this.jugador1.saltar();
+        
+        
+        if(idJugadorActivo == 1) {
+        	if (this.inputManager.getIsOPressed()) {
+                jugador1.atacar(this.mundo, this.friendlyFire);
+            } else {
+                jugador1.resetearTeclaAtaque();
             }
-        }
 
-        if (this.inputManager.getIsEPressed()) {
-            jugador2.atacar(this.mundo, this.friendlyFire);
-        } else {
-            jugador2.resetearTeclaAtaque();
-        }
-
-        if (this.inputManager.getIsOPressed()) {
-            jugador1.atacar(this.mundo, this.friendlyFire);
-        } else {
-            jugador1.resetearTeclaAtaque();
-        }
-
-        if (this.inputManager.getIsAPressed()) {
-            jugador1.moverIzquierda();
-        }
-
-        if (this.inputManager.getIsDPressed()) {
-            jugador1.moverDerecha();
-        }
-
-        if (this.inputManager.getIsUpPressed()) {
-            if (!this.jugador2.getEnElAire()) {
-                this.jugador2.saltar();
+            if (this.inputManager.getIsAPressed()) {
+                jugador1.moverIzquierda();
             }
-        }
 
-        if (this.inputManager.getIsLeftPressed()) {
-            jugador2.moverIzquierda();
-        }
+            if (this.inputManager.getIsDPressed()) {
+                jugador1.moverDerecha();
+            }
+            if (this.inputManager.getIsWPressed()) {
+                if (!this.jugador1.getEnElAire()) {
+                    this.jugador1.saltar();
+                }
+            }
+        } else {
+        	if (this.inputManager.getIsEPressed()) {
+                jugador2.atacar(this.mundo, this.friendlyFire);
+            } else {
+                jugador2.resetearTeclaAtaque();
+            }
 
-        if (this.inputManager.getIsRightPressed()) {
-            jugador2.moverDerecha();
+            if (this.inputManager.getIsUpPressed()) {
+                if (!this.jugador2.getEnElAire()) {
+                    this.jugador2.saltar();
+                }
+            }
+
+            if (this.inputManager.getIsLeftPressed()) {
+                jugador2.moverIzquierda();
+            }
+
+            if (this.inputManager.getIsRightPressed()) {
+                jugador2.moverDerecha();
+            }
         }
 
         limpiarEntidades();
@@ -287,4 +305,170 @@ public abstract class NivelBase extends EscenaBase {
         this.inputManager.resetPauseKeys();
         Gdx.input.setInputProcessor(this.inputManager);
     }
+    
+    protected void añadirElemento(IdManager elemento) {
+    	this.escena.addActor((Actor)elemento);
+    	entidades.put(elemento.getId(), (Actor)elemento);
+    }
+    
+    protected int asignarIdEntidad() {
+    	this.cantEntidades++;
+    	return this.cantEntidades;
+    }
+
+ @Override
+ public void procesarAccionesEntidades(String[] mensaje) {
+	 int idEntidad = Integer.parseInt(mensaje[1]);
+     switch(mensaje[0]) {
+     case "Jugador":
+    	 procesarAccionesJugador(mensaje, idEntidad);
+    	 break;
+     case "Enemigo":
+    	 procesarAccionesEnemigo(mensaje, idEntidad);
+    	 break;
+    	 
+     case "Puerta":
+    	 abrirPuerta(idEntidad);
+    	 break;
+     case "PlataformaMovil":
+    	 moverPlataformaMovil(idEntidad, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
+    	 break;
+     default: System.out.println("Mensaje desconocido"); break;
+     }
+ }
+
+ @Override
+ public void cambiarPantalla() {
+     
+ }
+
+ @Override
+ public void recogerItem() {
+ }
+
+ @Override
+ public void moverPlataformaMovil(int id, int posX, int posY) {
+	 Actor entidad = this.entidades.get(id);
+
+	    if (entidad != null) {
+	        // 2. Verificación y casting seguro
+	        if (entidad instanceof PlataformaMovil) {
+	            PlataformaMovil plataforma = (PlataformaMovil) entidad;
+	            
+	            plataforma.mover(posX, posY);
+	        }
+	    }
+ }
+
+ @Override
+ public void abrirPuerta(int id) {
+	 Actor entidad = this.entidades.get(id);
+
+	    if (entidad != null) {
+	        // 2. Verificación y casting seguro
+	        if (entidad instanceof PuertaLlegada) {
+	            PuertaLlegada puerta = (PuertaLlegada) entidad;
+	            
+	            puerta.desbloquear();
+	        }
+	    }
+}
+ 
+ public void procesarAccionesJugador(String[] mensaje, int idJugador) {
+	 switch(mensaje[1]) { 
+	 	case "ActualizarPosicion":
+	 		actualizarPosicionJugador(idJugador, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
+	 		break;
+	 	case "Dañar":
+	 		dañarJugador(idJugador, Integer.parseInt(mensaje[2]));
+	 		break;
+	 	case "Matar":
+	 		matarJugador(idJugador);
+	 		break;
+	 	default: System.out.println("Mensaje desconocido"); break;
+	 }
+ }
+ 
+ @Override
+ public void actualizarPosicionJugador(int id, int posX, int posY) {
+	 if(id == 1) {
+    	 this.jugador1.moverCuerpo(posX, posY);
+     } else this.jugador2.moverCuerpo(posX, posY);
+ }
+
+ @Override
+ public void matarJugador(int id) {
+     if(id == 1) {
+    	 this.jugador1.morir();
+     } else this.jugador2.morir();
+ }
+ 
+ @Override
+ public void dañarJugador(int idJugador, int nuevaVida) {
+	 if (idJugador == 1) {
+	     this.jugador1.recibirDaño(nuevaVida);
+	 } else {
+	     this.jugador2.recibirDaño(nuevaVida);
+	 }
+ }
+ 
+ public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
+	 switch(mensaje[1]) {
+	 	case "ActualizarPosicion":
+	 		actualizarPosicionEnemigo(idEnemigo, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
+	 		break;
+	 	case "Desaparecer":
+	 		desaparecerEnemigo(idEnemigo);
+	 		break;
+	 	default: System.out.println("Mensaje desconocido"); break;
+	 }
+ }
+ 
+ @Override
+ public void actualizarPosicionEnemigo(int id, int posX, int posY) {
+	 Actor entidad = this.entidades.get(id);
+
+	    if (entidad != null) {
+	        // 2. Verificación y casting seguro
+	        if (entidad instanceof Enemigo) {
+	        	Enemigo enemigo = (Enemigo) entidad;
+	            
+	        	enemigo.mover(posX, posY);
+	        }
+	    }
+}
+
+ @Override
+ public void desaparecerEnemigo(int id) {
+	 Actor entidad = this.entidades.get(id);
+
+	    if (entidad != null) {
+	        // 2. Verificación y casting seguro
+	        if (entidad instanceof Enemigo) {
+	        	Enemigo enemigo = (Enemigo) entidad;
+	            
+	        	enemigo.eliminar();
+	        	enemigo.dispose();
+	        }
+	    }
+}
+ 
+ @Override
+ public void empezarJuego() {
+     cambiarEscena(new Nivel1(this.juego));
+ }
+
+ @Override
+ public void conectar(int idJugador) {
+     this.idJugadorActivo = idJugador;
+ }
+
+ @Override
+ public void volverAlMenu() {
+	 cambiarEscena(new Menu(this.juego));
+ }
+
+ @Override
+ public void terminarJuego() {
+ }
 }
