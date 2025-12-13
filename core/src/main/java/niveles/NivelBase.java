@@ -217,7 +217,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
 
         if(idJugadorActivo == 1) {
-        	if (this.inputManager.getIsOPressed()) {
+            if (this.inputManager.getIsOPressed()) {
                 jugador1.atacar(this.mundo, this.friendlyFire);
             } else {
                 jugador1.resetearTeclaAtaque();
@@ -236,7 +236,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
                 }
             }
         } else {
-        	if (this.inputManager.getIsEPressed()) {
+            if (this.inputManager.getIsEPressed()) {
                 jugador2.atacar(this.mundo, this.friendlyFire);
             } else {
                 jugador2.resetearTeclaAtaque();
@@ -308,13 +308,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     }
 
     protected void añadirElemento(IdManager elemento) {
-    	this.escena.addActor((Actor)elemento);
-    	entidades.put(elemento.getId(), (Actor)elemento);
+        this.escena.addActor((Actor)elemento);
+        entidades.put(elemento.getId(), (Actor)elemento);
     }
 
     protected int asignarIdEntidad() {
-    	this.cantEntidades++;
-    	return this.cantEntidades;
+        this.cantEntidades++;
+        return this.cantEntidades;
     }
 
     @Override
@@ -326,159 +326,159 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         volverAlMenu();
     }
 
- @Override
- public void procesarAccionesEntidades(String[] mensaje) {
-	 int idEntidad = Integer.parseInt(mensaje[1]);
-     switch(mensaje[0]) {
-     case "Jugador":
-    	 procesarAccionesJugador(mensaje, idEntidad);
-    	 break;
-     case "Enemigo":
-    	 procesarAccionesEnemigo(mensaje, idEntidad);
-    	 break;
+    @Override
+    public void procesarAccionesEntidades(String[] mensaje) {
+        int idEntidad = Integer.parseInt(mensaje[1]);
+        switch(mensaje[0]) {
+            case "Jugador":
+                procesarAccionesJugador(mensaje, idEntidad);
+                break;
+            case "Enemigo":
+                procesarAccionesEnemigo(mensaje, idEntidad);
+                break;
 
-     case "Puerta":
-    	 abrirPuerta(idEntidad);
-    	 break;
-     case "PlataformaMovil":
-    	 moverPlataformaMovil(idEntidad, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
-    	 break;
-     default: System.out.println("Mensaje desconocido"); break;
-     }
- }
+            case "Puerta":
+                abrirPuerta(idEntidad);
+                break;
+            case "PlataformaMovil":
+                moverPlataformaMovil(idEntidad, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
+                break;
+            default: System.out.println("Mensaje desconocido"); break;
+        }
+    }
 
- @Override
- public void cambiarPantalla() {
+    @Override
+    public void cambiarPantalla() {
 
- }
+    }
 
- @Override
- public void recogerItem() {
- }
+    @Override
+    public void recogerLlave(int idLlave, int idJugador) {
+    }
 
- @Override
- public void moverPlataformaMovil(int id, int posX, int posY) {
-	 Actor entidad = this.entidades.get(id);
+    @Override
+    public void moverPlataformaMovil(int id, int posX, int posY) {
+        Actor entidad = this.entidades.get(id);
 
-	    if (entidad != null) {
-	        // 2. Verificación y casting seguro
-	        if (entidad instanceof PlataformaMovil) {
-	            PlataformaMovil plataforma = (PlataformaMovil) entidad;
+        if (entidad != null) {
+            // 2. Verificación y casting seguro
+            if (entidad instanceof PlataformaMovil) {
+                PlataformaMovil plataforma = (PlataformaMovil) entidad;
 
-	            plataforma.mover(posX, posY);
-	        }
-	    }
- }
+                plataforma.mover(posX, posY);
+            }
+        }
+    }
 
- @Override
- public void abrirPuerta(int id) {
-	 Actor entidad = this.entidades.get(id);
+    @Override
+    public void abrirPuerta(int id) {
+        Actor entidad = this.entidades.get(id);
 
-	    if (entidad != null) {
-	        // 2. Verificación y casting seguro
-	        if (entidad instanceof PuertaLlegada) {
-	            PuertaLlegada puerta = (PuertaLlegada) entidad;
+        if (entidad != null) {
+            // 2. Verificación y casting seguro
+            if (entidad instanceof PuertaLlegada) {
+                PuertaLlegada puerta = (PuertaLlegada) entidad;
 
-	            puerta.desbloquear();
-	        }
-	    }
-}
+                puerta.desbloquear();
+            }
+        }
+    }
 
- public void procesarAccionesJugador(String[] mensaje, int idJugador) {
-	 switch(mensaje[1]) {
-	 	case "ActualizarPosicion":
-	 		actualizarPosicionJugador(idJugador, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
-	 		break;
-	 	case "Dañar":
-	 		dañarJugador(idJugador, Integer.parseInt(mensaje[2]));
-	 		break;
-	 	case "Matar":
-	 		matarJugador(idJugador);
-	 		break;
-	 	default: System.out.println("Mensaje desconocido"); break;
-	 }
- }
+    public void procesarAccionesJugador(String[] mensaje, int idJugador) {
+        switch(mensaje[1]) {
+            case "ActualizarPosicion":
+                actualizarPosicionJugador(idJugador, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
+                break;
+            case "Dañar":
+                dañarJugador(idJugador, Integer.parseInt(mensaje[2]));
+                break;
+            case "Matar":
+                matarJugador(idJugador);
+                break;
+            default: System.out.println("Mensaje desconocido"); break;
+        }
+    }
 
- @Override
- public void actualizarPosicionJugador(int id, int posX, int posY) {
-	 if(id == 1) {
-    	 this.jugador1.moverCuerpo(posX, posY);
-     } else this.jugador2.moverCuerpo(posX, posY);
- }
+    @Override
+    public void actualizarPosicionJugador(int id, int posX, int posY) {
+        if(id == 1) {
+            this.jugador1.moverCuerpo(posX, posY);
+        } else this.jugador2.moverCuerpo(posX, posY);
+    }
 
- @Override
- public void matarJugador(int id) {
-     if(id == 1) {
-    	 this.jugador1.morir();
-     } else this.jugador2.morir();
- }
+    @Override
+    public void matarJugador(int id) {
+        if(id == 1) {
+            this.jugador1.morir();
+        } else this.jugador2.morir();
+    }
 
- @Override
- public void dañarJugador(int idJugador, int nuevaVida) {
-	 if (idJugador == 1) {
-	     this.jugador1.recibirDaño(nuevaVida);
-	 } else {
-	     this.jugador2.recibirDaño(nuevaVida);
-	 }
- }
+    @Override
+    public void dañarJugador(int idJugador, int nuevaVida) {
+        if (idJugador == 1) {
+            this.jugador1.recibirDaño(nuevaVida);
+        } else {
+            this.jugador2.recibirDaño(nuevaVida);
+        }
+    }
 
- public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
-	 switch(mensaje[1]) {
-	 	case "ActualizarPosicion":
-	 		actualizarPosicionEnemigo(idEnemigo, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
-	 		break;
-	 	case "Desaparecer":
-	 		desaparecerEnemigo(idEnemigo);
-	 		break;
-	 	default: System.out.println("Mensaje desconocido"); break;
-	 }
- }
+    public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
+        switch(mensaje[1]) {
+            case "ActualizarPosicion":
+                actualizarPosicionEnemigo(idEnemigo, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
+                break;
+            case "Desaparecer":
+                desaparecerEnemigo(idEnemigo);
+                break;
+            default: System.out.println("Mensaje desconocido"); break;
+        }
+    }
 
- @Override
- public void actualizarPosicionEnemigo(int id, int posX, int posY) {
-	 Actor entidad = this.entidades.get(id);
+    @Override
+    public void actualizarPosicionEnemigo(int id, int posX, int posY) {
+        Actor entidad = this.entidades.get(id);
 
-	    if (entidad != null) {
-	        // 2. Verificación y casting seguro
-	        if (entidad instanceof Enemigo) {
-	        	Enemigo enemigo = (Enemigo) entidad;
+        if (entidad != null) {
+            // 2. Verificación y casting seguro
+            if (entidad instanceof Enemigo) {
+                Enemigo enemigo = (Enemigo) entidad;
 
-	        	enemigo.mover(posX, posY);
-	        }
-	    }
-}
+                enemigo.mover(posX, posY);
+            }
+        }
+    }
 
- @Override
- public void desaparecerEnemigo(int id) {
-	 Actor entidad = this.entidades.get(id);
+    @Override
+    public void desaparecerEnemigo(int id) {
+        Actor entidad = this.entidades.get(id);
 
-	    if (entidad != null) {
-	        // 2. Verificación y casting seguro
-	        if (entidad instanceof Enemigo) {
-	        	Enemigo enemigo = (Enemigo) entidad;
+        if (entidad != null) {
+            // 2. Verificación y casting seguro
+            if (entidad instanceof Enemigo) {
+                Enemigo enemigo = (Enemigo) entidad;
 
-	        	enemigo.eliminar();
-	        	enemigo.dispose();
-	        }
-	    }
-}
+                enemigo.eliminar();
+                enemigo.dispose();
+            }
+        }
+    }
 
- @Override
- public void empezarJuego() {
-     cambiarEscena(new Nivel1(this.juego));
- }
+    @Override
+    public void empezarJuego() {
+        cambiarEscena(new Nivel1(this.juego));
+    }
 
- @Override
- public void conectar(int idJugador) {
-     this.idJugadorActivo = idJugador;
- }
+    @Override
+    public void conectar(int idJugador) {
+        this.idJugadorActivo = idJugador;
+    }
 
- @Override
- public void volverAlMenu() {
-	 cambiarEscena(new Menu(this.juego));
- }
+    @Override
+    public void volverAlMenu() {
+        cambiarEscena(new Menu(this.juego));
+    }
 
- @Override
- public void terminarJuego() {
- }
+    @Override
+    public void terminarJuego() {
+    }
 }
