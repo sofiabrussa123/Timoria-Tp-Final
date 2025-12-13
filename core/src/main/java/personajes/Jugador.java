@@ -162,7 +162,7 @@ public class Jugador extends Actor implements IdManager{
         );
         
         if(enElAire) {
-            this.hiloCliente.enviarMensaje("Jugador:ActualizarPosicion:"+this.id+":"+this.cuerpo.getPosition().x+":"+this.cuerpo.getPosition().y);  
+            this.hiloCliente.enviarMensaje("Jugador:Mover:"+this.id+":"+this.cuerpo.getPosition().x+":"+this.cuerpo.getPosition().y);  
         } 
     }
     
@@ -200,7 +200,7 @@ public class Jugador extends Actor implements IdManager{
             mirandoDerecha = true;
             estado = Estado.CORRIENDO; 
             // COMANDAR: Enviar comando al servidor
-            this.hiloCliente.enviarMensaje("Jugador:"+this.id+":MoverDerecha");
+            this.hiloCliente.enviarMensaje("Jugador:"+this.id+":true");
         } 
     }
     
@@ -210,7 +210,7 @@ public class Jugador extends Actor implements IdManager{
             mirandoIzquierda = true; 
             mirandoDerecha = false;
             estado = Estado.CORRIENDO; 
-            this.hiloCliente.enviarMensaje("Jugador:"+this.id+":MoverIzquierda");
+            this.hiloCliente.enviarMensaje("Jugador:"+this.id+":false");
         } 
     }
     

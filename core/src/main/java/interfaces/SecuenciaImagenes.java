@@ -4,7 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
+
+import Red.HiloCliente;
 import niveles.EscenaBase;
 
 public class SecuenciaImagenes extends EscenaBase {
@@ -17,12 +18,12 @@ public class SecuenciaImagenes extends EscenaBase {
     private boolean esperandoInput = false;
     private float tiempoEspera = 0.3f; // Evita avance accidental
     private float tiempoTranscurrido = 0f;
+    private HiloCliente hiloCliente;
 
-    public SecuenciaImagenes(Game juego, String[] rutasImagenes, Class<?> siguienteEscenaClase) {
+    public SecuenciaImagenes(Game juego, String[] rutasImagenes) {
         super(juego, rutasImagenes[0]);
         this.juego = juego;
         this.rutasImagenes = rutasImagenes;
-        this.siguienteEscenaClase = siguienteEscenaClase;
 
         // Cargar todas las texturas
         this.texturas = new Texture[rutasImagenes.length];
@@ -75,16 +76,7 @@ public class SecuenciaImagenes extends EscenaBase {
             esperandoInput = false;
 
             if (imagenActual >= rutasImagenes.length) {
-                // Terminó la secuencia, crear la siguiente escena
-                try {
-                    EscenaBase siguienteEscena = (EscenaBase) siguienteEscenaClase
-                        .getConstructor(Game.class)
-                        .newInstance(this.juego);
-                    cambiarEscena(siguienteEscena);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.err.println("Error al crear la siguiente escena: " + siguienteEscenaClase.getName());
-                }
+                this.hiloCliente.enviarMensaje("FinHistoria");
             }
         }
 
