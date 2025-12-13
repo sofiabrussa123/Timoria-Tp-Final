@@ -12,11 +12,27 @@ import personajes.Jugador;
 
 public class Nivel1 extends NivelBase {
 
+    private boolean inicializado = false;
+
     public Nivel1(Game juego) {
         super(juego, "FondoNivel1.jpeg");
-
         this.setFriendlyFire(true);
+    }
 
+    @Override
+    public void show() {
+        // Primero llamar al show del padre para inicializar hiloCliente
+        super.show();
+
+        // Ahora crear los elementos del nivel si no se han creado
+        if (!inicializado) {
+            inicializarNivel();
+            inicializado = true;
+        }
+    }
+
+    private void inicializarNivel() {
+        // Ahora hiloCliente ya está inicializado
         super.jugador1 = new Jugador(mundo, "Jugador1", 100, 85, 1, NivelBase.getMejorasJugador1(), super.hiloCliente);
         super.jugador2 = new Jugador(mundo, "Jugador2", 120, 85, 2, NivelBase.getMejorasJugador2(), super.hiloCliente);
 
