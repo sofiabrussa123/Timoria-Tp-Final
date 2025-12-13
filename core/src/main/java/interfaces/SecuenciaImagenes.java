@@ -13,23 +13,28 @@ public class SecuenciaImagenes extends EscenaBase {
     private String[] rutasImagenes;
     private int imagenActual = 0;
     private Game juego;
-    private Class<?> siguienteEscenaClase;
+    private Class<? extends EscenaBase> siguienteEscenaClase;
     private Texture[] texturas;
     private boolean esperandoInput = false;
     private float tiempoEspera = 0.3f; // Evita avance accidental
     private float tiempoTranscurrido = 0f;
     private HiloCliente hiloCliente;
 
-    public SecuenciaImagenes(Game juego, String[] rutasImagenes) {
+    public SecuenciaImagenes(Game juego, String[] rutasImagenes, Class<? extends EscenaBase> siguienteEscenaClase) {
         super(juego, rutasImagenes[0]);
         this.juego = juego;
         this.rutasImagenes = rutasImagenes;
+        this.siguienteEscenaClase = siguienteEscenaClase;
 
         // Cargar todas las texturas
         this.texturas = new Texture[rutasImagenes.length];
         for (int i = 0; i < rutasImagenes.length; i++) {
             this.texturas[i] = new Texture(Gdx.files.internal(rutasImagenes[i]));
         }
+    }
+
+    public void setHiloCliente(HiloCliente hiloCliente) {
+        this.hiloCliente = hiloCliente;
     }
 
     @Override
@@ -76,7 +81,23 @@ public class SecuenciaImagenes extends EscenaBase {
             esperandoInput = false;
 
             if (imagenActual >= rutasImagenes.length) {
-                this.hiloCliente.enviarMensaje("FinHistoria");
+                // Enviar mensaje al servidor si tenemos conexión
+                if (this.hiloCliente != null) {
+                    this.hiloCliente.enviarMensaje("FinHistoria");
+                }
+                
+                // Crear la siguiente escena usando reflexión
+                try {
+                    EscenaBase siguienteEscena = siguienteEscenaClase
+                        .getDeclaredConstructor(Game.class)
+                        .newInstance(juego);
+                    cambiarEscena(siguienteEscena);
+                } catch (Exception e) {
+                    System.err.println("Error al crear la siguiente escena: " + e.getMessage());
+                    e.printStackTrace();
+                    // Como fallback, volver al menú
+                    cambiarEscena(new Menu(juego));
+                }
             }
         }
 
