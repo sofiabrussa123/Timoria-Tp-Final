@@ -44,8 +44,6 @@ public class PantallaDeMuerte extends EscenaBase {
     private MejoraTemporal mejorasJugador2;
     private HiloServidor hiloServidor;
 
-    private Principal principal;
-
     public PantallaDeMuerte(Game principal, Jugador jugadorMuerto, NivelBase nivelAnterior, HiloServidor hiloServidor) {
         super(principal, "PantallaDeMuerte.png");
         
@@ -105,7 +103,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarVida, "Mejorar Vida (+20)",
                         jugador.getMejoras().getMejorasVida(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                        hiloServidor.enviarMensajeATodos("MejorarJugador:Vida:" + idJugadorMuerto);
+                        hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Vida:");
                     }
                 }
             }
@@ -119,7 +117,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarVelocidad, "Mejorar Velocidad (+1)",
                         jugador.getMejoras().getMejorasVelocidad(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                        hiloServidor.enviarMensajeATodos("MejorarJugador:Velocidad:" + idJugadorMuerto);
+                    	hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Velocidad:");
                     }
                 }
             }
@@ -133,7 +131,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarSalto, "Mejorar Salto (+1.5)",
                         jugador.getMejoras().getMejorasSalto(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                        hiloServidor.enviarMensajeATodos("MejorarJugador:Salto:" + idJugadorMuerto);
+                    	hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Salto:");
                     }
                 }
             }
@@ -147,7 +145,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarDaño, "Mejorar Daño (+10)",
                         jugador.getMejoras().getMejorasDaño(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                        hiloServidor.enviarMensajeATodos("MejorarJugador:Daño:" + idJugadorMuerto);
+                    	hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Daño:");
                     }
                 }
             }

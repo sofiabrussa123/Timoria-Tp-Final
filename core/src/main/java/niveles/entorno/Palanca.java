@@ -34,15 +34,6 @@ public class Palanca extends ElementoActivador {
 
         if (activado) {
             super.textura = new Texture(Gdx.files.internal("Palanca2.png"));
-            
-            // Enviar mensaje de activación si el servidor está disponible
-            if (hiloServidor != null) {
-                hiloServidor.enviarMensajeATodos(
-                    "ActivarPalanca:" + this.ID + ":" + 
-                    this.cuerpo.getPosition().x + ":" + 
-                    this.cuerpo.getPosition().y
-                );
-            }
         } else {
             super.textura = new Texture(Gdx.files.internal("Palanca1.png"));
         }

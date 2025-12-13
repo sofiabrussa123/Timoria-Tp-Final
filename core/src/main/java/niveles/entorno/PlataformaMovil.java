@@ -88,7 +88,7 @@ public class PlataformaMovil extends ElementoEntorno {
         // Sincronizar posición en red si el servidor está disponible
         if (hiloServidor != null) {
             hiloServidor.enviarMensajeATodos(
-                "CambiarPosicion:PlataformaMovil:" + this.ID + ":" + 
+                "PlataformaMovil:" + this.ID + ":Mover:" + 
                 this.cuerpo.getPosition().x + ":" + 
                 this.cuerpo.getPosition().y
             );

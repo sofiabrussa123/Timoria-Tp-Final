@@ -15,11 +15,6 @@ public class Nivel1 extends NivelBase {
     
     private int cantActores = 0;
 
-    // Constructor sin mejoras (para primera partida)
-    public Nivel1(Game juego) {
-        this(juego, null, null);
-    }
-
     // Constructor con mejoras (para reinicios después de muerte)
     public Nivel1(Game juego, MejoraTemporal mejorasJ1, MejoraTemporal mejorasJ2) {
         super(juego, "FondoNivel1.jpeg");

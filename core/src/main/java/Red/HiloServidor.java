@@ -1,8 +1,13 @@
 package Red;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
+
+import interfaces.GameController;
 
 public class HiloServidor extends Thread {
 
@@ -12,8 +17,10 @@ public class HiloServidor extends Thread {
     private final int MAX_CLIENTES = 2;
     private int clientesConectados = 0;
     private ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+    private GameController gameController;
 
-    public HiloServidor() {
+    public HiloServidor(GameController gameController) {
+    	this.gameController = gameController;
         try {
             socket = new DatagramSocket(puertoServidor);
         } catch (SocketException e) {
@@ -72,10 +79,16 @@ public class HiloServidor extends Thread {
             this.enviarMensaje("NoConectado", paquete.getAddress(), paquete.getPort());
             return;
         } else { // Si alguno se quiere mover
-            Cliente cliente = clientes.get(indice);
             switch(partes[0]){
                 case "Mover":
+                	gameController.moverJugador(Integer.parseInt(partes[1]), Boolean.parseBoolean(partes[2]));
                     break;
+                case "Saltar":
+                	gameController.saltar(Integer.parseInt(partes[1]));
+                	break;
+                case "Atacar":
+                	gameController.atacar(Integer.parseInt(partes[1]));
+                	break;
             }
         }
     }

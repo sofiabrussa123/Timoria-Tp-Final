@@ -34,7 +34,7 @@ public class PuertaLlegada extends ElementoEntorno {
         
         // Sincronizar desbloqueo en red si el servidor está disponible
         if (hiloServidor != null) {
-            hiloServidor.enviarMensajeATodos("DesbloquearPuerta:" + this.ID);
+            hiloServidor.enviarMensajeATodos("Puerta:" + this.ID+":Desbloquear");
         }
     }
 }

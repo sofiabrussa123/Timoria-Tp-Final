@@ -78,6 +78,14 @@ public class Enemigo extends Actor {
         super.act(delta);
 
         determinarDireccionMovimiento(calcularJugadorObjetivo());
+        
+        // Sincronizar posición en red si el servidor está disponible
+        if (hiloServidor != null) {
+            hiloServidor.enviarMensajeATodos(
+                "Enemigo:" + this.ID + ":ActualizarPosicion:" + 
+                getPosicionX() + ":" + getPosicionY()
+            );
+        }
 
         this.tiempoTranscurrido += delta;
 
@@ -213,14 +221,6 @@ public class Enemigo extends Actor {
             cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
             cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
         );
-
-        // Sincronizar posición en red si el servidor está disponible
-        if (hiloServidor != null) {
-            hiloServidor.enviarMensajeATodos(
-                "CambiarPosicion:Enemigo:" + this.ID + ":" + 
-                getPosicionX() + ":" + getPosicionY()
-            );
-        }
     }
 
     private Jugador calcularJugadorObjetivo() {

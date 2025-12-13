@@ -138,12 +138,10 @@ public class Jugador extends Actor {
         );
 
         // Sincronizar posición y frame en red
-        if (hiloServidor != null) {
+        if (hiloServidor != null && enElAire) {
             hiloServidor.enviarMensajeATodos(
-                "CambiarPosicion:Jugador:" + this.idJugador + ":" + 
-                this.cuerpo.getPosition().x + ":" + this.cuerpo.getPosition().y
+                "Jugador:" + this.idJugador + ":CambiarPosicionVertical" + this.cuerpo.getPosition().y
             );
-            hiloServidor.enviarMensajeATodos("CambiarFrame:" + this.idJugador + ":" + tiempoEstado);
         }
     }
 
@@ -214,12 +212,12 @@ public class Jugador extends Actor {
             sonidoReproduciéndose = false;
             
             if (hiloServidor != null) {
-                hiloServidor.enviarMensajeATodos("EliminarEntidad:Jugador:" + this.idJugador);
+                hiloServidor.enviarMensajeATodos("Jugador:" + this.idJugador + ":Matar");
             }
         }
 
         if (hiloServidor != null) {
-            hiloServidor.enviarMensajeATodos("ActualizarVidaJugador:" + this.idJugador + ":" + this.vida);
+            hiloServidor.enviarMensajeATodos("Jugador:" + this.idJugador + ":Dañar:" + this.vida);
         }
     }
 
@@ -238,6 +236,9 @@ public class Jugador extends Actor {
             mirandoIzquierda = false;
             mirandoDerecha = true;
             estado = Estado.CORRIENDO;
+            hiloServidor.enviarMensajeATodos(
+                "Jugador:" + this.idJugador + ":CambiarPosicionHorizontal" + this.cuerpo.getPosition().x
+            );
         }
     }
 
@@ -247,6 +248,9 @@ public class Jugador extends Actor {
             mirandoIzquierda = true;
             mirandoDerecha = false;
             estado = Estado.CORRIENDO;
+            hiloServidor.enviarMensajeATodos(
+                "Jugador:" + this.idJugador + ":CambiarPosicionHorizontal" + this.cuerpo.getPosition().x
+            );
         }
     }
 

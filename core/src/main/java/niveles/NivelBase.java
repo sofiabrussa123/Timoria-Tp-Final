@@ -5,14 +5,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import Red.HiloServidor;
-import globales.EsceneManager;
-import interfaces.MenuPausa;
+import interfaces.GameController;
 import interfaces.PantallaDeMuerte;
 import interfaces.PantallaGanaste;
 import niveles.entorno.BarraInventario;
@@ -26,7 +31,7 @@ import personajes.Enemigo;
 import personajes.Jugador;
 import personajes.accesorios.MejoraTemporal;
 
-public abstract class NivelBase extends EscenaBase {
+public abstract class NivelBase extends EscenaBase implements GameController{
 
     public static final float PIXELES_A_METROS = 1 / 100f;
     private static final float ALTO_VIEWPORT_INICIAL = 15f;
@@ -45,7 +50,6 @@ public abstract class NivelBase extends EscenaBase {
     protected float anchoViewport;
     protected float altoViewport;
     protected Body cuerpoPiso;
-    private boolean juegoPausado = false;
     protected Screen pantallaRetorno;
     protected Jugador jugador1;
     protected Jugador jugador2;
@@ -126,7 +130,7 @@ public abstract class NivelBase extends EscenaBase {
                         cambiarEscena(new PantallaGanaste(juego));
                         
                         if (hiloServidor != null) {
-                            hiloServidor.enviarMensajeATodos("CambiarEscena:PantallaGanaste");
+                            hiloServidor.enviarMensajeATodos("CambiarPantalla:PantallaGanaste");
                         }
                     }
                 }
@@ -165,8 +169,7 @@ public abstract class NivelBase extends EscenaBase {
     public void show() {
         // Inicializar servidor si no existe
         if (hiloServidor == null) {
-            hiloServidor = new HiloServidor();
-            this.hiloServidor.start();
+            hiloServidor = new HiloServidor(this);
         }
 
         Gdx.input.setInputProcessor(this.inputManager);
@@ -191,18 +194,12 @@ public abstract class NivelBase extends EscenaBase {
             this.jugador2.setBarraInventario(inventario2);
             this.escena.addActor(inventario2);
         }
+        
+        this.hiloServidor.start();
     }
 
     @Override
     public void render(float delta) {
-        // Cambiar al menú de pausa si se aprieta escape o p
-        if (this.inputManager.getIsEscPressed() || this.inputManager.getIsPPressed()) {
-            this.juegoPausado = !this.juegoPausado;
-            if (this.juegoPausado) {
-                EsceneManager.setEscenaActual(this);
-                this.cambiarEscena(new MenuPausa(this.juego));
-            }
-        }
 
         this.jugador1.detener();
         this.jugador2.detener();
@@ -281,10 +278,7 @@ public abstract class NivelBase extends EscenaBase {
                     enemigo.dispose();
                     
                     if (hiloServidor != null) {
-                        hiloServidor.enviarMensajeATodos("Eliminar:Enemigo:" + 
-                            enemigo.getID() + ":" + 
-                            enemigo.getPosicionX() + ":" + 
-                            enemigo.getPosicionY());
+                        hiloServidor.enviarMensajeATodos("Enemigo:" + enemigo.getID()+":Desaparecer");
                     }
                 }
             }
@@ -309,10 +303,22 @@ public abstract class NivelBase extends EscenaBase {
         this.actualizarCamara();
         this.escena.getViewport().getCamera().combined.set(this.camaraBox2D.combined);
     }
-
-    public void despausar() {
-        this.juegoPausado = false;
-        this.inputManager.resetPauseKeys();
-        Gdx.input.setInputProcessor(this.inputManager);
+    
+    public void moverJugador(int id, boolean derecha) {
+    	if(id == 1) {
+    		if(derecha) this.jugador1.moverIzquierda();
+    		else this.jugador1.moverDerecha();
+    	} else if(derecha) this.jugador2.moverDerecha();
+		else this.jugador2.moverIzquierda();
+    }
+    
+    public void saltar(int idJugador) {
+    	if(idJugador == 1) this.jugador1.saltar();
+    	else this.jugador2.saltar();
+    }
+    
+    public void atacar(int idJugador) {
+    	if(idJugador == 1) this.jugador1.atacar(this.mundo, this.friendlyFire);
+    	else this.jugador2.atacar(this.mundo, this.friendlyFire);
     }
 }
