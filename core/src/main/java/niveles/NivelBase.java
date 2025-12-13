@@ -321,4 +321,8 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     	if(idJugador == 1) this.jugador1.atacar(this.mundo, this.friendlyFire);
     	else this.jugador2.atacar(this.mundo, this.friendlyFire);
     }
+    
+    public void empezar() {
+    	cambiarEscena(new Nivel1(this.juego, this.mejorasJugador1, this.mejorasJugador2));
+    }
 }
