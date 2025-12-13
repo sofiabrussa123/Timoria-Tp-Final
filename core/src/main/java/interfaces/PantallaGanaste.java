@@ -21,11 +21,19 @@ public class PantallaGanaste extends EscenaBase {
         Label mensaje = new Label("¡Ganaste!", super.fuenteTextos);
         mensaje.setFontScale(2);
 
-        TextButton btnMenu = new TextButton("Menú", super.fuenteTextos);
-        btnMenu.addListener(new ClickListener() {
+
+        TextButton btnContinuar = new TextButton("Continuar", super.fuenteTextos);
+        btnContinuar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cambiarEscena(new Menu(juego));
+                String[] imagenesEpilogo = {
+                    "6.png",
+                    "7.png",
+                    "8.png"
+                };
+
+                // Pasamos Menu.class en lugar de new Menu(juego)
+                cambiarEscena(new SecuenciaImagenes(juego, imagenesEpilogo, Menu.class));
             }
         });
 
@@ -33,7 +41,7 @@ public class PantallaGanaste extends EscenaBase {
         tabla.setFillParent(true);
         tabla.center();
         tabla.add(mensaje).pad(10).row();
-        tabla.add(btnMenu).pad(10);
+        tabla.add(btnContinuar).pad(10);
 
         super.escena.addActor(tabla);
     }
