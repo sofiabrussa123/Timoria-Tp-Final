@@ -169,29 +169,30 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     public void show() {
         Gdx.input.setInputProcessor(this.inputManager);
 
-        BarraVida barra1 = new BarraVida(this.jugador1, true);
-        BarraVida barra2 = new BarraVida(this.jugador2, false);
-        this.jugador1.setBarraVida(barra1);
-        this.jugador2.setBarraVida(barra2);
-        this.escena.addActor(barra1);
-        this.escena.addActor(barra2);
-        
+        // Solo crear barras si los jugadores ya existen
         if (this.jugador1 != null) {
+            BarraVida barra1 = new BarraVida(this.jugador1, true);
+            this.jugador1.setBarraVida(barra1);
+            this.escena.addActor(barra1);
+
             BarraInventario inventario1 = new BarraInventario(this.jugador1, true);
             this.jugador1.setBarraInventario(inventario1);
             this.escena.addActor(inventario1);
         }
 
         if (this.jugador2 != null) {
+            BarraVida barra2 = new BarraVida(this.jugador2, false);
+            this.jugador2.setBarraVida(barra2);
+            this.escena.addActor(barra2);
+
             BarraInventario inventario2 = new BarraInventario(this.jugador2, false);
             this.jugador2.setBarraInventario(inventario2);
             this.escena.addActor(inventario2);
         }
-        
+
         this.hiloCliente = new HiloCliente(this);
         hiloCliente.start();
         hiloCliente.enviarMensaje("Conectar");
-
     }
 
     @Override
@@ -213,8 +214,8 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             this.cambiarEscena(new PantallaDeMuerte(this.juego, idJugadorMuerto));
         }
 
-        
-        
+
+
         if(idJugadorActivo == 1) {
         	if (this.inputManager.getIsOPressed()) {
                 jugador1.atacar(this.mundo, this.friendlyFire);
@@ -305,15 +306,24 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         this.inputManager.resetPauseKeys();
         Gdx.input.setInputProcessor(this.inputManager);
     }
-    
+
     protected void añadirElemento(IdManager elemento) {
     	this.escena.addActor((Actor)elemento);
     	entidades.put(elemento.getId(), (Actor)elemento);
     }
-    
+
     protected int asignarIdEntidad() {
     	this.cantEntidades++;
     	return this.cantEntidades;
+    }
+
+    @Override
+    public void desconectar() {
+        // Manejar desconexión del cliente
+        if (this.hiloCliente != null) {
+            this.hiloCliente.terminar();
+        }
+        volverAlMenu();
     }
 
  @Override
@@ -326,7 +336,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
      case "Enemigo":
     	 procesarAccionesEnemigo(mensaje, idEntidad);
     	 break;
-    	 
+
      case "Puerta":
     	 abrirPuerta(idEntidad);
     	 break;
@@ -339,14 +349,11 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
  @Override
  public void cambiarPantalla() {
-     
+
  }
 
  @Override
- public void recogerLlave(int idLlave, int idJugador) {
-	 LlaveActivadora llave = (LlaveActivadora) this.entidades.get(idLlave);
-	 if (idJugador == 1) llave.activarConJugador(jugador1); 
-	 else llave.activarConJugador(jugador2);
+ public void recogerItem() {
  }
 
  @Override
@@ -357,7 +364,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	        // 2. Verificación y casting seguro
 	        if (entidad instanceof PlataformaMovil) {
 	            PlataformaMovil plataforma = (PlataformaMovil) entidad;
-	            
+
 	            plataforma.mover(posX, posY);
 	        }
 	    }
@@ -368,16 +375,17 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	 Actor entidad = this.entidades.get(id);
 
 	    if (entidad != null) {
+	        // 2. Verificación y casting seguro
 	        if (entidad instanceof PuertaLlegada) {
 	            PuertaLlegada puerta = (PuertaLlegada) entidad;
-	            
+
 	            puerta.desbloquear();
 	        }
 	    }
 }
- 
+
  public void procesarAccionesJugador(String[] mensaje, int idJugador) {
-	 switch(mensaje[1]) { 
+	 switch(mensaje[1]) {
 	 	case "ActualizarPosicion":
 	 		actualizarPosicionJugador(idJugador, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
 	 		break;
@@ -390,7 +398,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	 	default: System.out.println("Mensaje desconocido"); break;
 	 }
  }
- 
+
  @Override
  public void actualizarPosicionJugador(int id, int posX, int posY) {
 	 if(id == 1) {
@@ -404,7 +412,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     	 this.jugador1.morir();
      } else this.jugador2.morir();
  }
- 
+
  @Override
  public void dañarJugador(int idJugador, int nuevaVida) {
 	 if (idJugador == 1) {
@@ -413,7 +421,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	     this.jugador2.recibirDaño(nuevaVida);
 	 }
  }
- 
+
  public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
 	 switch(mensaje[1]) {
 	 	case "ActualizarPosicion":
@@ -425,7 +433,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	 	default: System.out.println("Mensaje desconocido"); break;
 	 }
  }
- 
+
  @Override
  public void actualizarPosicionEnemigo(int id, int posX, int posY) {
 	 Actor entidad = this.entidades.get(id);
@@ -434,7 +442,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	        // 2. Verificación y casting seguro
 	        if (entidad instanceof Enemigo) {
 	        	Enemigo enemigo = (Enemigo) entidad;
-	            
+
 	        	enemigo.mover(posX, posY);
 	        }
 	    }
@@ -448,13 +456,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 	        // 2. Verificación y casting seguro
 	        if (entidad instanceof Enemigo) {
 	        	Enemigo enemigo = (Enemigo) entidad;
-	            
+
 	        	enemigo.eliminar();
 	        	enemigo.dispose();
 	        }
 	    }
 }
- 
+
  @Override
  public void empezarJuego() {
      cambiarEscena(new Nivel1(this.juego));
