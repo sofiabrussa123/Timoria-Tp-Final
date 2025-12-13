@@ -45,8 +45,17 @@ public class Menu extends EscenaBase {
             public void clicked(InputEvent event, float x, float y) {
                 Menu.this.musica.stop();
                 Menu.this.musica.dispose();
-                
-                cambiarEscena(new Nivel1(juego));
+
+                String[] imagenesIntro = {
+                    "1.png",
+                    "2.png",
+                    "3.png",
+                    "4.png",
+                    "5.png"
+                };
+
+                // Pasamos Nivel1.class en lugar de new Nivel1(juego)
+                cambiarEscena(new SecuenciaImagenes(juego, imagenesIntro, Nivel1.class));
             }
         });
 
@@ -56,7 +65,7 @@ public class Menu extends EscenaBase {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Menu.this.musicaActiva = !Menu.this.musicaActiva;
-                
+
                 if (Menu.this.musicaActiva) {
                     Menu.this.musica.play();
                     botonMusicaMenu.setText("Silenciar Música");
