@@ -16,6 +16,7 @@ public class HiloServidor extends Thread {
     private boolean fin = false;
     private final int MAX_CLIENTES = 2;
     private int clientesConectados = 0;
+    private int clientesFinalizadoHistoria = 0;
     private ArrayList<Cliente> clientes = new ArrayList<Cliente>();
     private GameController gameController;
 
@@ -46,6 +47,12 @@ public class HiloServidor extends Thread {
         String[] partes = mensaje.split(":"); //Separar el mensaje por el símbolo :
         int indice = encontrarIndiceCliente(paquete);
         System.out.println("Mensaje recibido " + mensaje);
+        
+        if(clientesConectados == MAX_CLIENTES && partes[0].equals("FinHistoria")){
+        	this.clientesFinalizadoHistoria++;
+        }
+        
+        if(this.clientesFinalizadoHistoria == MAX_CLIENTES) enviarMensajeATodos("Empezar");
 
         if(partes[0].equals("Conectar")){
 
@@ -62,13 +69,6 @@ public class HiloServidor extends Thread {
                 Cliente nuevoCliente = new Cliente(clientesConectados, paquete.getAddress(), paquete.getPort());
                 clientes.add(nuevoCliente);
                 enviarMensaje("Conectado:"+clientesConectados, paquete.getAddress(), paquete.getPort());
-
-                //Si ya se llegó al máximo se arranca el juego
-                if(clientesConectados == MAX_CLIENTES) {
-                    for(Cliente cliente : clientes) {
-                        enviarMensaje("Empezar", cliente.getIp(), cliente.getPuerto());
-                    }
-                }
 
             } else {
             	//Si ya se alcanzó el máximo de jugadores, se rebota al que se quiera conectar
@@ -89,6 +89,8 @@ public class HiloServidor extends Thread {
                 case "Atacar":
                 	gameController.atacar(Integer.parseInt(partes[1]));
                 	break;
+                case "Detener":
+                	gameController.detener(Integer.parseInt(partes[1]));
             }
         }
     }

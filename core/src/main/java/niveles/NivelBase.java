@@ -312,6 +312,11 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 		else this.jugador2.moverIzquierda();
     }
     
+    public void detenerJugador(int idJugador) {
+    	if(idJugador == 1) this.jugador1.detener();
+    	else this.jugador2.detener();
+    }
+    
     public void saltar(int idJugador) {
     	if(idJugador == 1) this.jugador1.saltar();
     	else this.jugador2.saltar();
