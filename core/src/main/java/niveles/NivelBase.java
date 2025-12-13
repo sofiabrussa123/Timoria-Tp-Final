@@ -353,7 +353,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     }
 
     @Override
-    public void recogerLlave(int idLlave, int idJugador) {
+    public void recogerItem(int idLlave, int idJugador) {
     }
 
     @Override
