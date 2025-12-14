@@ -2,6 +2,7 @@ package niveles;
 
 import com.badlogic.gdx.Game;
 
+import Red.HiloCliente;
 import niveles.entorno.LlaveActivadora;
 import niveles.entorno.Palanca;
 import niveles.entorno.Plataforma;
@@ -14,17 +15,48 @@ public class Nivel1 extends NivelBase {
 
     private boolean inicializado = false;
 
-    public Nivel1(Game juego) {
+    // ✅ RECIBIR HiloCliente en el constructor
+    public Nivel1(Game juego, HiloCliente hiloCliente) {
         super(juego, "FondoNivel1.jpeg");
+
+        // ✅ ASIGNAR HILOCLIENTE
+        this.hiloCliente = hiloCliente;
+        System.out.println("✅ [CLIENTE] HiloCliente asignado: " + (hiloCliente != null));
+
         this.setFriendlyFire(true);
+
+        // ✅ CREAR JUGADORES EN EL CONSTRUCTOR
+        System.out.println("🎮 [CLIENTE] Creando jugadores en constructor");
+        super.jugador1 = new Jugador(mundo, "Jugador1", 100, 85, 1,
+            NivelBase.getMejorasJugador1(), hiloCliente);
+        super.jugador2 = new Jugador(mundo, "Jugador2", 120, 85, 2,
+            NivelBase.getMejorasJugador2(), hiloCliente);
+        System.out.println("✅ Jugadores creados");
     }
 
     @Override
     public void show() {
-        // Primero llamar al show del padre para inicializar hiloCliente
+        System.out.println("🎬 [CLIENTE] Nivel1.show() llamado");
+
+        // ✅ Asignar GameController al hiloCliente
+        if (this.hiloCliente != null) {
+            this.hiloCliente.setGameController(this);
+            System.out.println("🔌 GameController asignado a HiloCliente");
+        }
+
+        // ✅ AHORA SÍ LLAMAR A super.show() (creará barras)
         super.show();
 
-        // Ahora crear los elementos del nivel si no se han creado
+        // ✅ CONFIGURAR QUIÉN ES MI JUGADOR (para sonidos)
+        if (idJugadorActivo == 1) {
+            super.jugador1.setEsMiJugador(true);
+            super.jugador2.setEsMiJugador(false);
+        } else if (idJugadorActivo == 2) {
+            super.jugador1.setEsMiJugador(false);
+            super.jugador2.setEsMiJugador(true);
+        }
+
+        // ✅ CREAR RESTO DE ELEMENTOS
         if (!inicializado) {
             inicializarNivel();
             inicializado = true;
@@ -32,31 +64,56 @@ public class Nivel1 extends NivelBase {
     }
 
     private void inicializarNivel() {
-        // Ahora hiloCliente ya está inicializado
-        super.jugador1 = new Jugador(mundo, "Jugador1", 100, 85, 1, NivelBase.getMejorasJugador1(), super.hiloCliente);
-        super.jugador2 = new Jugador(mundo, "Jugador2", 120, 85, 2, NivelBase.getMejorasJugador2(), super.hiloCliente);
+        System.out.println("🗺️ Inicializando resto del nivel");
 
-        Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20, asignarIdEntidad());
-        Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20, asignarIdEntidad());
-        Plataforma piso = new Plataforma(mundo, 0, 10, 1000, 50, asignarIdEntidad());
+        // ✅ IMPORTANTE: Los IDs deben coincidir con el servidor
+        // El servidor asigna IDs en orden, así que hacemos lo mismo aquí
 
-        Palanca palanca = new Palanca(mundo, 170, 120, asignarIdEntidad());
-        PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, palanca, asignarIdEntidad());
+        // Servidor crea: piso(1), plat2(2), plat3(3), palanca(4), platMovil(5), puerta(6), llave(7), enemigo(8)
 
-        PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, asignarIdEntidad());
-        LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta, asignarIdEntidad());
+        int idPiso = 1;
+        int idPlat2 = 2;
+        int idPlat3 = 3;
+        int idPalanca = 4;
+        int idPlatMovil = 5;
+        int idPuerta = 6;
+        int idLlave = 7;
+        int idEnemigo = 8;
 
-        Enemigo enemigo = new Enemigo(mundo, 400, 150, asignarIdEntidad());
+        // Crear plataformas
+        Plataforma piso = new Plataforma(mundo, 0, 10, 1000, 50, idPiso);
+        Plataforma plataforma2 = new Plataforma(mundo, 495, 200, 75, 20, idPlat2);
+        Plataforma plataforma3 = new Plataforma(mundo, 80, 250, 95, 20, idPlat3);
 
+        // Crear palanca y plataforma móvil
+        Palanca palanca = new Palanca(mundo, 170, 120, idPalanca);
+        PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, palanca, idPlatMovil);
+
+        // Crear puerta y llave
+        PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, idPuerta);
+        LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta, idLlave);
+
+        // Crear enemigo
+        Enemigo enemigo = new Enemigo(mundo, 400, 150, idEnemigo);
+
+        // ✅ Agregar jugadores al stage Y al mapa de entidades
         añadirElemento(super.jugador1);
         añadirElemento(super.jugador2);
+        añadirElemento(piso);
+        añadirElemento(plataforma2);
+        añadirElemento(plataforma3);
+        añadirElemento(palanca);
+        añadirElemento(plataformaMovil);
         añadirElemento(puerta);
         añadirElemento(llave);
         añadirElemento(enemigo);
-        añadirElemento(plataformaMovil);
-        añadirElemento(palanca);
-        añadirElemento(plataforma2);
-        añadirElemento(plataforma3);
-        añadirElemento(piso);
+
+        System.out.println("✅ Nivel inicializado con " + entidades.size() + " entidades");
+        System.out.println("📋 IDs en mapa: " + entidades.keySet());
+    }
+
+    @Override
+    public void mostrarAtaqueEnemigo(int idEnemigo) {
+
     }
 }
