@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import Red.HiloServidor;
-import io.github.timoria.Principal;
 import niveles.EscenaBase;
 import niveles.Nivel1;
 import niveles.NivelBase;
@@ -46,12 +45,12 @@ public class PantallaDeMuerte extends EscenaBase {
 
     public PantallaDeMuerte(Game principal, Jugador jugadorMuerto, NivelBase nivelAnterior, HiloServidor hiloServidor) {
         super(principal, "PantallaDeMuerte.png");
-        
+
         this.jugador = jugadorMuerto;
         this.idJugadorMuerto = jugadorMuerto.getIdJugador();
         this.hiloServidor = hiloServidor;
 
-        // Guardar las mejoras de ambos jugadores
+        // ✅ Guardar mejoras actuales (con las nuevas mejoras aplicadas)
         if (nivelAnterior.getJugador1() != null) {
             this.mejorasJugador1 = copiarMejoras(nivelAnterior.getJugador1().getMejoras());
         }
@@ -62,19 +61,16 @@ public class PantallaDeMuerte extends EscenaBase {
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
         this.fraseElegida = frases[new Random().nextInt(frases.length)];
 
-        // Label de frase
         Label frase = new Label(fraseElegida, super.fuenteTextos);
         frase.setAlignment(Align.center);
         frase.setFontScale(1.2f);
         frase.setWrap(true);
         frase.setWidth(600);
 
-        // Música de muerte
         this.musicaMuerte = Gdx.audio.newMusic(Gdx.files.internal("Muerte.mp3"));
         this.musicaMuerte.setLooping(true);
         if (this.musicaMuerteActiva) this.musicaMuerte.play();
 
-        // Título del jugador
         Label tituloJugador = new Label("=== JUGADOR " + idJugadorMuerto + " - ELIGE UNA MEJORA ===", super.fuenteTextos);
         tituloJugador.setAlignment(Align.center);
         tituloJugador.setColor(Color.YELLOW);
@@ -103,7 +99,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarVida, "Mejorar Vida (+20)",
                         jugador.getMejoras().getMejorasVida(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                        hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Vida:");
+                        hiloServidor.enviarMensajeATodos("Jugador:" + idJugadorMuerto + ":MejoraAplicada:Vida");
                     }
                 }
             }
@@ -117,7 +113,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarVelocidad, "Mejorar Velocidad (+1)",
                         jugador.getMejoras().getMejorasVelocidad(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                    	hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Velocidad:");
+                        hiloServidor.enviarMensajeATodos("Jugador:" + idJugadorMuerto + ":MejoraAplicada:Velocidad");
                     }
                 }
             }
@@ -131,7 +127,7 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarSalto, "Mejorar Salto (+1.5)",
                         jugador.getMejoras().getMejorasSalto(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                    	hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Salto:");
+                        hiloServidor.enviarMensajeATodos("Jugador:" + idJugadorMuerto + ":MejoraAplicada:Salto");
                     }
                 }
             }
@@ -145,33 +141,56 @@ public class PantallaDeMuerte extends EscenaBase {
                     actualizarBotonMejora(btnMejorarDaño, "Mejorar Daño (+10)",
                         jugador.getMejoras().getMejorasDaño(), jugador.getMejoras().getMaxMejoras());
                     if (hiloServidor != null) {
-                    	hiloServidor.enviarMensajeATodos("Jugador:"+idJugadorMuerto+"MejorarEstadistica:Daño:");
+                        hiloServidor.enviarMensajeATodos("Jugador:" + idJugadorMuerto + ":MejoraAplicada:Daño");
                     }
                 }
             }
         });
 
-        // Botón volver
-        TextButton botonVolver = new TextButton("Volver a jugar", super.fuenteTextos);
-        botonVolver.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                PantallaDeMuerte.this.musicaMuerte.pause();
-                cambiarEscena(new Nivel1(juego, mejorasJugador1, mejorasJugador2));
-            }
-        });
-
-        // Botón menú principal
         TextButton botonMenu = new TextButton("Menú principal", super.fuenteTextos);
         botonMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 PantallaDeMuerte.this.musicaMuerte.pause();
-                cambiarEscena(new Menu(juego));
+
+                // ✅ Reiniciar el estado del servidor sin cerrarlo
+                if (hiloServidor != null) {
+                    hiloServidor.reiniciarEstado();
+                }
+
+                juego.setScreen(new Menu(juego));
             }
         });
 
-        // Botón música
+        // ✅ BOTÓN VOLVER A JUGAR - Crear NUEVO nivel con mejoras guardadas
+        TextButton botonVolver = new TextButton("Volver a jugar", super.fuenteTextos);
+        botonVolver.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                PantallaDeMuerte.this.musicaMuerte.pause();
+
+                // ✅ Actualizar mejoras estáticas ANTES de crear el nuevo nivel
+                if (idJugadorMuerto == 1) {
+                    NivelBase.getMejorasJugador1().reset();
+                    copiarMejorasA(mejorasJugador1, NivelBase.getMejorasJugador1());
+                } else {
+                    NivelBase.getMejorasJugador2().reset();
+                    copiarMejorasA(mejorasJugador2, NivelBase.getMejorasJugador2());
+                }
+
+                // ✅ Crear NUEVO nivel con mejoras actualizadas
+                Nivel1 nuevoNivel = new Nivel1(juego, hiloServidor, mejorasJugador1, mejorasJugador2);
+
+                // ✅ Notificar a los clientes que deben reiniciar
+                if (hiloServidor != null) {
+                    hiloServidor.enviarMensajeATodos("ReiniciarNivel");
+                }
+
+                juego.setScreen(nuevoNivel);
+                System.out.println("🔄 Nivel reiniciado con mejoras aplicadas");
+            }
+        });
+
         TextButton botonMusica = new TextButton("Silenciar música", super.fuenteTextos);
         botonMusica.addListener(new ClickListener() {
             @Override
@@ -206,7 +225,6 @@ public class PantallaDeMuerte extends EscenaBase {
         super.escena.addActor(table);
     }
 
-    // Actualizar las mejoras guardadas con las del jugador actual
     private void actualizarMejorasGuardadas() {
         if (idJugadorMuerto == 1) {
             mejorasJugador1 = copiarMejoras(jugador.getMejoras());
@@ -215,24 +233,28 @@ public class PantallaDeMuerte extends EscenaBase {
         }
     }
 
-    // Método para copiar mejoras
     private MejoraTemporal copiarMejoras(MejoraTemporal origen) {
         MejoraTemporal copia = new MejoraTemporal();
+        copiarMejorasA(origen, copia);
+        return copia;
+    }
+
+    // ✅ Método auxiliar para copiar mejoras
+    private void copiarMejorasA(MejoraTemporal origen, MejoraTemporal destino) {
+        destino.reset();
 
         for (int i = 0; i < origen.getMejorasVida(); i++) {
-            copia.mejorarVida();
+            destino.mejorarVida();
         }
         for (int i = 0; i < origen.getMejorasVelocidad(); i++) {
-            copia.mejorarVelocidad();
+            destino.mejorarVelocidad();
         }
         for (int i = 0; i < origen.getMejorasSalto(); i++) {
-            copia.mejorarSalto();
+            destino.mejorarSalto();
         }
         for (int i = 0; i < origen.getMejorasDaño(); i++) {
-            copia.mejorarDaño();
+            destino.mejorarDaño();
         }
-
-        return copia;
     }
 
     private TextButton crearBotonMejora(String nombre, int nivel, int max) {
@@ -258,5 +280,13 @@ public class PantallaDeMuerte extends EscenaBase {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(escena);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (musicaMuerte != null) {
+            musicaMuerte.dispose();
+        }
     }
 }
