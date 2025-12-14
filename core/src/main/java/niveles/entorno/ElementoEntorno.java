@@ -13,6 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import interfaces.IdManager;
 import io.github.timoria.Principal;
 
+/**
+ * Clase base abstracta para todos los elementos del entorno del juego
+ */
 public abstract class ElementoEntorno extends Actor implements IdManager{
 
     protected World mundo;
@@ -26,8 +29,9 @@ public abstract class ElementoEntorno extends Actor implements IdManager{
     protected FixtureDef fixtureDef = new FixtureDef();
     protected int id;
 
+    // Constructor con dimensiones e ID
     protected ElementoEntorno(World mundo, float x, float y, float ancho, float alto, int id) {
-    	this.id = id;
+        this.id = id;
         this.mundo = mundo;
         this.x = x;
         this.y = y;
@@ -35,14 +39,17 @@ public abstract class ElementoEntorno extends Actor implements IdManager{
         this.alto = alto;
     }
 
+    // Constructor sin dimensiones pero con ID
     protected ElementoEntorno(World mundo, float x, float y, int id) {
-    	this.id = id;
+        this.id = id;
         this.mundo = mundo;
         this.x = x;
         this.y = y;
     }
 
+    // Crea y posiciona el cuerpo físico del elemento en el mundo Box2D
     protected void crearYPosicionarCuerpo() {
+        // Definir el cuerpo
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(
             (x + ancho / 2) / Principal.PPM,
@@ -53,12 +60,14 @@ public abstract class ElementoEntorno extends Actor implements IdManager{
         cuerpo = mundo.createBody(bodyDef);
         cuerpo.setUserData(this);
 
+        // Definir la forma
         PolygonShape forma = new PolygonShape();
         forma.setAsBox(
             ancho / 2 / Principal.PPM,
             (alto / 2 - 2) / Principal.PPM
         );
 
+        // Definir la fixture
         fixtureDef.shape = forma;
         fixtureDef.friction = 0.5f;
         cuerpo.createFixture(fixtureDef);
@@ -97,9 +106,9 @@ public abstract class ElementoEntorno extends Actor implements IdManager{
     public void dispose() {
         textura.dispose();
     }
-    
+
     @Override
     public int getId() {
-    	return this.id;
+        return this.id;
     }
 }
