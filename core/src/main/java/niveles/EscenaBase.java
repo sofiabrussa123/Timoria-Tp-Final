@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import globales.InputManager;
+import interfaces.Menu;
 
 /**
  * Clase base para todas las escenas del juego.
@@ -46,7 +47,7 @@ public abstract class EscenaBase implements Screen {
      * Cambia la escena actual a una nueva escena.
      * @param nuevaEscena La nueva escena a mostrar
      */
-    protected void cambiarEscena(EscenaBase nuevaEscena) {
+    protected void cambiarEscena(Menu nuevaEscena) {
         this.juego.setScreen(nuevaEscena);
     }
 
