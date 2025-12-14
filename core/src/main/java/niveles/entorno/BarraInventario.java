@@ -3,6 +3,7 @@ package niveles.entorno;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import personajes.Jugador;
 
@@ -81,12 +82,17 @@ public class BarraInventario extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        float y = jugador.getStage().getViewport().getScreenY()
-            + jugador.getStage().getViewport().getScreenHeight() - 90;
+        // ✅ Usar el Stage de este Actor, no del jugador
+        if (getStage() == null) {
+            return; // No dibujar si no hay Stage (servidor headless)
+        }
+
+        Viewport viewport = getStage().getViewport();
+        float y = viewport.getScreenY() + viewport.getScreenHeight() - 90;
 
         if (posicionIzquierda) {
             // Dibujar inventario desde la izquierda
-            float baseX = jugador.getStage().getViewport().getScreenX() + 10;
+            float baseX = viewport.getScreenX() + 10;
 
             for (int i = 0; i < 5; i++) {
                 float x = baseX + (i * 52);
@@ -97,8 +103,7 @@ public class BarraInventario extends Actor {
             }
         } else {
             // Dibujar inventario desde la derecha
-            float baseX = jugador.getStage().getViewport().getScreenX()
-                + jugador.getStage().getViewport().getScreenWidth() - 10 - 50;
+            float baseX = viewport.getScreenX() + viewport.getScreenWidth() - 10 - 50;
 
             for (int i = 0; i < 5; i++) {
                 float x = baseX - (i * 52);
@@ -114,7 +119,9 @@ public class BarraInventario extends Actor {
      * Libera los recursos de texturas utilizados.
      */
     public void dispose() {
-        slotVacio.dispose();
+        if (slotVacio != null) {
+            slotVacio.dispose();
+        }
 
         for (Texture icono : iconos) {
             if (icono != null) {
