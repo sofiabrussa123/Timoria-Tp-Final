@@ -1,26 +1,21 @@
 package personajes;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import Red.HiloServidor;
 import niveles.NivelBase;
 
-// Enemigo que persigue y ataca al jugador más cercano
-public class Enemigo extends Actor {
+public class Enemigo {
 
     private int vida = 50;
-    private Texture textura;
     private Body cuerpo;
-    private float anchoHitbox;
-    private float altoHitbox;
+    private float anchoHitbox = 48;
+    private float altoHitbox = 48;
     private int daño = 10;
     private int cooldown = 1;
     private float tiempoTranscurrido = 0;
@@ -29,16 +24,16 @@ public class Enemigo extends Actor {
     private boolean enCooldown = false;
     private boolean encontroJugador;
     private World mundo;
-    private boolean atacandoVisualmente = false;
-    private float tiempoAtaqueVisual = 0.1f;
-    private float contadorAtaqueVisual = 0f;
     private boolean muerto = false;
     private HiloServidor hiloServidor;
     private final int ID;
 
+    // ✅ Control de sincronización para evitar spam
+    private float tiempoDesdeUltimaSincronizacion = 0f;
+    private static final float INTERVALO_SINCRONIZACION = 0.1f; // 10Hz para enemigos
+
     public Enemigo(World mundo, float x, float y, NivelBase nivel, int id) {
         this.ID = id;
-        this.textura = new Texture("enemigo.png");
         this.nivel = nivel;
         this.anchoHitbox = 48;
         this.altoHitbox = 48;
@@ -64,38 +59,28 @@ public class Enemigo extends Actor {
         cuerpo.createFixture(fixture);
         forma.dispose();
 
-        setSize(anchoHitbox, altoHitbox);
         cuerpo.setUserData(this);
     }
 
-    // Setter para el servidor (se debe llamar después de la construcción)
     public void setHiloServidor(HiloServidor hiloServidor) {
         this.hiloServidor = hiloServidor;
     }
 
-    @Override
     public void act(float delta) {
-        super.act(delta);
-
         determinarDireccionMovimiento(calcularJugadorObjetivo());
-        
-        // Sincronizar posición en red si el servidor está disponible
-        if (hiloServidor != null) {
+
+        // ✅ Sincronizar posición solo cada 100ms
+        tiempoDesdeUltimaSincronizacion += delta;
+
+        if (hiloServidor != null && tiempoDesdeUltimaSincronizacion >= INTERVALO_SINCRONIZACION) {
             hiloServidor.enviarMensajeATodos(
-                "Enemigo:" + this.ID + ":ActualizarPosicion:" + 
-                getPosicionX() + ":" + getPosicionY()
+                String.format(java.util.Locale.US, "Enemigo:%d:ActualizarPosicion:%.2f:%.2f",
+                    this.ID, getPosicionX(), getPosicionY())
             );
+            tiempoDesdeUltimaSincronizacion = 0f;
         }
 
         this.tiempoTranscurrido += delta;
-
-        if (atacandoVisualmente) {
-            contadorAtaqueVisual += delta;
-            if (contadorAtaqueVisual >= tiempoAtaqueVisual) {
-                atacandoVisualmente = false;
-                contadorAtaqueVisual = 0f;
-            }
-        }
 
         if (this.tiempoTranscurrido >= cooldown && enCooldown) {
             enCooldown = false;
@@ -106,7 +91,6 @@ public class Enemigo extends Actor {
 
             Vector2 posicionEnemigo = this.cuerpo.getPosition();
 
-            // Área de ataque mejorada con validación de altura
             float anchoAreaAtaque = (anchoHitbox * NivelBase.PIXELES_A_METROS) + (2 * alcanceAtaque);
             float altoAreaAtaque = altoHitbox * NivelBase.PIXELES_A_METROS * 0.6f;
 
@@ -125,11 +109,21 @@ public class Enemigo extends Actor {
                     Jugador jugador = (Jugador) userData;
                     Vector2 posJugador = jugador.getCuerpo().getPosition();
 
-                    // Validar que el jugador esté a la misma altura aproximada
                     float diferenciaY = Math.abs(posJugador.y - posicionEnemigo.y);
 
                     if (diferenciaY < 0.3f) {
                         jugador.recibirDaño(this.daño);
+
+                        if (hiloServidor != null) {
+                            int nuevaVida = jugador.getVida();
+                            hiloServidor.enviarMensajeATodos(
+                                "Jugador:" + jugador.getIdJugador() + ":Dañar:" + nuevaVida
+                            );
+
+                            System.out.println("💥 Enemigo " + this.ID + " dañó a Jugador " +
+                                jugador.getIdJugador() + " → Vida: " + nuevaVida);
+                        }
+
                         this.encontroJugador = true;
                     }
 
@@ -141,33 +135,12 @@ public class Enemigo extends Actor {
             if (encontroJugador) {
                 this.enCooldown = true;
                 this.tiempoTranscurrido = 0f;
-                this.atacandoVisualmente = true;
+
+                if (hiloServidor != null) {
+                    hiloServidor.enviarMensajeATodos("Enemigo:" + this.ID + ":Atacando");
+                }
             }
         }
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        float xDraw = getX();
-        float yDraw = getY();
-        float anchoDraw = getWidth();
-        float altoDraw = getHeight();
-
-        if (atacandoVisualmente) {
-            float alcancePixeles = alcanceAtaque / NivelBase.PIXELES_A_METROS;
-
-            anchoDraw += 2 * alcancePixeles;
-            altoDraw += 2 * alcancePixeles;
-
-            xDraw -= alcancePixeles;
-            yDraw -= alcancePixeles;
-        }
-
-        batch.draw(this.textura, xDraw, yDraw, anchoDraw, altoDraw);
-    }
-
-    public void aplicarDañoJugador(Jugador jugador) {
-        jugador.recibirDaño(daño);
     }
 
     public void recibirDaño(int dañoAtaque) {
@@ -187,7 +160,6 @@ public class Enemigo extends Actor {
             this.mundo.destroyBody(this.cuerpo);
             this.cuerpo = null;
         }
-        this.remove();
     }
 
     public boolean getMuerto() {
@@ -207,7 +179,7 @@ public class Enemigo extends Actor {
     }
 
     public void dispose() {
-        textura.dispose();
+        // No hay textura que limpiar
     }
 
     private void determinarDireccionMovimiento(Jugador objetivo) {
@@ -216,17 +188,12 @@ public class Enemigo extends Actor {
 
         Vector2 direccion = posicionJugador.cpy().sub(posicionEnemigo).nor().scl(1.5f);
         cuerpo.setLinearVelocity(direccion.x, cuerpo.getLinearVelocity().y);
-
-        setPosition(
-            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
-            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
-        );
     }
 
     private Jugador calcularJugadorObjetivo() {
-        float posicionAbsolutaJugador1 = Math.abs(this.nivel.getJugador1().getX());
-        float posicionAbsolutaJugador2 = Math.abs(this.nivel.getJugador2().getX());
-        float posicionAbsolutaEnemigo = Math.abs(this.getX());
+        float posicionAbsolutaJugador1 = Math.abs(this.nivel.getJugador1().getCuerpo().getPosition().x);
+        float posicionAbsolutaJugador2 = Math.abs(this.nivel.getJugador2().getCuerpo().getPosition().x);
+        float posicionAbsolutaEnemigo = Math.abs(this.cuerpo.getPosition().x);
 
         if (Math.abs(posicionAbsolutaJugador1 - posicionAbsolutaEnemigo) >
             Math.abs(posicionAbsolutaJugador2 - posicionAbsolutaEnemigo)) {
