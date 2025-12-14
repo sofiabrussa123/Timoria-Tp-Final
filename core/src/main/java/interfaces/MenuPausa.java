@@ -24,28 +24,38 @@ public class MenuPausa extends EscenaBase {
         Table table = new Table();
         table.setFillParent(true);
 
-        //Crear botón seguir, ir al nivel pausado previamente guardado
+        // Botón seguir
         TextButton btnSeguir = new TextButton("Seguir", super.fuenteTextos);
         btnSeguir.addListener(new ClickListener() {
+            @Override
             public void clicked(InputEvent event, float x, float y) {
-                MenuPausa.this.nivelPausado.despausar();
-                cambiarEscena(MenuPausa.this.nivelPausado);
+                if (MenuPausa.this.nivelPausado != null) {
+                    MenuPausa.this.nivelPausado.despausar();
+                    juego.setScreen(MenuPausa.this.nivelPausado);
+                }
             }
         });
 
-      //Crear botón menú, enviar a un nuevo menú
+        // Botón menú - Notificar al servidor
         TextButton btnMenu = new TextButton("Menú", super.fuenteTextos);
         btnMenu.addListener(new ClickListener() {
+            @Override
             public void clicked(InputEvent event, float x, float y) {
-                cambiarEscena(new Menu(juego));
+                if (MenuPausa.this.nivelPausado != null) {
+                    MenuPausa.this.nivelPausado.volverAlMenu();
+                } else {
+                    juego.setScreen(new Menu(juego));
+                }
             }
         });
 
+        // Botón instrucciones
         TextButton btnInstrucciones = new TextButton("Instrucciones", super.fuenteTextos);
         btnInstrucciones.addListener(new ClickListener() {
+            @Override
             public void clicked(InputEvent event, float x, float y) {
                 EsceneManager.setEscenaActual(MenuPausa.this);
-                cambiarEscena(new Instrucciones(juego));
+                juego.setScreen(new Instrucciones(juego));
             }
         });
 
@@ -61,7 +71,6 @@ public class MenuPausa extends EscenaBase {
     public void show() {
         Gdx.input.setInputProcessor(this.escena);
 
-        //Si se viene de un nivel, se guarda para mostrarlo de fondo
         if (EsceneManager.getEscenaActual() instanceof NivelBase) {
             this.nivelPausado = (NivelBase) EsceneManager.getEscenaActual();
         }
@@ -69,9 +78,16 @@ public class MenuPausa extends EscenaBase {
 
     @Override
     public void render(float delta) {
-    	
-    	//Dibujar nivel pausado de fondo
-        this.nivelPausado.draw(delta);
+        // ✅ CORREGIDO: Renderizar el fondo del nivel pausado
+        if (this.nivelPausado != null) {
+            // Renderizar solo el fondo estático, sin actualizar física
+            this.nivelPausado.renderFondoPausado(delta);
+        } else {
+            // Si no hay nivel, usar render base
+            super.render(delta);
+        }
+
+        // Dibujar la UI del menú de pausa encima
         super.escena.act(delta);
         super.escena.draw();
     }
