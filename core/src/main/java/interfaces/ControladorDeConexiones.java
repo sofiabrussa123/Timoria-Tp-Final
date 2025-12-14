@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Red.HiloCliente;
+import com.badlogic.gdx.utils.Timer;
 import niveles.EscenaBase;
 import niveles.Nivel1;
 
@@ -24,16 +25,13 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
     private float cooldown = 0.5f;
     private float tiempoTranscurrido = 0f;
 
-    // Constructor sin cliente (crea uno nuevo)
     public ControladorDeConexiones(Game juego) {
         super(juego, "FondoTransparente.png");
         this.hiloCliente = new HiloCliente(this);
-        
-        //fthis.hiloCliente.setPantallaEspera(this);
         this.hiloCliente.start();
 
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
-        
+
         lblEstado = new Label("Conectando con el servidor...", super.fuenteTextos);
         lblEstado.setFontScale(1f);
         lblEstado.setColor(Color.WHITE);
@@ -45,21 +43,19 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
         lblMensaje = new Label("Esperando...", super.fuenteTextos);
         lblMensaje.setFontScale(1.2f);
         lblMensaje.setColor(Color.LIGHT_GRAY);
-        
+
         this.hiloCliente.enviarMensaje("Conectar");
 
-        // Título
         Label titulo = new Label("ESPERANDO A UN JUGADOR 2", super.fuenteTextos);
         titulo.setFontScale(2f);
         titulo.setColor(Color.YELLOW);
 
-        // Botón cancelar
         TextButton btnCancelar = new TextButton("Cancelar", super.fuenteTextos);
         btnCancelar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (hiloCliente != null) {
-                	hiloCliente.terminar();
+                    hiloCliente.terminar();
                 }
                 cambiarEscena(new Menu(juego));
             }
@@ -68,11 +64,11 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
         Table tabla = new Table();
         tabla.setFillParent(true);
         tabla.center();
-        
+
         tabla.add(titulo).padBottom(40).row();
         tabla.add(lblEstado).padBottom(20).row();
         tabla.add(lblTuId).padBottom(30).row();
-        tabla.add(lblMensaje).padBottom(30).row(); 
+        tabla.add(lblMensaje).padBottom(30).row();
         tabla.add(btnCancelar).width(200).height(50);
 
         super.escena.addActor(tabla);
@@ -81,13 +77,13 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
     @Override
     public void render(float delta) {
         super.render(delta);
-        
+
         tiempoTranscurrido += delta;
 
         if(miId != -1) {
-        	lblTuId.setText("Eres el Jugador: " + miId);
+            lblTuId.setText("Eres el Jugador: " + miId);
             lblTuId.setColor(miId == 1 ? Color.CYAN : Color.ORANGE);
-            
+
             lblEstado.setText("Conectado. Esperando al Jugador " + (miId == 1 ? 2 : 1) + "...");
         }
     }
@@ -96,23 +92,24 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
     public void show() {
         Gdx.input.setInputProcessor(escena);
     }
-    
+
     @Override
     public void asignarId(int id) {
-    	this.miId = id;
+        this.miId = id;
+        System.out.println("✅ [CLIENTE] ID asignado: " + id);
     }
-    
+
     @Override
     public void empezarHistoria() {
-    	String[] imagenesIntro = {
-                "1.png",
-                "2.png",
-                "3.png",
-                "4.png",
-                "5.png"
-            };
-    	
-    	Gdx.app.postRunnable(new Runnable() {
+        String[] imagenesIntro = {
+            "1.png",
+            "2.png",
+            "3.png",
+            "4.png",
+            "5.png"
+        };
+
+        Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -120,27 +117,81 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
                     secuenciaInicio.setHiloCliente(hiloCliente);
                     cambiarEscena(secuenciaInicio);
                 } catch (Exception e) {
-                    System.err.println("Error al iniciar SecuenciaImagenes: " + e.getMessage());
+                    System.err.println("❌ Error al iniciar SecuenciaImagenes: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
         });
     }
-    
+
     @Override
     public void empezarJuego() {
-    	Gdx.app.postRunnable(new Runnable() {
+        System.out.println("📩 [CLIENTE] Recibió EmpezarJuego");
+
+        Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
                 try {
-                	Nivel1 primerNivel = new Nivel1(juego);
-                	primerNivel.setHiloCliente(hiloCliente);
+                    Nivel1 primerNivel = new Nivel1(juego, hiloCliente);
+                    primerNivel.conectar(miId);
                     cambiarEscena(primerNivel);
+                    System.out.println("✅ [CLIENTE] Nivel1 creado con HiloCliente");
                 } catch (Exception e) {
-                    System.err.println("Error al iniciar el nivel: " + e.getMessage());
+                    System.err.println("❌ Error al iniciar el nivel: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+    // ✅ NUEVO: Reiniciar nivel cuando el servidor lo ordena
+    @Override
+    public void reiniciarNivel() {
+        System.out.println("🔄 [CLIENTE] Reiniciando nivel...");
+
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Nivel1 nuevoNivel = new Nivel1(juego, hiloCliente);
+                    nuevoNivel.conectar(miId);
+                    juego.setScreen(nuevoNivel);
+                    System.out.println("✅ [CLIENTE] Nivel reiniciado");
+                } catch (Exception e) {
+                    System.err.println("❌ Error al reiniciar nivel: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void servidorDesconectado() {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                lblEstado.setText("❌ SERVIDOR DESCONECTADO");
+                lblEstado.setColor(Color.RED);
+                lblMensaje.setText("El servidor se ha cerrado. Volviendo al menú...");
+
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        if (hiloCliente != null) {
+                            hiloCliente.terminar();
+                        }
+                        cambiarEscena(new Menu(juego));
+                    }
+                }, 3);
+            }
+        });
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (hiloCliente != null) {
+            System.out.println("🔄 [CLIENTE] ControladorDeConexiones dispose - HiloCliente se mantiene activo");
+        }
     }
 }
