@@ -1,14 +1,11 @@
 package niveles.entorno;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import Red.HiloServidor;
 import io.github.timoria.Principal;
 
-// Plataforma que se mueve automáticamente o al activar una palanca
 public class PlataformaMovil extends ElementoEntorno {
 
     private int direccionMovimiento;
@@ -20,35 +17,39 @@ public class PlataformaMovil extends ElementoEntorno {
     private float dy = 0;
     private HiloServidor hiloServidor;
 
-    // Constructor con palanca activadora (plataforma requiere activación)
-    public PlataformaMovil(World mundo, float x, float y, int direccionMovimiento, 
-                          int distanciaMovimiento, Palanca palanca, int id) {
+    // ✅ Control de sincronización con delta compression
+    private float tiempoDesdeUltimaSincronizacion = 0f;
+    private static final float INTERVALO_SINCRONIZACION = 0.033f; // 30Hz
+
+    private float posXAnterior = 0f;
+    private float posYAnterior = 0f;
+    private static final float UMBRAL_MOVIMIENTO = 0.05f; // 5cm
+
+    // Constructor con palanca
+    public PlataformaMovil(World mundo, float x, float y, int direccionMovimiento,
+                           int distanciaMovimiento, Palanca palanca, int id) {
         super(mundo, x, y, 150, 20, id);
-        super.textura = new Texture(Gdx.files.internal("PlataformaActivable.png"));
         this.direccionMovimiento = direccionMovimiento;
         this.distanciaMovimiento = (int) (distanciaMovimiento / Principal.PPM);
         this.palancaActivadora = palanca;
-        
+
         inicializarMovimiento();
     }
 
-    // Constructor sin palanca (plataforma siempre activa)
-    public PlataformaMovil(World mundo, float x, float y, int direccionMovimiento, 
-                          int distanciaMovimiento, int id) {
+    // Constructor sin palanca
+    public PlataformaMovil(World mundo, float x, float y, int direccionMovimiento,
+                           int distanciaMovimiento, int id) {
         super(mundo, x, y, 150, 20, id);
-        super.textura = new Texture(Gdx.files.internal("PlataformaMovil.png"));
         this.direccionMovimiento = direccionMovimiento;
         this.distanciaMovimiento = (int) (distanciaMovimiento / Principal.PPM);
-        
+
         inicializarMovimiento();
     }
 
-    // Setter para el servidor (se debe llamar después de la construcción)
     public void setHiloServidor(HiloServidor hiloServidor) {
         this.hiloServidor = hiloServidor;
     }
 
-    // Inicializa la dirección del movimiento y crea el cuerpo físico
     private void inicializarMovimiento() {
         switch (this.direccionMovimiento) {
             case 1: dy = 1; break; // Vertical
@@ -59,11 +60,12 @@ public class PlataformaMovil extends ElementoEntorno {
         super.crearYPosicionarCuerpo();
 
         this.posicionInicial = (dx != 0) ? cuerpo.getPosition().x : cuerpo.getPosition().y;
+        this.posXAnterior = cuerpo.getPosition().x;
+        this.posYAnterior = cuerpo.getPosition().y;
     }
 
-    @Override
     public void act(float delta) {
-        super.act(delta);
+        tiempoDesdeUltimaSincronizacion += delta;
 
         // Si hay palanca y no está activada, detener movimiento
         if (palancaActivadora != null && !palancaActivadora.getActivada()) {
@@ -85,17 +87,31 @@ public class PlataformaMovil extends ElementoEntorno {
             cambiarSentidoMovimiento(posicion, posicionInicial, distanciaMovimiento);
         }
 
-        // Sincronizar posición en red si el servidor está disponible
-        if (hiloServidor != null) {
-            hiloServidor.enviarMensajeATodos(
-                "PlataformaMovil:" + this.ID + ":Mover:" + 
-                this.cuerpo.getPosition().x + ":" + 
-                this.cuerpo.getPosition().y
+        // ✅ Sincronizar con delta compression
+        if (hiloServidor != null && tiempoDesdeUltimaSincronizacion >= INTERVALO_SINCRONIZACION) {
+            float posX = this.cuerpo.getPosition().x;
+            float posY = this.cuerpo.getPosition().y;
+
+            // Calcular distancia desde última sincronización
+            float distancia = (float) Math.sqrt(
+                Math.pow(posX - posXAnterior, 2) + Math.pow(posY - posYAnterior, 2)
             );
+
+            // Solo enviar si se movió significativamente
+            if (distancia > UMBRAL_MOVIMIENTO) {
+                String mensaje = String.format(java.util.Locale.US, "PlataformaMovil:%d:%.2f:%.2f",
+                    this.ID, posX, posY);
+
+                hiloServidor.enviarMensajeATodos(mensaje);
+
+                posXAnterior = posX;
+                posYAnterior = posY;
+            }
+
+            tiempoDesdeUltimaSincronizacion = 0f;
         }
     }
 
-    // Invierte la dirección del movimiento al llegar a los límites
     private void cambiarSentidoMovimiento(float posicion, float posicionInicial, int distanciaMovimiento) {
         if (posicion >= posicionInicial + distanciaMovimiento || posicion <= posicionInicial) {
             this.velocidadMovimiento = -this.velocidadMovimiento;
