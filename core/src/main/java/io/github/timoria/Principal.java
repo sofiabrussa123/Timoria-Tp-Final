@@ -11,15 +11,26 @@ import Red.HiloServidor;
  * Para activar el modo de testing, descomentar el bloque inferior y comentar esta clase.
  */
 public class Principal extends Game {
-    
+
     public static final float PPM = 100;
-    
+
     @Override
     public void create() {
-    	HiloServidor hiloServidor = new HiloServidor(this);
-    	hiloServidor.start();
-        //Menu menu = new Menu(this);
-        //setScreen(menu);
+        // ✅ Inicializar servidor a través del ServidorManager
+        HiloServidor hiloServidor = ServidorManager.obtenerServidor(this);
+        System.out.println("✅ Servidor inicializado en Principal");
+
+        // ✅ Iniciar con el menú en lugar de solo servidor
+        Menu menu = new Menu(this);
+        setScreen(menu);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        // ✅ Terminar servidor al cerrar la aplicación
+        ServidorManager.terminarServidor();
+        System.out.println("✅ Aplicación cerrada - Servidor terminado");
     }
 }
 
