@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import personajes.Jugador;
 
@@ -17,7 +18,6 @@ public class BarraVida extends Actor {
     private final Texture relleno;
     private Jugador jugador;
     private Texture fondo;
-    private Texture vidaLlena;
     private boolean posicionIzquierda;
     private BitmapFont fuente;
 
@@ -39,25 +39,28 @@ public class BarraVida extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        // ✅ Usar el Stage de este Actor, no del jugador
+        if (getStage() == null) {
+            return; // No dibujar si no hay Stage (servidor headless)
+        }
+
         int vida = jugador.getVida();
         int vidaMax = jugador.getVidaMaxima();
         float porcentaje = (float) vida / (float) vidaMax;
 
-        float y = jugador.getStage().getViewport().getScreenY()
-            + jugador.getStage().getViewport().getScreenHeight() - 30;
+        Viewport viewport = getStage().getViewport();
+        float y = viewport.getScreenY() + viewport.getScreenHeight() - 30;
 
         float x;
 
         if (posicionIzquierda) {
             // Barra de vida desde la izquierda (Jugador 1)
-            x = jugador.getStage().getViewport().getScreenX() + 10;
+            x = viewport.getScreenX() + 10;
             batch.draw(fondo, x, y, getWidth(), getHeight());
             batch.draw(relleno, x, y, getWidth() * porcentaje, getHeight());
         } else {
             // Barra de vida desde la derecha (Jugador 2)
-            x = jugador.getStage().getViewport().getScreenX()
-                + jugador.getStage().getViewport().getScreenWidth()
-                - getWidth() - 10;
+            x = viewport.getScreenX() + viewport.getScreenWidth() - getWidth() - 10;
 
             batch.draw(fondo, x, y, getWidth(), getHeight());
 
@@ -77,11 +80,15 @@ public class BarraVida extends Actor {
      * Libera los recursos de texturas y fuentes utilizados.
      */
     public void dispose() {
-        fondo.dispose();
-        relleno.dispose();
-        if (vidaLlena != null) {
-            vidaLlena.dispose();
+        if (fondo != null) {
+            fondo.dispose();
         }
-        fuente.dispose();
+        if (relleno != null) {
+            relleno.dispose();
+        }
+        if (fuente != null) {
+            fuente.dispose();
+        }
     }
+
 }
