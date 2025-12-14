@@ -14,6 +14,10 @@ import personajes.accesorios.MejoraTemporal;
 public class Nivel1 extends NivelBase {
     
     private int cantActores = 0;
+    
+    public Nivel1(Game juego) {
+    	this(juego, null, null);
+    }
 
     // Constructor con mejoras (para reinicios después de muerte)
     public Nivel1(Game juego, MejoraTemporal mejorasJ1, MejoraTemporal mejorasJ2) {

@@ -7,7 +7,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+
 import interfaces.GameController;
+import niveles.Nivel1;
 
 public class HiloServidor extends Thread {
 
@@ -19,9 +23,11 @@ public class HiloServidor extends Thread {
     private int clientesFinalizadoHistoria = 0;
     private ArrayList<Cliente> clientes = new ArrayList<Cliente>();
     private GameController gameController;
+    private Game juego;
 
-    public HiloServidor(GameController gameController) {
-    	this.gameController = gameController;
+    public HiloServidor(Game juego) {
+    	this.juego = juego;
+    	
         try {
             socket = new DatagramSocket(puertoServidor);
         } catch (SocketException e) {
@@ -52,7 +58,21 @@ public class HiloServidor extends Thread {
         	this.clientesFinalizadoHistoria++;
         }
         
-        if(this.clientesFinalizadoHistoria == MAX_CLIENTES) enviarMensajeATodos("Empezar");
+        if(this.clientesFinalizadoHistoria == MAX_CLIENTES) {
+        	enviarMensajeATodos("EmpezarJuego");
+        	
+        	clientesFinalizadoHistoria++;
+        	
+        	Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        juego.setScreen(new Nivel1(juego));
+                    } catch (Exception e) {
+                    }
+                }
+            });
+        }
 
         if(partes[0].equals("Conectar")){
 
@@ -70,6 +90,9 @@ public class HiloServidor extends Thread {
                 clientes.add(nuevoCliente);
                 enviarMensaje("Conectado:"+clientesConectados, paquete.getAddress(), paquete.getPort());
 
+                if(clientesConectados == MAX_CLIENTES) {
+                	this.enviarMensajeATodos("EmpezarHistoria");
+                }
             } else {
             	//Si ya se alcanzó el máximo de jugadores, se rebota al que se quiera conectar
                 enviarMensaje("Lleno", paquete.getAddress(), paquete.getPort());
@@ -134,9 +157,13 @@ public class HiloServidor extends Thread {
 
     public void desconectarClientes() {
         for (Cliente cliente : clientes) {
-            enviarMensaje("Disconnect", cliente.getIp(), cliente.getPuerto());
+            enviarMensaje("Desconectar", cliente.getIp(), cliente.getPuerto());
         }
         this.clientes.clear();
         this.clientesConectados = 0;
+    }
+    
+    public void setGameController(GameController gameController) {
+    	this.gameController = gameController;
     }
 }

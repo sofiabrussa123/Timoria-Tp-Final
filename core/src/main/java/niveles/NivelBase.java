@@ -167,10 +167,6 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
     @Override
     public void show() {
-        // Inicializar servidor si no existe
-        if (hiloServidor == null) {
-            hiloServidor = new HiloServidor(this);
-        }
 
         Gdx.input.setInputProcessor(this.inputManager);
 
@@ -195,7 +191,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             this.escena.addActor(inventario2);
         }
         
-        this.hiloServidor.start();
+        this.hiloServidor.setGameController(this);;
     }
 
     @Override
@@ -297,6 +293,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
         camaraBox2D.update();
     }
+    
+    public void despausar() {
+    	
+    }
 
     public void draw(float delta) {
         super.render(delta);
@@ -329,5 +329,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     
     public void empezar() {
     	cambiarEscena(new Nivel1(this.juego, this.mejorasJugador1, this.mejorasJugador2));
+    }
+    
+    public void detener(int idJugador) {
+    	if(idJugador == 1) this.jugador1.detener();
+    	else this.jugador2.detener();
     }
 }

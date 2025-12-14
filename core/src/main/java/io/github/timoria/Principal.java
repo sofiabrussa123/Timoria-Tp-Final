@@ -2,7 +2,7 @@ package io.github.timoria;
 
 import com.badlogic.gdx.Game;
 
-import interfaces.Menu;
+import Red.HiloServidor;
 
 /**
  * Clase principal del juego.
@@ -16,8 +16,10 @@ public class Principal extends Game {
     
     @Override
     public void create() {
-        Menu menu = new Menu(this);
-        setScreen(menu);
+    	HiloServidor hiloServidor = new HiloServidor(this);
+    	hiloServidor.start();
+        //Menu menu = new Menu(this);
+        //setScreen(menu);
     }
 }
 
