@@ -15,7 +15,7 @@ import niveles.NivelBase;
 
 public class Enemigo extends Actor implements IdManager{
 
-	private int vida = 50;
+    private int vida = 50;
     private Texture textura;
     private Body cuerpo;
     private float anchoHitbox;
@@ -33,7 +33,7 @@ public class Enemigo extends Actor implements IdManager{
     private int id;
 
     public Enemigo(World mundo, float x, float y, int id) {
-    	this.id = id;
+        this.id = id;
         this.textura = new Texture("enemigo.png");
         this.anchoHitbox = 48;
         this.altoHitbox = 48;
@@ -67,6 +67,12 @@ public class Enemigo extends Actor implements IdManager{
     public void act(float delta) {
         super.act(delta);
 
+        // ✅ EN EL CLIENTE: Solo actualizar posición visual desde el Body
+        setPosition(
+            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
+            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
+        );
+
         this.tiempoTranscurrido += delta;
 
         if (atacandoVisualmente) {
@@ -80,11 +86,6 @@ public class Enemigo extends Actor implements IdManager{
         if (this.tiempoTranscurrido >= cooldown && enCooldown) {
             enCooldown = false;
         }
-
-        setPosition(
-            cuerpo.getPosition().x / NivelBase.PIXELES_A_METROS - anchoHitbox / 2,
-            cuerpo.getPosition().y / NivelBase.PIXELES_A_METROS - altoHitbox / 2
-        );
     }
 
     @Override
@@ -105,6 +106,12 @@ public class Enemigo extends Actor implements IdManager{
         }
 
         batch.draw(this.textura, xDraw, yDraw, anchoDraw, altoDraw);
+    }
+
+    // ✅ NUEVO: Método para mostrar animación de ataque (llamado desde red)
+    public void mostrarAnimacionAtaque() {
+        this.atacandoVisualmente = true;
+        this.contadorAtaqueVisual = 0f;
     }
 
     public void aplicarDañoJugador(Jugador jugador) {
@@ -130,15 +137,20 @@ public class Enemigo extends Actor implements IdManager{
         }
         this.remove();
     }
-    
+
     public void mover(int posX, int posY) {
         if (this.cuerpo != null) {
             this.cuerpo.setTransform(
-                posX * NivelBase.PIXELES_A_METROS, 
-                posY * NivelBase.PIXELES_A_METROS, 
+                posX * NivelBase.PIXELES_A_METROS,
+                posY * NivelBase.PIXELES_A_METROS,
                 this.cuerpo.getAngle()
             );
         }
+    }
+
+    public void actualizarPosicion(float x, float y) {
+        setPosition(x, y);
+        System.out.println("👹 Enemigo visual actualizado a (" + x + ", " + y + ")");
     }
 
     public boolean getMuerto() {
@@ -148,9 +160,13 @@ public class Enemigo extends Actor implements IdManager{
     public void dispose() {
         textura.dispose();
     }
-    
+
     @Override
     public int getId() {
-    	return this.id;
+        return this.id;
+    }
+
+    public Body getCuerpo() {
+        return this.cuerpo;
     }
 }
