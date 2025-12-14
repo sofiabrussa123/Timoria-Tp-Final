@@ -6,6 +6,7 @@ import java.util.Map;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -16,7 +17,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import Red.HiloCliente;
@@ -41,7 +42,6 @@ import personajes.MejoraTemporal;
 public abstract class NivelBase extends EscenaBase implements GameController{
 
     public static final float PIXELES_A_METROS = 1 / 100f;
-    private static final float ALTO_VIEWPORT_INICIAL = 15f;
 
     protected final int anchoPantalla = 800;
     protected final int altoPantalla = 800;
@@ -55,17 +55,24 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     protected ExtendViewport viewport;
     protected float anchoViewport;
     protected float altoViewport;
-    protected Body cuerpoPiso;
     private boolean juegoPausado = false;
     protected Screen pantallaRetorno;
     protected Jugador jugador1;
     protected Jugador jugador2;
     protected Jugador personaje;
-    protected boolean friendlyFire = false;
     protected Map<Integer, Actor> entidades = new HashMap<>();
     protected HiloCliente hiloCliente;
     protected int cantEntidades = 0;
     protected int idJugadorActivo;
+
+    private Queue<Runnable> accionesBox2DPendientes = new Queue<Runnable>();
+
+    // ✅ Control de estados previos para evitar envíos repetidos
+    private String estadoAnteriorJ1 = "";
+    private String estadoAnteriorJ2 = "";
+    private boolean teclaWSaltoPrevioJ1 = false;
+    private boolean teclaWSaltoPrevioJ2 = false;
+    private boolean teclaUpSaltoPrevioJ2 = false;
 
     public NivelBase(Game juego, String fondo) {
         super(juego, fondo);
@@ -80,20 +87,26 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         this.establecerContactos();
     }
 
+    public void encolarAccionBox2D(Runnable accion) {
+        accionesBox2DPendientes.addLast(accion);
+    }
+
+    private void procesarAccionesBox2DPendientes() {
+        while (accionesBox2DPendientes.size > 0) {
+            try {
+                accionesBox2DPendientes.removeFirst().run();
+            } catch (Exception e) {
+                System.err.println("❌ Error Box2D: " + e.getMessage());
+            }
+        }
+    }
+
     public static MejoraTemporal getMejorasJugador1() {
         return mejorasJugador1;
     }
 
     public static MejoraTemporal getMejorasJugador2() {
         return mejorasJugador2;
-    }
-
-    public boolean isFriendlyFire() {
-        return friendlyFire;
-    }
-
-    public void setFriendlyFire(boolean friendlyFire) {
-        this.friendlyFire = friendlyFire;
     }
 
     public Jugador getJugador1() {
@@ -127,13 +140,8 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
                 if ((a instanceof Jugador && b instanceof PuertaLlegada) ||
                     (b instanceof Jugador && a instanceof PuertaLlegada)) {
-
                     PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
                     if (puerta.sePuedeCruzar()) {
-                        NivelBase.this.jugador1 = null;
-                        NivelBase.this.escena.getActors().removeValue(jugador1, true);
-                        NivelBase.this.jugador2 = null;
-                        NivelBase.this.escena.getActors().removeValue(jugador2, true);
                         cambiarEscena(new PantallaGanaste(juego));
                     }
                 }
@@ -152,8 +160,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
                 }
 
                 if ((a instanceof Jugador && (b instanceof Plataforma || b instanceof PlataformaMovil)) ||
-                    (b instanceof Jugador && (b instanceof Plataforma || b instanceof PlataformaMovil))) {
-
+                    (b instanceof Jugador && (a instanceof Plataforma || a instanceof PlataformaMovil))) {
                     Jugador personaje = (a instanceof Jugador) ? (Jugador) a : (Jugador) b;
                     personaje.setEnElAire(false);
                 }
@@ -169,7 +176,6 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     public void show() {
         Gdx.input.setInputProcessor(this.inputManager);
 
-        // Solo crear barras si los jugadores ya existen
         if (this.jugador1 != null) {
             BarraVida barra1 = new BarraVida(this.jugador1, true);
             this.jugador1.setBarraVida(barra1);
@@ -190,7 +196,9 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             this.escena.addActor(inventario2);
         }
 
-        this.hiloCliente.setGameController(this);
+        if (this.hiloCliente != null) {
+            this.hiloCliente.setGameController(this);
+        }
     }
 
     @Override
@@ -203,79 +211,130 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             }
         }
 
-        this.jugador1.detener();
-        this.jugador2.detener();
+        // ✅ OPTIMIZADO: Aplicar controles SOLO cuando cambian
+        aplicarControlesOptimizados();
 
-
-        if (this.jugador1.getVida() == 0 || this.jugador2.getVida() == 0) {
-            int idJugadorMuerto = (this.jugador1.getVida() == 0) ? 1 : 2;
-            this.cambiarEscena(new PantallaDeMuerte(this.juego, idJugadorMuerto));
+        // Verificar muerte
+        if (this.jugador1 != null && this.jugador1.getVida() == 0) {
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, 1, hiloCliente));
         }
 
-
-
-        if(idJugadorActivo == 1) {
-            if (this.inputManager.getIsOPressed()) {
-                jugador1.atacar(this.mundo, this.friendlyFire);
-            } else {
-                jugador1.resetearTeclaAtaque();
-            }
-
-            if (this.inputManager.getIsAPressed()) {
-                jugador1.moverIzquierda();
-            }
-
-            if (this.inputManager.getIsDPressed()) {
-                jugador1.moverDerecha();
-            }
-            if (this.inputManager.getIsWPressed()) {
-                if (!this.jugador1.getEnElAire()) {
-                    this.jugador1.saltar();
-                }
-            }
-        } else {
-            if (this.inputManager.getIsEPressed()) {
-                jugador2.atacar(this.mundo, this.friendlyFire);
-            } else {
-                jugador2.resetearTeclaAtaque();
-            }
-
-            if (this.inputManager.getIsUpPressed()) {
-                if (!this.jugador2.getEnElAire()) {
-                    this.jugador2.saltar();
-                }
-            }
-
-            if (this.inputManager.getIsLeftPressed()) {
-                jugador2.moverIzquierda();
-            }
-
-            if (this.inputManager.getIsRightPressed()) {
-                jugador2.moverDerecha();
-            }
+        if (this.jugador2 != null && this.jugador2.getVida() == 0) {
+            this.cambiarEscena(new PantallaDeMuerte(this.juego, 2, hiloCliente));
         }
-
-        limpiarEntidades();
 
         super.render(delta);
         actualizarCamara();
         escena.getViewport().getCamera().combined.set(camaraBox2D.combined);
+
         mundo.step(1 / 60f, 6, 2);
+        procesarAccionesBox2DPendientes();
     }
 
-    private void limpiarEntidades() {
-        Array<Actor> actores = escena.getActors();
+    // ✅ Controles optimizados - Solo enviar cuando CAMBIA el estado
+    private void aplicarControlesOptimizados() {
+        if (idJugadorActivo == 1 && this.jugador1 != null) {
+            String estadoActual = "";
 
-        for (int i = actores.size - 1; i >= 0; i--) {
-            Actor actor = actores.get(i);
-
-            if (actor instanceof Enemigo) {
-                Enemigo enemigo = (Enemigo) actor;
-
-                if (enemigo.getMuerto()) {
-                    enemigo.eliminar();
-                    enemigo.dispose();
+            if (this.inputManager.getIsAPressed()) {
+                estadoActual = "MoverIzquierda";
+                if (!estadoAnteriorJ1.equals(estadoActual)) {
+                    jugador1.moverIzquierda(); // Predicción local
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:1:MoverIzquierda");
+                    }
                 }
+            } else if (this.inputManager.getIsDPressed()) {
+                estadoActual = "MoverDerecha";
+                if (!estadoAnteriorJ1.equals(estadoActual)) {
+                    jugador1.moverDerecha();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:1:MoverDerecha");
+                    }
+                }
+            } else {
+                estadoActual = "Detener";
+                if (!estadoAnteriorJ1.equals(estadoActual)) {
+                    jugador1.detener();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:1:Detener");
+                    }
+                }
+            }
+
+            estadoAnteriorJ1 = estadoActual;
+
+            // Salto - solo una vez por presión
+            if (this.inputManager.getIsWPressed()) {
+                if (!teclaWSaltoPrevioJ1 && !this.jugador1.getEnElAire()) {
+                    this.jugador1.saltar();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:1:Saltar");
+                    }
+                }
+                teclaWSaltoPrevioJ1 = true;
+            } else {
+                teclaWSaltoPrevioJ1 = false;
+            }
+
+            // Ataque - solo una vez por presión
+            if (this.inputManager.getIsOPressed()) {
+                if (hiloCliente != null) {
+                    hiloCliente.enviarMensaje("Input:1:Atacar");
+                }
+            } else {
+                jugador1.resetearTeclaAtaque();
+            }
+
+        } else if (idJugadorActivo == 2 && this.jugador2 != null) {
+            String estadoActual = "";
+
+            if (this.inputManager.getIsLeftPressed()) {
+                estadoActual = "MoverIzquierda";
+                if (!estadoAnteriorJ2.equals(estadoActual)) {
+                    jugador2.moverIzquierda();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:2:MoverIzquierda");
+                    }
+                }
+            } else if (this.inputManager.getIsRightPressed()) {
+                estadoActual = "MoverDerecha";
+                if (!estadoAnteriorJ2.equals(estadoActual)) {
+                    jugador2.moverDerecha();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:2:MoverDerecha");
+                    }
+                }
+            } else {
+                estadoActual = "Detener";
+                if (!estadoAnteriorJ2.equals(estadoActual)) {
+                    jugador2.detener();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:2:Detener");
+                    }
+                }
+            }
+
+            estadoAnteriorJ2 = estadoActual;
+
+            if (this.inputManager.getIsUpPressed()) {
+                if (!teclaUpSaltoPrevioJ2 && !this.jugador2.getEnElAire()) {
+                    this.jugador2.saltar();
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Input:2:Saltar");
+                    }
+                }
+                teclaUpSaltoPrevioJ2 = true;
+            } else {
+                teclaUpSaltoPrevioJ2 = false;
+            }
+
+            if (this.inputManager.getIsEPressed()) {
+                if (hiloCliente != null) {
+                    hiloCliente.enviarMensaje("Input:2:Atacar");
+                }
+            } else {
+                jugador2.resetearTeclaAtaque();
             }
         }
     }
@@ -283,13 +342,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-
-        camaraBox2D.setToOrtho(
-            false,
-            viewport.getWorldWidth() * PIXELES_A_METROS,
-            viewport.getWorldHeight() * PIXELES_A_METROS
-        );
-
+        camaraBox2D.setToOrtho(false, viewport.getWorldWidth() * PIXELES_A_METROS, viewport.getWorldHeight() * PIXELES_A_METROS);
         camaraBox2D.update();
     }
 
@@ -314,173 +367,232 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         this.cantEntidades++;
         return this.cantEntidades;
     }
-    
+
     public void setHiloCliente(HiloCliente hiloCliente) {
-    	this.hiloCliente = hiloCliente;
+        this.hiloCliente = hiloCliente;
     }
 
-    @Override
-    public void desconectar() {
-        // Manejar desconexión del cliente
-        if (this.hiloCliente != null) {
-            this.hiloCliente.terminar();
-        }
-        volverAlMenu();
-    }
+    // =========================================================================
+    // GameController - Recepción de Estados
+    // =========================================================================
 
     @Override
     public void procesarAccionesEntidades(String[] mensaje) {
-        int idEntidad = Integer.parseInt(mensaje[1]);
-        switch(mensaje[0]) {
-            case "Jugador":
-                procesarAccionesJugador(mensaje, idEntidad);
-                break;
-            case "Enemigo":
-                procesarAccionesEnemigo(mensaje, idEntidad);
-                break;
-
-            case "Puerta":
-                abrirPuerta(idEntidad);
-                break;
-            case "PlataformaMovil":
-                moverPlataformaMovil(idEntidad, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
-                break;
-            default: System.out.println("Mensaje desconocido"); break;
-        }
+        // No usado
     }
 
     @Override
     public void cambiarPantalla() {
-
+        // No usado
     }
 
     @Override
     public void recogerItem(int idLlave, int idJugador) {
+        Actor entidad = this.entidades.get(idLlave);
+        if (entidad instanceof LlaveActivadora) {
+            LlaveActivadora llave = (LlaveActivadora) entidad;
+            Jugador jugador = (idJugador == 1) ? this.jugador1 : this.jugador2;
+            if (jugador != null) {
+                llave.activarConJugador(jugador);
+            }
+        }
     }
 
     @Override
-    public void moverPlataformaMovil(int id, int posX, int posY) {
-        Actor entidad = this.entidades.get(id);
-
-        if (entidad != null) {
-            // 2. Verificación y casting seguro
-            if (entidad instanceof PlataformaMovil) {
-                PlataformaMovil plataforma = (PlataformaMovil) entidad;
-
-                plataforma.mover(posX, posY);
-            }
+    public void moverPlataformaMovil(int id, float posX, float posY) {
+        final Actor entidad = this.entidades.get(id);
+        if (entidad instanceof PlataformaMovil) {
+            encolarAccionBox2D(new Runnable() {
+                @Override
+                public void run() {
+                    ((PlataformaMovil) entidad).moverDesdeServidor(posX, posY);
+                }
+            });
         }
     }
 
     @Override
     public void abrirPuerta(int id) {
         Actor entidad = this.entidades.get(id);
-
-        if (entidad != null) {
-            // 2. Verificación y casting seguro
-            if (entidad instanceof PuertaLlegada) {
-                PuertaLlegada puerta = (PuertaLlegada) entidad;
-
-                puerta.desbloquear();
-            }
-        }
-    }
-
-    public void procesarAccionesJugador(String[] mensaje, int idJugador) {
-        switch(mensaje[1]) {
-            case "ActualizarPosicion":
-                actualizarPosicionJugador(idJugador, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
-                break;
-            case "Dañar":
-                dañarJugador(idJugador, Integer.parseInt(mensaje[2]));
-                break;
-            case "Matar":
-                matarJugador(idJugador);
-                break;
-            default: System.out.println("Mensaje desconocido"); break;
+        if (entidad instanceof PuertaLlegada) {
+            ((PuertaLlegada) entidad).desbloquear();
         }
     }
 
     @Override
-    public void actualizarPosicionJugador(int id, int posX, int posY) {
-        if(id == 1) {
-            this.jugador1.moverCuerpo(posX, posY);
-        } else this.jugador2.moverCuerpo(posX, posY);
+    public void procesarAccionesJugador(String[] mensaje, int idJugador) {
+        // Manejado por casos específicos
+    }
+
+    @Override
+    public void actualizarPosicionJugador(int id, float posX, float posY, boolean mirandoDerecha) {
+        // ✅ NUEVO ENFOQUE: Actualizar AMBOS jugadores, pero con interpolación diferente
+
+        final Jugador jugador = (id == 1) ? this.jugador1 : this.jugador2;
+        if (jugador == null) return;
+
+        encolarAccionBox2D(new Runnable() {
+            @Override
+            public void run() {
+                if (id == idJugadorActivo) {
+                    // ✅ MI jugador: Interpolación suave (corrección ligera)
+                    jugador.corregirPosicionSuave(posX, posY, mirandoDerecha);
+                } else {
+                    // ✅ OTRO jugador: Actualización directa
+                    jugador.actualizarDesdeServidor(posX, posY, mirandoDerecha);
+                }
+            }
+        });
+    }
+
+    public void renderFondoPausado(float delta) {
+        // Limpiar pantalla
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Dibujar el escenario tal como está (sin actualizar)
+        escena.getViewport().apply();
+        escena.getViewport().getCamera().combined.set(camaraBox2D.combined);
+        escena.draw();
+    }
+
+    @Override
+    public void actualizarPosicionEnemigo(int id, float posX, float posY) {
+        final Actor entidad = this.entidades.get(id);
+        if (entidad instanceof Enemigo) {
+            encolarAccionBox2D(new Runnable() {
+                @Override
+                public void run() {
+                    Enemigo enemigo = (Enemigo) entidad;
+                    if (enemigo.getCuerpo() != null) {
+                        enemigo.getCuerpo().setTransform(posX, posY, 0);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void servidorDesconectado() {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                volverAlMenu();
+            }
+        });
     }
 
     @Override
     public void matarJugador(int id) {
-        if(id == 1) {
-            this.jugador1.morir();
-        } else this.jugador2.morir();
+        Jugador jugador = (id == 1) ? this.jugador1 : this.jugador2;
+        if (jugador != null) {
+            jugador.morir();
+        }
     }
 
     @Override
     public void dañarJugador(int idJugador, int nuevaVida) {
-        if (idJugador == 1) {
-            this.jugador1.recibirDaño(nuevaVida);
-        } else {
-            this.jugador2.recibirDaño(nuevaVida);
-        }
-    }
+        Jugador jugador = (idJugador == 1) ? this.jugador1 : this.jugador2;
+        if (jugador != null) {
+            int vidaAnterior = jugador.getVida();
+            jugador.setVida(nuevaVida);
 
-    public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
-        switch(mensaje[1]) {
-            case "ActualizarPosicion":
-                actualizarPosicionEnemigo(idEnemigo, Integer.parseInt(mensaje[2]), Integer.parseInt(mensaje[3]));
-                break;
-            case "Desaparecer":
-                desaparecerEnemigo(idEnemigo);
-                break;
-            default: System.out.println("Mensaje desconocido"); break;
+            // ✅ REPRODUCIR SONIDO si es MI jugador Y recibió daño (no curación)
+            if (idJugador == idJugadorActivo && nuevaVida < vidaAnterior) {
+                jugador.reproducirSonidoDaño();
+            }
         }
     }
 
     @Override
-    public void actualizarPosicionEnemigo(int id, int posX, int posY) {
-        Actor entidad = this.entidades.get(id);
-
-        if (entidad != null) {
-            // 2. Verificación y casting seguro
-            if (entidad instanceof Enemigo) {
-                Enemigo enemigo = (Enemigo) entidad;
-
-                enemigo.mover(posX, posY);
-            }
-        }
+    public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
+        // Manejado
     }
 
     @Override
     public void desaparecerEnemigo(int id) {
         Actor entidad = this.entidades.get(id);
+        if (entidad instanceof Enemigo) {
+            Enemigo enemigo = (Enemigo) entidad;
+            enemigo.eliminar();
+            enemigo.dispose();
+        }
+    }
 
-        if (entidad != null) {
-            // 2. Verificación y casting seguro
-            if (entidad instanceof Enemigo) {
-                Enemigo enemigo = (Enemigo) entidad;
+    @Override
+    public void activarPalanca(int idPalanca) {
+        Actor entidad = this.entidades.get(idPalanca);
+        if (entidad instanceof Palanca) {
+            ((Palanca) entidad).activar();
+        }
+    }
 
-                enemigo.eliminar();
-                enemigo.dispose();
-            }
+    @Override
+    public void aplicarMejora(int idJugador, String tipoMejora) {
+        Jugador jugador = (idJugador == 1) ? this.jugador1 : this.jugador2;
+        MejoraTemporal mejoras = (idJugador == 1) ? mejorasJugador1 : mejorasJugador2;
+
+        if (jugador == null || mejoras == null) return;
+
+        switch(tipoMejora) {
+            case "Vida":
+                mejoras.mejorarVida();
+                jugador.actualizarVidaConMejoras();
+                break;
+            case "Velocidad":
+                mejoras.mejorarVelocidad();
+                break;
+            case "Salto":
+                mejoras.mejorarSalto();
+                break;
+            case "Daño":
+                mejoras.mejorarDaño();
+                break;
+        }
+    }
+
+    @Override
+    public void mostrarAtaqueJugador(int idJugador) {
+        Jugador jugador = (idJugador == 1) ? this.jugador1 : this.jugador2;
+        if (jugador != null) {
+            // Mostrar animación de ataque visualmente
+            jugador.setFrameAnimacion(0, jugador.getMirandoDerecha());
         }
     }
 
     @Override
     public void empezarJuego() {
-        cambiarEscena(new Nivel1(this.juego));
+        // No usado
     }
 
     @Override
     public void conectar(int idJugador) {
         this.idJugadorActivo = idJugador;
+
+        if (jugador1 != null && jugador2 != null) {
+            jugador1.setEsMiJugador(idJugador == 1);
+            jugador2.setEsMiJugador(idJugador == 2);
+        }
     }
 
     @Override
     public void volverAlMenu() {
+        if (this.hiloCliente != null) {
+            hiloCliente.enviarMensaje("VolverAlMenu");
+        }
         cambiarEscena(new Menu(this.juego));
     }
 
     @Override
     public void terminarJuego() {
+        volverAlMenu();
+    }
+
+    @Override
+    public void desconectar() {
+
+    }
+
+    protected void setFriendlyFire(boolean b) {
     }
 }
