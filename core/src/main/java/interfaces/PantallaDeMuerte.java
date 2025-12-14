@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
+import Red.HiloCliente;
 import niveles.*;
 import personajes.MejoraTemporal;
 
@@ -35,10 +36,12 @@ public class PantallaDeMuerte extends EscenaBase {
     private String fraseElegida;
     private int idJugadorMuerto;
     private MejoraTemporal mejorasJugador;
+    private HiloCliente hiloCliente;
 
-    public PantallaDeMuerte(Game principal, int idJugadorMuerto) {
+    public PantallaDeMuerte(Game principal, int idJugadorMuerto, HiloCliente hiloCliente) {
         super(principal, "PantallaDeMuerte.png");
 
+        this.hiloCliente = hiloCliente;
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
 
         this.fraseElegida = frases[new Random().nextInt(frases.length)];
@@ -84,6 +87,10 @@ public class PantallaDeMuerte extends EscenaBase {
                 if (!botonMejorarVida.isDisabled() && mejorasJugador.mejorarVida()) {
                     actualizarBotonMejora(botonMejorarVida, "Mejorar Vida (+20)",
                         mejorasJugador.getMejorasVida(), mejorasJugador.getMaxMejoras());
+
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Jugador:" + idJugadorMuerto + ":MejorarEstadistica:Vida");
+                    }
                 }
             }
         });
@@ -94,6 +101,10 @@ public class PantallaDeMuerte extends EscenaBase {
                 if (!botonMejorarVelocidad.isDisabled() && mejorasJugador.mejorarVelocidad()) {
                     actualizarBotonMejora(botonMejorarVelocidad, "Mejorar Velocidad (+1)",
                         mejorasJugador.getMejorasVelocidad(), mejorasJugador.getMaxMejoras());
+
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Jugador:" + idJugadorMuerto + ":MejorarEstadistica:Velocidad");
+                    }
                 }
             }
         });
@@ -104,6 +115,10 @@ public class PantallaDeMuerte extends EscenaBase {
                 if (!botonMejorarSalto.isDisabled() && mejorasJugador.mejorarSalto()) {
                     actualizarBotonMejora(botonMejorarSalto, "Mejorar Salto (+1.5)",
                         mejorasJugador.getMejorasSalto(), mejorasJugador.getMaxMejoras());
+
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Jugador:" + idJugadorMuerto + ":MejorarEstadistica:Salto");
+                    }
                 }
             }
         });
@@ -114,29 +129,52 @@ public class PantallaDeMuerte extends EscenaBase {
                 if (!botonMejorarDaño.isDisabled() && mejorasJugador.mejorarDaño()) {
                     actualizarBotonMejora(botonMejorarDaño, "Mejorar Daño (+10)",
                         mejorasJugador.getMejorasDaño(), mejorasJugador.getMaxMejoras());
+
+                    if (hiloCliente != null) {
+                        hiloCliente.enviarMensaje("Jugador:" + idJugadorMuerto + ":MejorarEstadistica:Daño");
+                    }
                 }
             }
         });
 
+        // ✅ CORREGIDO: Botón "Volver a jugar" solicita reinicio al servidor
         TextButton botonVolver = new TextButton("Volver a jugar", super.fuenteTextos);
         botonVolver.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 PantallaDeMuerte.this.musicaMuerte.pause();
-                cambiarEscena(new Nivel1(juego));
+
+                System.out.println("🔄 Solicitando reinicio al servidor...");
+
+                // ✅ Enviar solicitud al servidor
+                // El servidor esperará a que AMBOS jugadores estén listos
+                // Luego enviará "ReiniciarNivel" a todos
+                if (hiloCliente != null) {
+                    hiloCliente.enviarMensaje("SolicitarReinicio");
+                }
+
+                // Cambiar texto del botón para indicar que está esperando
+                botonVolver.setText("Esperando...");
+                botonVolver.setDisabled(true);
             }
         });
 
+        // Botón menú - Notificar al servidor
         TextButton botonMenu = new TextButton("Menú principal", super.fuenteTextos);
         botonMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 PantallaDeMuerte.this.musicaMuerte.pause();
-                cambiarEscena(new Menu(juego));
+
+                // Notificar al servidor que nos vamos
+                if (hiloCliente != null) {
+                    hiloCliente.enviarMensaje("VolverAlMenu");
+                }
+
+                juego.setScreen(new Menu(juego));
             }
         });
 
-        // Botón música
         TextButton botonMusica = new TextButton("Silenciar música", super.fuenteTextos);
         botonMusica.addListener(new ClickListener() {
             @Override
@@ -169,6 +207,7 @@ public class PantallaDeMuerte extends EscenaBase {
 
         super.escena.addActor(table);
     }
+
     private TextButton crearBotonMejora(String nombre, int nivel, int max) {
         String texto = String.format("%s [%d/%d]", nombre, nivel, max);
         TextButton boton = new TextButton(texto, super.fuenteTextos);
@@ -192,5 +231,13 @@ public class PantallaDeMuerte extends EscenaBase {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(escena);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (musicaMuerte != null) {
+            musicaMuerte.dispose();
+        }
     }
 }
