@@ -1,7 +1,9 @@
 package interfaces;
 
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -9,17 +11,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import Red.HiloServidor;
+import Red.ServidorManager;
 import globales.EsceneManager;
+import interfaces.Instrucciones;
 import niveles.EscenaBase;
-import niveles.Nivel1;
 
 public class Menu extends EscenaBase {
 
     private Music musica;
     private boolean musicaActiva = true;
+    private HiloServidor hiloServidor;
 
     public Menu(Game juego) {
         super(juego, "Fondo.jpeg");
+
+        // ✅ Obtener servidor único a través del manager
+        this.hiloServidor = ServidorManager.obtenerServidor(juego);
+        System.out.println("✅ Servidor obtenido en Menu");
 
         // Fuente / Skin
         super.fuenteTextos = new Skin(Gdx.files.internal("uiskin.json"));
@@ -42,7 +51,12 @@ public class Menu extends EscenaBase {
             public void clicked(InputEvent event, float x, float y) {
                 Menu.this.musica.stop();
                 Menu.this.musica.dispose();
-                cambiarEscena(new Nivel1(juego));
+
+                // ✅ NO crear nivel aquí - El servidor lo hará automáticamente
+                System.out.println("⏳ Esperando a que los clientes se conecten y completen la historia...");
+
+                // Opcional: Cambiar a pantalla de espera
+                // juego.setScreen(new PantallaEspera(juego, hiloServidor));
             }
         });
 
@@ -69,7 +83,7 @@ public class Menu extends EscenaBase {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 EsceneManager.setEscenaActual(Menu.this);
-                cambiarEscena(new Instrucciones(juego));
+                juego.setScreen(new Instrucciones(juego));
             }
         });
 
@@ -86,5 +100,15 @@ public class Menu extends EscenaBase {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this.escena);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        // ✅ NO terminar el servidor aquí, solo limpiar la música
+        if (this.musica != null) {
+            this.musica.dispose();
+        }
+        System.out.println("✅ Menu dispose - Música limpiada (servidor sigue activo)");
     }
 }
