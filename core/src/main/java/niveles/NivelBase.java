@@ -331,12 +331,12 @@ public abstract class NivelBase implements Screen, GameController {
             return null;
         }
 
-        float x = jugador.getCuerpo().getPosition().x;
-        float y = jugador.getCuerpo().getPosition().y;
+        float xPasar = jugador.getCuerpo().getPosition().x - (jugador.getAncho() / 2f);
+        float yPasar = jugador.getCuerpo().getPosition().y - (jugador.getAlto() / 2f);
         boolean mirandoDerecha = jugador.getMirandoDerecha();
 
         return String.format(java.util.Locale.US, "Estado:Jugador:%d:%.2f:%.2f:%b",
-            idJugador, x, y, mirandoDerecha);
+            idJugador, xPasar, yPasar, mirandoDerecha);
     }
 
     @Override

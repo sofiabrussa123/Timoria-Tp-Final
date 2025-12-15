@@ -258,4 +258,11 @@ public class Jugador {
         return this.barraInventario; // Puede ser null en servidor
     }
 
+    public float getAlto(){
+        return this.altoHitbox;
+    }
+
+    public float getAncho(){
+        return this.anchoHitbox;
+    }
 }
