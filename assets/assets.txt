@@ -1,3 +1,4 @@
+Boton.png
 Daño.mp3
 Fondo.jpeg
 FondoNivel1.jpeg
@@ -73,7 +74,6 @@ animaciones/run.png
 barraInventario.png
 barra_fondo.png
 barra_vida.png
-boton.png
 default.fnt
 enemigo.png
 font-small.fnt
