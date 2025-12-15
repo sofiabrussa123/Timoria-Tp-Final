@@ -3,8 +3,8 @@ package io.github.timoria;
 import com.badlogic.gdx.Game;
 
 import Red.HiloServidor;
-import interfaces.Menu;
 import Red.ServidorManager;
+import interfaces.Menu;
 
 /**
  * Clase principal del juego.
@@ -39,6 +39,7 @@ public class Principal extends Game {
 /* ============================================================================
  * CÓDIGO DE TESTING DE RED - DESCOMENTAR PARA PRUEBAS DE SERVIDOR/CLIENTE
  * ============================================================================
+<<<<<<< HEAD
  *
  * import Red.ClientePrueba;
  * import Red.HiloServidor;
