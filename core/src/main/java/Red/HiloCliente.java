@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import interfaces.ConectionManager;
 import interfaces.GameController;
 import interfaces.ControladorDeConexiones;
 
@@ -39,34 +38,29 @@ public class HiloCliente extends Thread {
             DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
             try {
                 if(this.idAsignado == -1){
-                    socket.setSoTimeout(5000); // 5 segundos timeout
-                } else socket.setSoTimeout(0);
-
+                    socket.setSoTimeout(5000);
+                }
                 socket.receive(packet);
                 procesarMensaje(packet);
             } catch (java.net.SocketTimeoutException e) {
                 System.err.println("⚠️ No se reciben datos del servidor (5s timeout)...");
 
-                // ✅ Notificar desconexión del servidor
                 if (controladorDeConexiones != null) {
                     controladorDeConexiones.servidorDesconectado();
                 } else if (gameController != null) {
                     gameController.servidorDesconectado();
                 }
-
-                break; // Salir del loop
+                break;
 
             } catch (IOException e) {
                 if (!socket.isClosed()) {
                     System.err.println("❌ Error al recibir paquete: " + e.getMessage());
 
-                    // ✅ Notificar desconexión
                     if (controladorDeConexiones != null) {
                         controladorDeConexiones.servidorDesconectado();
                     } else if (gameController != null) {
                         gameController.servidorDesconectado();
                     }
-
                     break;
                 }
             }
@@ -79,7 +73,10 @@ public class HiloCliente extends Thread {
         String message = (new String(packet.getData())).trim();
         String[] parts = message.split(":");
 
-        //System.out.println("Mensaje recibido: " + message);
+        // ✅ CRÍTICO: Reducir logs para evitar spam
+        if (!parts[0].equals("Estado") && !parts[0].equals("Enemigo") && !parts[0].equals("PlataformaMovil")) {
+            System.out.println("📩 Mensaje: " + message);
+        }
 
         try {
             switch(parts[0]) {
@@ -88,7 +85,7 @@ public class HiloCliente extends Thread {
                     break;
 
                 case "Conectado":
-                    System.out.println("Conectado al servidor");
+                    System.out.println("✅ Conectado al servidor");
                     this.ipServidor = packet.getAddress();
                     if (parts.length > 1) {
                         controladorDeConexiones.asignarId(Integer.parseInt(parts[1]));
@@ -97,7 +94,7 @@ public class HiloCliente extends Thread {
                     break;
 
                 case "Lleno":
-                    System.out.println("Servidor lleno");
+                    System.out.println("⚠️ Servidor lleno");
                     this.end = true;
                     break;
 
@@ -125,79 +122,46 @@ public class HiloCliente extends Thread {
                     }
                     break;
 
-                // ✅ NUEVO: Reiniciar nivel
                 case "ReiniciarNivel":
                     if (controladorDeConexiones != null) {
                         controladorDeConexiones.reiniciarNivel();
                     }
                     break;
 
+                // ✅ CRÍTICO: Procesar actualizaciones de posición
                 case "Estado":
-                    System.out.println("📄 Procesando estado: " + message);
-                    if (this.gameController != null) {
+                    if (this.gameController != null && parts.length >= 6) {
                         if (parts[1].equals("Jugador")) {
                             int idJugador = Integer.parseInt(parts[2]);
                             float posX = Float.parseFloat(parts[3]);
                             float posY = Float.parseFloat(parts[4]);
                             boolean direccion = Boolean.parseBoolean(parts[5]);
 
-                            System.out.println("👤 Actualizando jugador " + idJugador + " en (" + posX + ", " + posY + ")");
-
+                            // ✅ Actualizar posición del jugador
                             this.gameController.actualizarPosicionJugador(idJugador, posX, posY, direccion);
-                        }
-                    } else {
-                        System.out.println("⚠️ GameController null o mensaje incompleto");
-                    }
-                    break;
-
-                // En HiloCliente.java - Actualizar el case "Jugador"
-
-                case "Jugador":
-                    if (this.gameController != null && parts.length >= 2) {
-                        int idJugador = Integer.parseInt(parts[1]);
-
-                        // Procesar según la acción
-                        if (parts.length >= 4 && parts[2].equals("MejoraAplicada")) {
-                            String tipoMejora = parts[3];
-                            this.gameController.aplicarMejora(idJugador, tipoMejora);
-                            System.out.println("⬆️ Cliente: Jugador " + idJugador + " mejoró " + tipoMejora);
-                        }
-                        // ✅ NUEVO: Procesar ataque
-                        else if (parts.length >= 3 && parts[2].equals("Atacar")) {
-                            this.gameController.mostrarAtaqueJugador(idJugador);
-                            System.out.println("⚔️ Cliente: Jugador " + idJugador + " atacando");
-                        }
-                        else if (parts.length >= 4 && parts[2].equals("Dañar")) {
-                            int nuevaVida = Integer.parseInt(parts[3]);
-                            this.gameController.dañarJugador(idJugador, nuevaVida);
-                            System.out.println("🩸 Cliente: Jugador " + idJugador + " dañado → Vida: " + nuevaVida);
-                        }
-                        else if (parts.length >= 3 && parts[2].equals("Matar")) {
-                            this.gameController.matarJugador(idJugador);
-                            System.out.println("💀 Cliente: Jugador " + idJugador + " murió");
-                        }
-                        else {
-                            this.gameController.procesarAccionesJugador(parts, idJugador);
                         }
                     }
                     break;
 
                 case "Enemigo":
-                    System.out.println("👹 Acción de enemigo: " + message);
                     if (this.gameController != null && parts.length >= 3) {
                         int idEnemigo = Integer.parseInt(parts[1]);
 
                         if (parts[2].equals("ActualizarPosicion") && parts.length >= 5) {
                             float posX = Float.parseFloat(parts[3]);
                             float posY = Float.parseFloat(parts[4]);
-
-                            System.out.println("👹 Moviendo enemigo " + idEnemigo + " a (" + posX + ", " + posY + ")");
-
                             this.gameController.actualizarPosicionEnemigo(idEnemigo, posX, posY);
-                        } else if (parts[2].equals("Atacando")) {
-                            // ✅ NUEVO: Mostrar animación de ataque del enemigo
+                        }
+                        else if (parts[2].equals("Atacando")) {
                             this.gameController.mostrarAtaqueEnemigo(idEnemigo);
-                        } else {
+                        }
+                        else if (parts[2].equals("RecibirDaño")) {
+                            // Ignorar en cliente - el servidor maneja la lógica
+                        }
+                        else if (parts[2].equals("Desaparecer")) {
+                            this.gameController.desaparecerEnemigo(idEnemigo);
+                        }
+                        else {
                             this.gameController.procesarAccionesEnemigo(parts, idEnemigo);
                         }
                     }
@@ -212,7 +176,6 @@ public class HiloCliente extends Thread {
                     }
                     break;
 
-                // ✅ NUEVO: Procesar movimiento de plataforma móvil
                 case "PlataformaMovil":
                     if (this.gameController != null && parts.length >= 4) {
                         int idPlataforma = Integer.parseInt(parts[1]);
@@ -222,12 +185,10 @@ public class HiloCliente extends Thread {
                     }
                     break;
 
-                // ✅ NUEVO: Procesar activación de palanca
                 case "Palanca":
                     if (this.gameController != null && parts.length >= 3 && parts[2].equals("Activar")) {
                         int idPalanca = Integer.parseInt(parts[1]);
                         this.gameController.activarPalanca(idPalanca);
-                        System.out.println("🔧 Cliente: Palanca " + idPalanca + " activada");
                     }
                     break;
 
@@ -239,6 +200,14 @@ public class HiloCliente extends Thread {
                     }
                     break;
 
+                case "CambiarPantalla":
+                    if (this.gameController != null && parts.length >= 2) {
+                        if (parts[1].equals("PantallaGanaste")) {
+                            this.gameController.cambiarPantalla();
+                        }
+                    }
+                    break;
+
                 default:
                     if (this.gameController != null) {
                         this.gameController.procesarAccionesEntidades(parts);
@@ -246,25 +215,23 @@ public class HiloCliente extends Thread {
                     break;
             }
         } catch (NumberFormatException e) {
-            System.err.println("Error al parsear números en mensaje: " + message);
-            e.printStackTrace();
+            System.err.println("❌ Error al parsear números en: " + message);
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("Mensaje mal formado: " + message);
-            e.printStackTrace();
+            System.err.println("❌ Mensaje mal formado: " + message);
         } catch (Exception e) {
-            System.err.println("Error al procesar mensaje: " + message);
+            System.err.println("❌ Error al procesar: " + message);
             e.printStackTrace();
         }
     }
 
     public void enviarMensaje(String message) {
         if (socket == null || socket.isClosed()) {
-            System.err.println("Socket cerrado, no se puede enviar mensaje");
+            System.err.println("❌ Socket cerrado, no se puede enviar mensaje");
             return;
         }
 
         if (ipServidor == null) {
-            System.err.println("Dirección de servidor no establecida");
+            System.err.println("❌ Dirección de servidor no establecida");
             return;
         }
 
@@ -273,9 +240,12 @@ public class HiloCliente extends Thread {
 
         try {
             socket.send(packet);
-            System.out.println("Mensaje enviado: " + message);
+            // ✅ Reducir logs de envío
+            if (!message.startsWith("Input:")) {
+                System.out.println("📤 Enviado: " + message);
+            }
         } catch (IOException e) {
-            System.err.println("Error al enviar mensaje: " + e.getMessage());
+            System.err.println("❌ Error al enviar mensaje: " + e.getMessage());
         }
     }
 
@@ -289,15 +259,10 @@ public class HiloCliente extends Thread {
 
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
+        System.out.println("✅ GameController asignado a HiloCliente");
     }
 
     public int getIdAsignado() {
         return this.idAsignado;
-    }
-
-    public boolean tieneGameController(){
-        if(this.gameController != null){
-            return true;
-        } else return false;
     }
 }

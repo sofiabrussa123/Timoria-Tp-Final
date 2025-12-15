@@ -402,29 +402,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     public void actualizarPosicionJugador(int id, float posX, float posY, boolean mirandoDerecha) {
         // ✅ NUEVO ENFOQUE: Actualizar AMBOS jugadores, pero con interpolación diferente
 
-        final Jugador jugador = (id == 1) ? this.jugador1 : this.jugador2;
+        Jugador jugador = (id == 1) ? this.jugador1 : this.jugador2;
         if (jugador == null) return;
 
         encolarAccionBox2D(new Runnable() {
             @Override
             public void run() {
-                if (id == idJugadorActivo) {
-                    float anchoActor = jugador.getWidth(); // Obtener el ancho del actor en píxeles
-                    float altoActor = jugador.getHeight(); // Obtener el alto del actor en píxeles
-
-                    float x_esquina = posX - (anchoActor / 2);
-                    float y_esquina = posY - (altoActor / 2);
-
-                    jugador.setPosition(x_esquina, y_esquina);
-                } else {
-                    float anchoActor = jugador.getWidth(); // Obtener el ancho del actor en píxeles
-                    float altoActor = jugador.getHeight(); // Obtener el alto del actor en píxeles
-
-                    float x_esquina = posX - (anchoActor / 2);
-                    float y_esquina = posY - (altoActor / 2);
-
-                    jugador.setPosition(x_esquina, y_esquina);
-                }
+                jugador.actualizarPosicion(posX, posY, mirandoDerecha);
             }
         });
     }
@@ -447,7 +431,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
                 @Override
                 public void run() {
                     Enemigo enemigo = (Enemigo) entidad;
-                    enemigo.actualizarPosicion(posX * 100, posY * 100);
+                    enemigo.actualizarPosicion(posX, posY);
                 }
             });
         }

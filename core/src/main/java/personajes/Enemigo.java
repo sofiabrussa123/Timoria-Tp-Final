@@ -101,7 +101,9 @@ public class Enemigo extends Actor implements IdManager{
     }
 
     public void actualizarPosicion(float x, float y) {
-        setPosition(x, y);
+        float yd = y * 100 - (altoHitbox / 2);
+        float xd = x * 100 - (anchoHitbox / 2);
+        setPosition(xd, yd);
         System.out.println("👹 Enemigo visual actualizado a (" + x + ", " + y + ")");
     }
 

@@ -25,8 +25,8 @@ public class Jugador extends Actor implements IdManager{
     private BarraVida barraVida;
     private BarraInventario barraInventario;
 
-    private float anchoHitbox = 0.4f;
-    private float altoHitbox = 0.7f;
+    private float anchoHitbox = 40f;
+    private float altoHitbox = 70f;
     private float velocidadBase = 5f;
     private float fuerzaSaltoBase = 7f;
     private float velocidadX = 0f;
@@ -89,7 +89,17 @@ public class Jugador extends Actor implements IdManager{
         this.vida = this.vidaMaxima;
     }
 
-    public void actualizarPosicion(float x, float y) {
+    // Jugador.java (Cliente)
+    /**
+     * ✅ Actualiza posición desde el servidor
+     */
+    public void actualizarPosicion(float posX, float posY, boolean mirandoDerecha) {
+        float x = posX * 100;
+        float y = posY * 100;
+
+        this.mirandoDerecha = mirandoDerecha;
+        this.mirandoIzquierda = !mirandoDerecha;
+        // 3. Establecer la posición
         setPosition(x, y);
     }
 
