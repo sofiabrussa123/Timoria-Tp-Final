@@ -6,11 +6,13 @@
 6.png
 7.png
 8.png
+Boton.png
 Daño.mp3
 Fondo.jpeg
 FondoNivel1.jpeg
 FondoTransparente.png
 Instrucciones.png
+META-INF/MANIFEST.MF
 Muerte.mp3
 Palanca1.png
 Palanca2.png
@@ -81,7 +83,6 @@ animaciones/run.png
 barraInventario.png
 barra_fondo.png
 barra_vida.png
-boton.png
 default.fnt
 enemigo.png
 font-small.fnt

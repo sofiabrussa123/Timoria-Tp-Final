@@ -246,7 +246,7 @@ public class HiloCliente extends Thread {
 
                 default:
                     if (this.gameController != null) {
-                        this.gameController.procesarAccionesEntidades(parts);
+                        System.err.println("❌ Error, el mensaje está mal redactado o es extraño: " + message);
                     }
                     break;
             }

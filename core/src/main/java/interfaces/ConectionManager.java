@@ -5,5 +5,5 @@ public interface ConectionManager {
     void empezarHistoria();
     void empezarJuego();
     void servidorDesconectado();
-    void reiniciarNivel(); // ✅ NUEVO
+    void reiniciarNivel();
 }

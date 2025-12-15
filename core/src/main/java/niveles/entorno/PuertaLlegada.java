@@ -19,7 +19,6 @@ public class PuertaLlegada extends ElementoEntorno {
 
     public void desbloquear() {
         estaBloqueada = false;
-<<<<<<< HEAD
 
         Gdx.app.postRunnable(new Runnable() {
             @Override
@@ -30,8 +29,5 @@ public class PuertaLlegada extends ElementoEntorno {
                 textura = new Texture(Gdx.files.internal("puertaAbierta.png"));
             }
         });
-=======
-        textura = new Texture(Gdx.files.internal("puertaAbierta.png"));
->>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     }
 }
