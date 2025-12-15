@@ -166,7 +166,6 @@ public class HiloServidor extends Thread {
                 clientes.add(nuevoCliente);
                 enviarMensaje("Conectado:"+clientesConectados, paquete.getAddress(), paquete.getPort());
 
-
                 if(clientesConectados == MAX_CLIENTES) {
                     this.enviarMensajeATodos("EmpezarHistoria");
                 }
@@ -292,7 +291,6 @@ public class HiloServidor extends Thread {
             }
         }
     }
-
 
     private int encontrarIndiceCliente(DatagramPacket paquete) {
         int i = 0;

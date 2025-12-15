@@ -33,7 +33,6 @@ public class LlaveActivadora extends ElementoActivador {
         if (!this.activado) {
             this.puerta.desbloquear();
             this.activado = true;
-
         }
     }
 

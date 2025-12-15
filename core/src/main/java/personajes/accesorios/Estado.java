@@ -40,7 +40,6 @@ public enum Estado {
                 "La hoja de sprites no contiene cuadros o no se ha cargado correctamente: " + rutaHoja
             );
         }
-
         return new Animation<TextureRegion>(duracionFrame, cuadros);
     }
 }

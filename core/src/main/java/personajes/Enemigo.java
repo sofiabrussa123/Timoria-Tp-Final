@@ -216,4 +216,6 @@ public class Enemigo {
             return jugador1;
         }
     }
+
+    public void dispose(){}
 }

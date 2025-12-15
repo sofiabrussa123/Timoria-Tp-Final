@@ -76,7 +76,6 @@ public class Nivel1 extends NivelBase {
 
         Enemigo enemigo = new Enemigo(mundo, 400, 150, this, idEnemigo);
 
-
         palanca.setHiloServidor(hiloServidor);
         plataformaMovil.setHiloServidor(hiloServidor);
         puerta.setHiloServidor(hiloServidor);
