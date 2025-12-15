@@ -268,7 +268,6 @@ public class Jugador extends Actor implements IdManager{
     public BarraInventario getBarraInventario() {
         return this.barraInventario;
     }
-
     public int getVidaMaxima() {
         return this.vidaMaxima;
     }

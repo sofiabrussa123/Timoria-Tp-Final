@@ -7,7 +7,14 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+<<<<<<< HEAD
 import com.badlogic.gdx.math.Vector2;
+=======
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -21,12 +28,21 @@ import Red.HiloCliente;
 import globales.EsceneManager;
 import interfaces.GameController;
 import interfaces.IdManager;
+<<<<<<< HEAD
 import pantallas.Menu;
 import pantallas.MenuPausa;
 import pantallas.PantallaDeMuerte;
 import pantallas.PantallaGanaste;
 import personajes.accesorios.BarraInventario;
 import personajes.accesorios.BarraVida;
+=======
+import interfaces.Menu;
+import interfaces.MenuPausa;
+import interfaces.PantallaDeMuerte;
+import interfaces.PantallaGanaste;
+import niveles.entorno.BarraInventario;
+import niveles.entorno.BarraVida;
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
 import niveles.entorno.LlaveActivadora;
 import niveles.entorno.Palanca;
 import niveles.entorno.Plataforma;
@@ -34,8 +50,12 @@ import niveles.entorno.PlataformaMovil;
 import niveles.entorno.PuertaLlegada;
 import personajes.Enemigo;
 import personajes.Jugador;
+<<<<<<< HEAD
 import personajes.accesorios.MejoraTemporal;
 import personajes.accesorios.Estado;
+=======
+import personajes.MejoraTemporal;
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
 
 public abstract class NivelBase extends EscenaBase implements GameController{
 
@@ -63,6 +83,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
     private Queue<Runnable> accionesBox2DPendientes = new Queue<Runnable>();
 
+<<<<<<< HEAD
+=======
+    // ✅ Control de estados previos para evitar envíos repetidos
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     private String estadoAnteriorJ1 = "";
     private String estadoAnteriorJ2 = "";
     private boolean teclaWSaltoPrevioJ1 = false;
@@ -190,8 +214,15 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             }
         }
 
+<<<<<<< HEAD
         aplicarControlesOptimizados();
 
+=======
+        // ✅ OPTIMIZADO: Aplicar controles SOLO cuando cambian
+        aplicarControlesOptimizados();
+
+        // Verificar muerte
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
         if (this.jugador1 != null && this.jugador1.getVida() == 0) {
             this.cambiarEscena(new PantallaDeMuerte(this.juego, 1, hiloCliente));
         }
@@ -206,6 +237,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         procesarAccionesBox2DPendientes();
     }
 
+<<<<<<< HEAD
+=======
+    // ✅ Controles optimizados - Solo enviar cuando CAMBIA el estado
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     private void aplicarControlesOptimizados() {
         if (idJugadorActivo == 1 && this.jugador1 != null) {
             String estadoActual = "";
@@ -213,9 +248,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             if (this.inputManager.getIsAPressed()) {
                 estadoActual = "MoverIzquierda";
                 if (!estadoAnteriorJ1.equals(estadoActual)) {
+<<<<<<< HEAD
                     jugador1.setEstadoAnimacion(Estado.CORRIENDO);
                     jugador1.setDireccion(false); // Mirando izquierda
 
+=======
+                    jugador1.moverIzquierda(); // Predicción local
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
                     if (hiloCliente != null) {
                         hiloCliente.enviarMensaje("Input:1:MoverIzquierda");
                     }
@@ -223,9 +262,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             } else if (this.inputManager.getIsDPressed()) {
                 estadoActual = "MoverDerecha";
                 if (!estadoAnteriorJ1.equals(estadoActual)) {
+<<<<<<< HEAD
                     jugador1.setEstadoAnimacion(Estado.CORRIENDO);
                     jugador1.setDireccion(true); // Mirando derecha
 
+=======
+                    jugador1.moverDerecha();
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
                     if (hiloCliente != null) {
                         hiloCliente.enviarMensaje("Input:1:MoverDerecha");
                     }
@@ -233,8 +276,12 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             } else {
                 estadoActual = "Detener";
                 if (!estadoAnteriorJ1.equals(estadoActual)) {
+<<<<<<< HEAD
                     jugador1.setEstadoAnimacion(Estado.QUIETO);
 
+=======
+                    jugador1.detener();
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
                     if (hiloCliente != null) {
                         hiloCliente.enviarMensaje("Input:1:Detener");
                     }
@@ -243,6 +290,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
             estadoAnteriorJ1 = estadoActual;
 
+<<<<<<< HEAD
+=======
+            // Salto - solo una vez por presión
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
             if (this.inputManager.getIsWPressed()) {
                 if (!teclaWSaltoPrevioJ1 && !this.jugador1.getEnElAire()) {
                     if (hiloCliente != null) {
@@ -254,6 +305,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
                 teclaWSaltoPrevioJ1 = false;
             }
 
+<<<<<<< HEAD
+=======
+            // Ataque - solo una vez por presión
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
             if (this.inputManager.getIsOPressed()) {
                 if (hiloCliente != null) {
                     hiloCliente.enviarMensaje("Input:1:Atacar");
@@ -268,9 +323,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             if (this.inputManager.getIsLeftPressed()) {
                 estadoActual = "MoverIzquierda";
                 if (!estadoAnteriorJ2.equals(estadoActual)) {
+<<<<<<< HEAD
                     jugador2.setEstadoAnimacion(Estado.CORRIENDO);
                     jugador2.setDireccion(false);
 
+=======
+                    jugador2.moverIzquierda();
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
                     if (hiloCliente != null) {
                         hiloCliente.enviarMensaje("Input:2:MoverIzquierda");
                     }
@@ -278,9 +337,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             } else if (this.inputManager.getIsRightPressed()) {
                 estadoActual = "MoverDerecha";
                 if (!estadoAnteriorJ2.equals(estadoActual)) {
+<<<<<<< HEAD
                     jugador2.setEstadoAnimacion(Estado.CORRIENDO);
                     jugador2.setDireccion(true);
 
+=======
+                    jugador2.moverDerecha();
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
                     if (hiloCliente != null) {
                         hiloCliente.enviarMensaje("Input:2:MoverDerecha");
                     }
@@ -288,8 +351,12 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             } else {
                 estadoActual = "Detener";
                 if (!estadoAnteriorJ2.equals(estadoActual)) {
+<<<<<<< HEAD
                     jugador2.setEstadoAnimacion(Estado.QUIETO);
 
+=======
+                    jugador2.detener();
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
                     if (hiloCliente != null) {
                         hiloCliente.enviarMensaje("Input:2:Detener");
                     }
@@ -319,7 +386,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         }
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
@@ -340,10 +410,35 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         entidades.put(elemento.getId(), (Actor)elemento);
     }
 
+<<<<<<< HEAD
+=======
+    protected int asignarIdEntidad() {
+        this.cantEntidades++;
+        return this.cantEntidades;
+    }
+
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     public void setHiloCliente(HiloCliente hiloCliente) {
         this.hiloCliente = hiloCliente;
     }
 
+<<<<<<< HEAD
+=======
+    // =========================================================================
+    // GameController - Recepción de Estados
+    // =========================================================================
+
+    @Override
+    public void procesarAccionesEntidades(String[] mensaje) {
+        // No usado
+    }
+
+    @Override
+    public void cambiarPantalla() {
+        // No usado
+    }
+
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     @Override
     public void recogerItem(int idLlave, int idJugador) {
         Actor entidad = this.entidades.get(idLlave);
@@ -358,20 +453,28 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
     @Override
     public void moverPlataformaMovil(int id, float posX, float posY) {
+<<<<<<< HEAD
 
         final Actor entidad = this.entidades.get(id);
 
         if (entidad instanceof PlataformaMovil) {
 
+=======
+        final Actor entidad = this.entidades.get(id);
+        if (entidad instanceof PlataformaMovil) {
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
             encolarAccionBox2D(new Runnable() {
                 @Override
                 public void run() {
                     ((PlataformaMovil) entidad).moverDesdeServidor(posX, posY);
                 }
             });
+<<<<<<< HEAD
         } else {
             System.err.println("❌ [CLIENTE] PlataformaMovil ID " + id + " NO encontrada. Entidad: " + (entidad != null ? entidad.getClass().getName() : "null"));
             System.err.println("📋 [CLIENTE] IDs disponibles: " + entidades.keySet());
+=======
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
         }
     }
 
@@ -384,7 +487,18 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     }
 
     @Override
+<<<<<<< HEAD
     public void actualizarPosicionJugador(int id, float posX, float posY, boolean mirandoDerecha) {
+=======
+    public void procesarAccionesJugador(String[] mensaje, int idJugador) {
+        // Manejado por casos específicos
+    }
+
+    @Override
+    public void actualizarPosicionJugador(int id, float posX, float posY, boolean mirandoDerecha) {
+        // ✅ NUEVO ENFOQUE: Actualizar AMBOS jugadores, pero con interpolación diferente
+
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
         Jugador jugador = (id == 1) ? this.jugador1 : this.jugador2;
         if (jugador == null) return;
 
@@ -397,9 +511,17 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     }
 
     public void renderFondoPausado(float delta) {
+<<<<<<< HEAD
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+=======
+        // Limpiar pantalla
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Dibujar el escenario tal como está (sin actualizar)
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
         escena.getViewport().apply();
         escena.draw();
     }
@@ -443,6 +565,10 @@ public abstract class NivelBase extends EscenaBase implements GameController{
             int vidaAnterior = jugador.getVida();
             jugador.setVida(nuevaVida);
 
+<<<<<<< HEAD
+=======
+            // ✅ REPRODUCIR SONIDO si es MI jugador Y recibió daño (no curación)
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
             if (idJugador == idJugadorActivo && nuevaVida < vidaAnterior) {
                 jugador.reproducirSonidoDaño();
             }
@@ -450,6 +576,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     }
 
     @Override
+<<<<<<< HEAD
     public void mostrarAtaqueEnemigo(int idEnemigo) {
         final Actor entidad = this.entidades.get(idEnemigo);
 
@@ -482,12 +609,15 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     }
 
     @Override
+=======
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     public void procesarAccionesEnemigo(String[] mensaje, int idEnemigo) {
         // Manejado
     }
 
     @Override
     public void desaparecerEnemigo(int id) {
+<<<<<<< HEAD
         final Actor entidad = this.entidades.get(id);
 
         if (entidad instanceof Enemigo) {
@@ -506,6 +636,13 @@ public abstract class NivelBase extends EscenaBase implements GameController{
                     }
                 }
             });
+=======
+        Actor entidad = this.entidades.get(id);
+        if (entidad instanceof Enemigo) {
+            Enemigo enemigo = (Enemigo) entidad;
+            enemigo.eliminar();
+            enemigo.dispose();
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
         }
     }
 
@@ -514,8 +651,11 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         Actor entidad = this.entidades.get(idPalanca);
         if (entidad instanceof Palanca) {
             ((Palanca) entidad).activar();
+<<<<<<< HEAD
         } else {
             System.err.println("❌ [CLIENTE] No se encontró palanca con ID: " + idPalanca);
+=======
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
         }
     }
 
@@ -547,11 +687,23 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     public void mostrarAtaqueJugador(int idJugador) {
         Jugador jugador = (idJugador == 1) ? this.jugador1 : this.jugador2;
         if (jugador != null) {
+<<<<<<< HEAD
+=======
+            // Mostrar animación de ataque visualmente
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
             jugador.setFrameAnimacion(0, jugador.getMirandoDerecha());
         }
     }
 
     @Override
+<<<<<<< HEAD
+=======
+    public void empezarJuego() {
+        // No usado
+    }
+
+    @Override
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     public void conectar(int idJugador) {
         this.idJugadorActivo = idJugador;
 
@@ -569,6 +721,19 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         cambiarEscena(new Menu(this.juego));
     }
 
+<<<<<<< HEAD
+=======
+    @Override
+    public void terminarJuego() {
+        volverAlMenu();
+    }
+
+    @Override
+    public void desconectar() {
+
+    }
+
+>>>>>>> c3bf54b67a97052204f07f4e9aa74e62d547785f
     protected void setFriendlyFire(boolean b) {
     }
 }

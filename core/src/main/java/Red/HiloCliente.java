@@ -205,7 +205,6 @@ public class HiloCliente extends Thread {
                         int idPlataforma = Integer.parseInt(parts[1]);
                         float posX = Float.parseFloat(parts[2]);
                         float posY = Float.parseFloat(parts[3]);
-
                         this.gameController.moverPlataformaMovil(idPlataforma, posX, posY);
                     }
                     break;
