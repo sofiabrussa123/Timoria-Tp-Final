@@ -408,7 +408,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         encolarAccionBox2D(new Runnable() {
             @Override
             public void run() {
-                if (id == idJugadorActivo) {¿
+                if (id == idJugadorActivo) {
                     float anchoActor = jugador.getWidth(); // Obtener el ancho del actor en píxeles
                     float altoActor = jugador.getHeight(); // Obtener el alto del actor en píxeles
 
