@@ -9,6 +9,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -401,7 +408,7 @@ public abstract class NivelBase extends EscenaBase implements GameController{
         encolarAccionBox2D(new Runnable() {
             @Override
             public void run() {
-                if (id == idJugadorActivo) {
+                if (id == idJugadorActivo) {¿
                     float anchoActor = jugador.getWidth(); // Obtener el ancho del actor en píxeles
                     float altoActor = jugador.getHeight(); // Obtener el alto del actor en píxeles
 

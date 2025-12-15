@@ -25,7 +25,7 @@ public class Enemigo extends Actor implements IdManager{
     private boolean muerto = false;
     private int id;
 
-    public Enemigo(float x, float y, int id) {
+    public Enemigo(float x, float y, int id){
         this.id = id;
         this.textura = new Texture("enemigo.png");
         this.anchoHitbox = 48;

@@ -15,8 +15,13 @@ public abstract class ElementoActivador extends ElementoEntorno {
     protected Texture textura;
 
     // Constructor base para elementos activadores
+<<<<<<< HEAD
     protected ElementoActivador(float x, float y, int id) {
         super(x, y, 1, 2, id);
+=======
+    protected ElementoActivador(World mundo, float x, float y, int id) {
+        super(mundo, x, y, id);
+>>>>>>> 59553da028e5f56236ed3268a3004e76c8921828
     }
 
     // Crea y posiciona el cuerpo físico del elemento como sensor
@@ -24,6 +29,15 @@ public abstract class ElementoActivador extends ElementoEntorno {
     protected void crearYPosicionarCuerpo(float ancho, float alto) {
         super.ancho = ancho;
         super.alto = alto;
+<<<<<<< HEAD
+=======
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.isSensor = true; // Configurar como sensor (sin colisión física)
+
+        super.setFixtureDef(fixtureDef);
+        super.crearYPosicionarCuerpo();
+>>>>>>> 59553da028e5f56236ed3268a3004e76c8921828
     }
 
     @Override
