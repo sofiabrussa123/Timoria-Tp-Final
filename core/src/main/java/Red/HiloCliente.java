@@ -16,11 +16,11 @@ public class HiloCliente extends Thread {
 
     private DatagramSocket socket;
     private int puertoServidor = 5555;
-    private String ipServidorStr = "localhost";
+    private String ipServidorStr = "255.255.255.255";
     private InetAddress ipServidor;
     private boolean end = false;
     private GameController gameController;
-    private int idAsignado;
+    private int idAsignado = -1;
     private ControladorDeConexiones controladorDeConexiones;
     private Game juego;
 
@@ -31,6 +31,7 @@ public class HiloCliente extends Thread {
         try {
             ipServidor = InetAddress.getByName(ipServidorStr);
             socket = new DatagramSocket();
+            socket.setBroadcast(true);
         } catch (SocketException | UnknownHostException e) {
             System.err.println("Error al inicializar HiloCliente: " + e.getMessage());
         }
@@ -43,7 +44,7 @@ public class HiloCliente extends Thread {
             try {
                 if(this.idAsignado == -1){
                     socket.setSoTimeout(5000);
-                }
+                } else socket.setSoTimeout(0);
                 socket.receive(packet);
                 procesarMensaje(packet);
             } catch (java.net.SocketTimeoutException e) {

@@ -16,7 +16,7 @@ public class BarraInventario extends Actor {
     public BarraInventario(Jugador jugador, boolean posicionIzquierda) {
         this.jugador = jugador;
         this.posicionIzquierda = posicionIzquierda;
-        this.slotVacio = new Texture("barraInventario.png");
+        this.slotVacio = new Texture("plataforma.jpg");
         this.iconos = new Texture[5];
 
         for (int i = 0; i < this.iconos.length; i++) {

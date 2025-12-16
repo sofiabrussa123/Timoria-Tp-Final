@@ -22,7 +22,7 @@ public abstract class ElementoEntorno extends Actor implements IdManager {
         this.ancho = ancho;
         this.alto = alto;
 
-        setBounds(x + 37.5f, y, ancho, alto);
+        setBounds(x, y, ancho, alto);
     }
 
     @Override

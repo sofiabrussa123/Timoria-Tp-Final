@@ -8,11 +8,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -47,7 +42,6 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     protected static MejoraTemporal mejorasJugador1 = new MejoraTemporal();
     protected static MejoraTemporal mejorasJugador2 = new MejoraTemporal();
 
-    protected World mundo;
     protected ExtendViewport viewport;
     protected float anchoViewport;
     protected float altoViewport;
@@ -72,12 +66,9 @@ public abstract class NivelBase extends EscenaBase implements GameController{
     public NivelBase(Game juego, String fondo) {
         super(juego, fondo);
 
-        this.mundo = new World(new Vector2(0f, -25f), true);
         this.viewport = new ExtendViewport(anchoPantalla, altoPantalla);
         this.anchoViewport = anchoPantalla * PIXELES_A_METROS;
         this.altoViewport = altoPantalla * PIXELES_A_METROS;
-
-        this.establecerContactos();
     }
 
     public void encolarAccionBox2D(Runnable accion) {
@@ -112,47 +103,6 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
     public void setPersonaje(Jugador personaje) {
         this.personaje = personaje;
-    }
-
-    private void establecerContactos() {
-        this.mundo.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                Object a = contact.getFixtureA().getBody().getUserData();
-                Object b = contact.getFixtureB().getBody().getUserData();
-
-                if ((a instanceof Jugador && b instanceof PuertaLlegada) ||
-                    (b instanceof Jugador && a instanceof PuertaLlegada)) {
-                    PuertaLlegada puerta = (a instanceof PuertaLlegada) ? (PuertaLlegada) a : (PuertaLlegada) b;
-                    if (puerta.sePuedeCruzar()) {
-                        cambiarEscena(new PantallaGanaste(juego));
-                    }
-                }
-
-                if (a instanceof Jugador && b instanceof LlaveActivadora ||
-                    b instanceof Jugador && a instanceof LlaveActivadora) {
-                    LlaveActivadora llave = a instanceof LlaveActivadora ? (LlaveActivadora) a : (LlaveActivadora) b;
-                    Jugador personaje = a instanceof Jugador ? (Jugador) a : (Jugador) b;
-                    llave.activarConJugador(personaje);
-                }
-
-                if (a instanceof Jugador && b instanceof Palanca ||
-                    b instanceof Jugador && a instanceof Palanca) {
-                    Palanca palanca = a instanceof Palanca ? (Palanca) a : (Palanca) b;
-                    palanca.activar();
-                }
-
-                if ((a instanceof Jugador && (b instanceof Plataforma || b instanceof PlataformaMovil)) ||
-                    (b instanceof Jugador && (a instanceof Plataforma || a instanceof PlataformaMovil))) {
-                    Jugador personaje = (a instanceof Jugador) ? (Jugador) a : (Jugador) b;
-                    personaje.setEnElAire(false);
-                }
-            }
-
-            @Override public void endContact(Contact contact) { }
-            @Override public void preSolve(Contact contact, Manifold oldManifold) { }
-            @Override public void postSolve(Contact contact, ContactImpulse impulse) { }
-        });
     }
 
     @Override
@@ -202,7 +152,6 @@ public abstract class NivelBase extends EscenaBase implements GameController{
 
         super.render(delta);
 
-        mundo.step(1 / 60f, 6, 2);
         procesarAccionesBox2DPendientes();
     }
 

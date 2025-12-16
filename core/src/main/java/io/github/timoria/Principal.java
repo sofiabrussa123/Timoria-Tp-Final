@@ -16,6 +16,9 @@ public class Principal extends Game {
 
     @Override
     public void dispose(){
-        if(menu.getControlador() != null) menu.getControlador().getHiloCliente().enviarMensaje("Desconectar");
+        if(menu.getControlador() != null) {
+            menu.getControlador().getHiloCliente().enviarMensaje("Desconectar");
+            menu.getControlador().getHiloCliente().terminar();
+        }
     }
 }
