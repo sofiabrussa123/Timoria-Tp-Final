@@ -93,6 +93,7 @@ public class HiloCliente extends Thread {
 
                 case "Lleno":
                     System.out.println("Servidor lleno");
+                    controladorDeConexiones.servidorLleno();
                     this.end = true;
                     break;
 

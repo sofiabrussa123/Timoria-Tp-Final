@@ -186,6 +186,28 @@ public class ControladorDeConexiones extends EscenaBase implements ConectionMana
         });
     }
 
+    @Override
+    public void servidorLleno() {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                lblEstado.setText("SERVIDOR LLENO");
+                lblEstado.setColor(Color.RED);
+                lblMensaje.setText("El servidor está lleno. Volviendo al menú...");
+
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        if (hiloCliente != null) {
+                            hiloCliente.terminar();
+                        }
+                        cambiarEscena(new Menu(juego));
+                    }
+                }, 3);
+            }
+        });
+    }
+
     public void cambiarAPantallaGanaste() {
         juego.setScreen(new PantallaGanaste(juego));
     }

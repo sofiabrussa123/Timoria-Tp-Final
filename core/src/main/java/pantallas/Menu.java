@@ -98,4 +98,9 @@ public class Menu extends EscenaBase {
     public void show() {
         Gdx.input.setInputProcessor(this.escena);
     }
+
+    @Override
+    public void dispose(){
+        this.musica.dispose();
+    }
 }

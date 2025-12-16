@@ -6,4 +6,5 @@ public interface ConectionManager {
     void empezarJuego();
     void servidorDesconectado();
     void reiniciarNivel();
+    void servidorLleno();
 }

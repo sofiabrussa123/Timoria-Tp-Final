@@ -38,6 +38,7 @@ public class Nivel1 extends NivelBase {
         }
 
         super.show();
+        inicializarNivel();
 
         if (idJugadorActivo == 1) {
             super.jugador1.setEsMiJugador(true);
@@ -45,11 +46,6 @@ public class Nivel1 extends NivelBase {
         } else if (idJugadorActivo == 2) {
             super.jugador1.setEsMiJugador(false);
             super.jugador2.setEsMiJugador(true);
-        }
-
-        if (!inicializado) {
-            inicializarNivel();
-            inicializado = true;
         }
     }
 
@@ -68,11 +64,13 @@ public class Nivel1 extends NivelBase {
         Plataforma piso = new Plataforma(0, 10, 1000, 50, idPiso);
         Plataforma plataforma2 = new Plataforma(495, 200, 75, 20, idPlat2);
         Plataforma plataforma3 = new Plataforma(80, 250, 95, 20, idPlat3);
+        Plataforma muroIzquierdo = new Plataforma(-10, 0, 20, 1000, 100);
+        Plataforma muroDerecho = new Plataforma(620, 0, 20, 1000, 101);
 
         Palanca palanca = new Palanca(170, 120, idPalanca);
         PlataformaMovil plataformaMovil = new PlataformaMovil(200, 130, palanca, idPlatMovil);
 
-        PuertaLlegada puerta = new PuertaLlegada(590, 50, idPuerta);
+        PuertaLlegada puerta = new PuertaLlegada(580, 60, idPuerta);
         LlaveActivadora llave = new LlaveActivadora(532, 210, puerta, idLlave);
 
         Enemigo enemigo = new Enemigo(400, 150, idEnemigo);
@@ -87,6 +85,9 @@ public class Nivel1 extends NivelBase {
         añadirElemento(puerta);
         añadirElemento(llave);
         añadirElemento(enemigo);
+        añadirElemento(muroIzquierdo);
+        añadirElemento(muroDerecho);
+        añadirElemento(muroIzquierdo);
     }
 
     @Override
