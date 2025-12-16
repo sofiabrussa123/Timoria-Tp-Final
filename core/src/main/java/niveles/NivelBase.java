@@ -209,30 +209,29 @@ public abstract class NivelBase implements Screen, GameController {
             if (hiloServidor != null) {
                 hiloServidor.enviarMensajeATodos("Jugador:1:Matar");
             }
-            jugador1MuerteNotificada = true; // ✅ Marcar como notificado
+            jugador1MuerteNotificada = true;
         }
 
         if (this.jugador2 != null && this.jugador2.getVida() == 0 && !jugador2MuerteNotificada) {
             if (hiloServidor != null) {
                 hiloServidor.enviarMensajeATodos("Jugador:2:Matar");
             }
-            jugador2MuerteNotificada = true; // ✅ Marcar como notificado
+            jugador2MuerteNotificada = true;
         }
     }
 
     private void verificarCaidaJugadores() {
-        // Detectar si los jugadores cayeron fuera del mapa (Y < -2 metros)
         if (jugador1 != null && jugador1.getCuerpo() != null) {
-            float posY = jugador1.getCuerpo().getPosition().y;
-            if (posY < -2f && jugador1.getVida() > 0) {
-                jugador1.recibirDaño(jugador1.getVida()); // Muerte instantánea
+            float posX = jugador1.getCuerpo().getPosition().x;
+            if (posX < -2f && jugador1.getVida() > 0) {
+                jugador1.recibirDaño(jugador1.getVida());
             }
         }
 
         if (jugador2 != null && jugador2.getCuerpo() != null) {
             float posY = jugador2.getCuerpo().getPosition().y;
             if (posY < -2f && jugador2.getVida() > 0) {
-                jugador2.recibirDaño(jugador2.getVida()); // Muerte instantánea
+                jugador2.recibirDaño(jugador2.getVida());
             }
         }
     }

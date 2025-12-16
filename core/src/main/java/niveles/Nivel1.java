@@ -26,8 +26,8 @@ public class Nivel1 extends NivelBase {
         this.setFriendlyFire(true);
 
 
-        Plataforma muroIzquierdo = new Plataforma(mundo, -10, 0, 10, 1000, 100);
-        Plataforma muroDerecho = new Plataforma(mundo, 1000, 0, 10, 1000, 101);
+        Plataforma muroIzquierdo = new Plataforma(mundo, -10, 0, 20, 1000, 100);
+        Plataforma muroDerecho = new Plataforma(mundo, 620, 0, 20, 1000, 101);
 
         agregarEntidad(muroIzquierdo, 100);
         agregarEntidad(muroDerecho, 101);
@@ -71,7 +71,7 @@ public class Nivel1 extends NivelBase {
         Palanca palanca = new Palanca(mundo, 170, 120, idPalanca);
         PlataformaMovil plataformaMovil = new PlataformaMovil(mundo, 200, 130, 2, 200, palanca, idPlatMovil);
 
-        PuertaLlegada puerta = new PuertaLlegada(mundo, 590, 50, idPuerta);
+        PuertaLlegada puerta = new PuertaLlegada(mundo, 580, 60, idPuerta);
         LlaveActivadora llave = new LlaveActivadora(mundo, 532, 210, puerta, idLlave);
 
         Enemigo enemigo = new Enemigo(mundo, 400, 150, this, idEnemigo);
@@ -82,7 +82,6 @@ public class Nivel1 extends NivelBase {
         llave.setHiloServidor(hiloServidor);
         enemigo.setHiloServidor(hiloServidor);
 
-        // ✅ Agregar al mapa de entidades (no al escenario en servidor headless)
         agregarEntidad(super.jugador1, super.jugador1.getIdJugador());
         agregarEntidad(super.jugador2, super.jugador2.getIdJugador());
         agregarEntidad(piso, idPiso);

@@ -37,6 +37,7 @@ public class Menu extends EscenaBase {
         table.setFillParent(true);
         super.escena.addActor(table);
 
+        /*
         TextButton botonJugar = new TextButton("Jugar", super.fuenteTextos);
         botonJugar.addListener(new ClickListener() {
             @Override
@@ -47,7 +48,7 @@ public class Menu extends EscenaBase {
                 System.out.println("⏳ Esperando a que los clientes se conecten y completen la historia...");
             }
         });
-
+*/
         TextButton botonMusicaMenu = new TextButton("Silenciar Música", super.fuenteTextos);
         botonMusicaMenu.addListener(new ClickListener() {
             @Override
@@ -64,6 +65,7 @@ public class Menu extends EscenaBase {
             }
         });
 
+        /*
         TextButton btnInstrucciones = new TextButton("Instrucciones", super.fuenteTextos);
         btnInstrucciones.addListener(new ClickListener() {
             @Override
@@ -75,11 +77,12 @@ public class Menu extends EscenaBase {
 
         table.add(botonJugar).width(350).height(40).padBottom(15);
         table.row();
-
+*/
         table.add(botonMusicaMenu).width(350).height(40).padBottom(15);
         table.row();
 
-        table.add(btnInstrucciones).width(350).height(40);
+        //table.add(btnInstrucciones).width(350).height(40);
+
     }
 
     @Override

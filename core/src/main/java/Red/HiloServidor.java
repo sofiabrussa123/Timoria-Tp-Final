@@ -6,8 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -32,9 +30,6 @@ public class HiloServidor extends Thread {
 
     private int jugadoresListosParaReiniciar = 0;
     private boolean esperandoReinicio = false;
-
-    private Map<Integer, String> ultimosEstadosJugadores = new HashMap<>();
-    private Map<Integer, String> ultimosEstadosEnemigos = new HashMap<>();
 
     public HiloServidor(Game juego) {
         this.juego = juego;
@@ -71,8 +66,6 @@ public class HiloServidor extends Thread {
         this.juegoIniciado = false;
         this.clientes.clear();
         this.gameController = null;
-        this.ultimosEstadosJugadores.clear();
-        this.ultimosEstadosEnemigos.clear();
 
         this.jugadoresListosParaReiniciar = 0;
         this.esperandoReinicio = false;
