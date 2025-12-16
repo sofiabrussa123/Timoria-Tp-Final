@@ -323,12 +323,6 @@ public class HiloServidor extends Thread {
         this.fin = true;
         this.juegoIniciado = false;
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         if (socket != null && !socket.isClosed()) {
             socket.close();
         }
@@ -343,9 +337,7 @@ public class HiloServidor extends Thread {
     }
 
     public void desconectarClientes() {
-        for (Cliente cliente : clientes) {
-            enviarMensaje("Desconectar", cliente.getIp(), cliente.getPuerto());
-        }
+        enviarMensajeATodos("Desconectar");
         this.clientes.clear();
         this.clientesConectados = 0;
     }

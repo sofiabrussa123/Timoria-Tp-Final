@@ -4,6 +4,7 @@ Fondo.jpeg
 FondoNivel1.jpeg
 FondoTransparente.png
 Instrucciones.png
+META-INF/MANIFEST.MF
 Muerte.mp3
 Palanca1.png
 Palanca2.png
